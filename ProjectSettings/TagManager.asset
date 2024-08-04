@@ -20,7 +20,7 @@ TagManager:
   - player body
   - 
   - bullet
-  - 
+  - magazine
   - ground
   - 
   - 
@@ -45,3 +45,6 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  - wepon
+  - player
+  - magazine

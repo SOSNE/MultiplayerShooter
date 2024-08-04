@@ -4,6 +4,7 @@ public class bullet : MonoBehaviour
 {
     public float bulletSpeed = 10f;
     private Rigidbody2D rb;
+    public GameObject bloodParticleSystem;
     
     public GameObject GetHighestParent(GameObject child)
         {
@@ -25,14 +26,18 @@ public class bullet : MonoBehaviour
     void FixedUpdate()
     {
         Vector2 forwardDirection = transform.right;
-        rb.linearVelocity += forwardDirection * -bulletSpeed;
+        rb.linearVelocity = forwardDirection * -bulletSpeed;
     }
     
     private void OnTriggerEnter2D(Collider2D target)
     {
         if (GetHighestParent(target.gameObject).CompareTag("player"))
         {
+            
+
             print(target.gameObject.name);
+            Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180));
+            Destroy(gameObject);
         }
     }
 }

@@ -15,7 +15,7 @@ public class playerMovment : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (weapon.position.x > transform.position.x)
+        if (weapon.position.x >= transform.position.x+0.1f)
         {
             transform.rotation = Quaternion.Euler(new Vector2(0, 180));
         }
