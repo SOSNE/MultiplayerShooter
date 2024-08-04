@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 358094113}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ef1ddbde43aa764da42de1c0b015731, type: 3}
+  m_Script: {fileID: 11500000, guid: 51184565eca7b4debbbc13fc104b9598, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ammoCounter: {fileID: 430349437}
@@ -366,7 +366,7 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 3477146210293715247, guid: 0cfc213c33a41594e8b2e65f5aff6dd6, type: 3}
     Prefabs:
       NetworkPrefabsLists:
-      - {fileID: 11400000, guid: 9dec412b6b7d98c43a549383639fbae8, type: 2}
+      - {fileID: 11400000, guid: b5dc6ff99f4ce4164a6a57d5b82b8670, type: 2}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -1028,7 +1028,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 710964065}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70f9a022c7e0754488bb75a4133fc060, type: 3}
+  m_Script: {fileID: 11500000, guid: e0ca10b7b4a9f448f80dc8406a9831ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   host: {fileID: 1229407105}
@@ -1211,9 +1211,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Host
-
-'
+  m_text: Host
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
