@@ -4,27 +4,42 @@ using UnityEngine;
 public class playerMovment : MonoBehaviour
 {
     public float movementSpeed, jumpHeight;
-    public Transform weapon;
-    private Rigidbody2D rb;
+    public Transform centerOfPlayer;
+    private Rigidbody2D _rb;
     private bool grounded;
+    private Camera _camera;
+
     void Start()
     { 
-        rb = GetComponent<Rigidbody2D>();
+        _camera = Camera.main;
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private Quaternion _targetRotation;
+    private float _timer;
+    
+    void FixedUpdate()
     {
-        if (weapon.position.x >= transform.position.x+0.1f)
+        Vector3 mouseScreenPosition = Input.mousePosition;
+        Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mouseScreenPosition);
+        
+        float distance = mouseWorldPosition.x - centerOfPlayer.position.x;
+        if (Mathf.Abs(distance) > 0.1f)
         {
-            transform.rotation = Quaternion.Euler(new Vector2(0, 180));
-        }
-        else
-        {
-            transform.rotation = Quaternion.Euler(new Vector2(0, 0));
+            if (distance > 0)
+            {
+                
+                transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+            }
+            else
+            {
+                
+                transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+            }
+
+            
         }
         
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
         
         if (Input.GetKeyDown(KeyCode.W) && grounded )
         {

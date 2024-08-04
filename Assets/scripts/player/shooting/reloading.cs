@@ -65,7 +65,7 @@ public class reloading : MonoBehaviour
         {
             while (Vector2.Distance(leftHandTarget.position, waypoint[_index].position) > 0.01f)
             {
-                leftHandTarget.position = Vector2.MoveTowards(leftHandTarget.position, waypoint[_index].position, 10 * Time.deltaTime);
+                leftHandTarget.position = Vector2.MoveTowards(leftHandTarget.position, waypoint[_index].position, 7 * Time.deltaTime);
                 yield return null; 
             }
             
