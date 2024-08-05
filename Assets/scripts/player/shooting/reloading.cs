@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Unity.Netcode;
 
-public class reloading : MonoBehaviour
+public class reloading : NetworkBehaviour
 {
     public Transform leftHandTarget, magazineSpawningTarget;
     private Transform _magazine;
@@ -21,6 +22,7 @@ public class reloading : MonoBehaviour
     private bool _ejectMagazine = false;
     void Update()
     {
+        if(!IsOwner) return;
         if (_createdMagazine != null)
         {
             _magazine = _createdMagazine.transform;
@@ -73,6 +75,7 @@ public class reloading : MonoBehaviour
             {
                 yield return new WaitForSeconds(2f);
                 _createdMagazine = Instantiate(magazine, leftHandTarget.position, magazine.transform.rotation);
+                _createdMagazine.GetComponent<NetworkObject>().Spawn(true);
                 _createdMagazine.transform.SetParent(leftHandTarget);
             }
 
@@ -83,6 +86,7 @@ public class reloading : MonoBehaviour
                     Destroy(_createdMagazine);
                     _createdMagazine = Instantiate(magazine, magazineSpawningTarget.position, transform.rotation);
                     _createdMagazine.transform.SetParent(transform);
+                    _createdMagazine.GetComponent<NetworkObject>().Spawn(true);
                     leftHandTarget.SetParent(transform);
                 }
             }

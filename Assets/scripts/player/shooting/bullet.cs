@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class bullet : MonoBehaviour
+public class bullet : NetworkBehaviour
 {
     public float bulletSpeed = 10f;
     private Rigidbody2D rb;
@@ -36,7 +37,8 @@ public class bullet : MonoBehaviour
             
 
             print(target.gameObject.name);
-            Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180));
+            Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
+            blood.GetComponent<NetworkObject>().Spawn(true);
             Destroy(gameObject);
         }
     }

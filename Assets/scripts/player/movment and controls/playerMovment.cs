@@ -1,8 +1,11 @@
 using System;
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class playerMovment : MonoBehaviour
+public class playerMovment : NetworkBehaviour
 {
+    
     public float movementSpeed, jumpHeight;
     public Transform centerOfPlayer;
     private Rigidbody2D _rb;
@@ -19,6 +22,8 @@ public class playerMovment : MonoBehaviour
     
     void FixedUpdate()
     {
+        if (!IsOwner) return;
+        
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mouseScreenPosition);
         
