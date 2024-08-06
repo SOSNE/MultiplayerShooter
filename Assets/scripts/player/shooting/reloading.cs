@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class reloading : NetworkBehaviour
 {
@@ -13,7 +14,7 @@ public class reloading : NetworkBehaviour
     public GameObject magazine;
     
     
-    GameObject _createdMagazine = null;
+    private GameObject _createdMagazine = null;
     void Start()
     {
         _magazine = transform.Find("magazine");
@@ -47,6 +48,11 @@ public class reloading : NetworkBehaviour
                 StartCoroutine(GrabMagazine());
             }
         }
+        if (_createdMagazine != null && !_ejectMagazine && !_isCoroutineRunning)
+        {
+            _createdMagazine.transform.position = magazineSpawningTarget.position;
+            _createdMagazine.transform.rotation = magazineSpawningTarget.rotation;
+        }
     }
     
     bool IsInside(Transform outer, Transform inner)
@@ -56,7 +62,6 @@ public class reloading : NetworkBehaviour
 
         return innerBounds.Intersects(outerBounds);
     }
-    float _timer;
     
     
     IEnumerator GrabMagazine()
@@ -68,6 +73,10 @@ public class reloading : NetworkBehaviour
             while (Vector2.Distance(leftHandTarget.position, waypoint[_index].position) > 0.01f)
             {
                 leftHandTarget.position = Vector2.MoveTowards(leftHandTarget.position, waypoint[_index].position, 7 * Time.deltaTime);
+                if (_createdMagazine != null && _index > 2)
+                {
+                    _createdMagazine.transform.position = leftHandTarget.position;
+                }
                 yield return null; 
             }
             
@@ -76,7 +85,6 @@ public class reloading : NetworkBehaviour
                 yield return new WaitForSeconds(2f);
                 _createdMagazine = Instantiate(magazine, leftHandTarget.position, magazine.transform.rotation);
                 _createdMagazine.GetComponent<NetworkObject>().Spawn(true);
-                _createdMagazine.transform.SetParent(leftHandTarget);
             }
 
             if (_index == waypoint.Length - 1)
@@ -85,9 +93,8 @@ public class reloading : NetworkBehaviour
                 {
                     Destroy(_createdMagazine);
                     _createdMagazine = Instantiate(magazine, magazineSpawningTarget.position, transform.rotation);
-                    _createdMagazine.transform.SetParent(transform);
-                    _createdMagazine.GetComponent<NetworkObject>().Spawn(true);
                     leftHandTarget.SetParent(transform);
+                    _createdMagazine.GetComponent<NetworkObject>().Spawn(true);
                 }
             }
             _index++;
