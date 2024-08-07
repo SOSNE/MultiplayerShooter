@@ -32,14 +32,18 @@ public class bullet : NetworkBehaviour
     
     private void OnTriggerEnter2D(Collider2D target)
     {
+        if (!IsOwner)return;
         if (GetHighestParent(target.gameObject).CompareTag("player"))
         {
-            
-
-            print(target.gameObject.name);
-            Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
-            blood.GetComponent<NetworkObject>().Spawn(true);
+            SpawnBloodServerRpc();
             Destroy(gameObject);
         }
+    }
+
+    [ServerRpc]
+    private void SpawnBloodServerRpc()
+    {
+        Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
+        blood.GetComponent<NetworkObject>().Spawn(true);
     }
 }
