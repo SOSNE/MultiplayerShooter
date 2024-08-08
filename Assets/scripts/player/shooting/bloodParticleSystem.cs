@@ -13,7 +13,7 @@ public class bloodParticleSystem : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
-        if (time > 0.06f)
+        if (time > 0.3f)
         {
             system.Stop();
         }
