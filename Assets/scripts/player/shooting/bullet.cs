@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class bullet : MonoBehaviour
+public class bullet : NetworkBehaviour
 {
     public float bulletSpeed = 10f;
     private Rigidbody2D rb;
@@ -31,13 +32,18 @@ public class bullet : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D target)
     {
+        if (!IsOwner)return;
         if (GetHighestParent(target.gameObject).CompareTag("player"))
         {
-            
-
-            print(target.gameObject.name);
-            Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180));
+            SpawnBloodServerRpc();
             Destroy(gameObject);
         }
+    }
+
+    [ServerRpc]
+    private void SpawnBloodServerRpc()
+    {
+        Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
+        blood.GetComponent<NetworkObject>().Spawn(true);
     }
 }

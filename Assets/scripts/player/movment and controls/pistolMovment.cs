@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using Unity.Netcode;
 
-public class pistolMovment : MonoBehaviour
+public class pistolMovment : NetworkBehaviour
 {
     public Transform targetL, targetR, positionL, positionR, positionFirstL, positionFirstR;
     public double maxExtension = 1.11931;
@@ -14,6 +15,7 @@ public class pistolMovment : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mouseScreenPosition);
