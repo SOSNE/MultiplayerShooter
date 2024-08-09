@@ -5,7 +5,7 @@ using Vector3 = System.Numerics.Vector3;
 public class weaponHandling : NetworkBehaviour
 {
     public GameObject bullet;
-    public Transform bulletSpawn, bloodParticleSystem;
+    public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
     public LayerMask layerMask;
     
@@ -22,6 +22,7 @@ public class weaponHandling : NetworkBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
+                ShootParticleServerRpc();
                 RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right, Mathf.Infinity, layerMask);
                 if (hit2D)
                 {
@@ -29,7 +30,7 @@ public class weaponHandling : NetworkBehaviour
                     data.Position = hit2D.point;
                     NetworkObjectReference   netObject = new NetworkObjectReference (
                         hit2D.transform.GetComponent<NetworkObject>());
-                    ShootServerRpc(netObject,data);
+                    ShootBloodServerRpc(netObject,data);
                 }
                 
             }
@@ -43,7 +44,7 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void ShootServerRpc(NetworkObjectReference  playerGameObject,ContactData contactData,ServerRpcParams serverRpcParams = default)
+    private void ShootBloodServerRpc(NetworkObjectReference  playerGameObject,ContactData contactData,ServerRpcParams serverRpcParams = default)
     {
         Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
         blood.GetComponent<NetworkObject>().Spawn(true);
@@ -54,11 +55,17 @@ public class weaponHandling : NetworkBehaviour
         ClientRpcNotifyServerRpcClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
     }
     
+    [ServerRpc]
+    private void ShootParticleServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
+        shootParticle.GetComponent<NetworkObject>().Spawn(true);
+    }
+    
     struct ContactData : INetworkSerializable
     {
         public Vector2 Position;
         
-
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Position);
