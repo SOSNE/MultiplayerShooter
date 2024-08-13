@@ -60,7 +60,7 @@ public class weaponHandling : NetworkBehaviour
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
         shootParticle.GetComponent<NetworkObject>().Spawn(true);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
-        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity;
+        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         ClientRpcNotifyServerRpcClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
     }
     
