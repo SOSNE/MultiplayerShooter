@@ -26,9 +26,11 @@ public class weaponHandling : NetworkBehaviour
                 RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right, Mathf.Infinity, layerMask);
                 if (hit2D)
                 {
+                    ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
                     ContactData data;
                     data.Position = hit2D.point;
-                    NetworkObjectReference   netObject = new NetworkObjectReference (
+                    NetworkObjectReference netObject = new NetworkObjectReference (
                         hit2D.transform.GetComponent<NetworkObject>());
                     ShootBloodServerRpc(netObject,data);
                 }
