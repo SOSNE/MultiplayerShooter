@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerHhandling : NetworkBehaviour
 {
     // NetworkBehaviourpublic NetworkList<int> playersHealth = new NetworkList<int>();
-    private Dictionary<ulong, int> _clientHealthMap = new Dictionary<ulong, int>();
+    private static Dictionary<ulong, int> _clientHealthMap = new Dictionary<ulong, int>();
     
     public override void OnNetworkSpawn()
     {
@@ -23,7 +23,7 @@ public class PlayerHhandling : NetworkBehaviour
         if (!IsOwner) return;
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            NewClientConnectionServerRpc();
+            NewClientConnectionServerRpc(NetworkManager.Singleton.LocalClientId);
         }
     }
 
@@ -33,14 +33,9 @@ public class PlayerHhandling : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void NewClientConnectionServerRpc(ServerRpcParams serverRpcParams = default)
+    private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
     {
-        foreach (var clientEntry  in NetworkManager.Singleton.ConnectedClients)
-        {
-            ulong clientId = clientEntry.Key;
-            print("connected with id:" +  clientId);
-            _clientHealthMap.Add(clientId, 10);
-        }
+        _clientHealthMap.Add(clientId, 10);
         foreach (var value  in _clientHealthMap)
         {
             print(value);
