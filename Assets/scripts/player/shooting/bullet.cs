@@ -7,17 +7,17 @@ public class bullet : NetworkBehaviour
     private Rigidbody2D rb;
     public GameObject bloodParticleSystem;
     
-    public GameObject GetHighestParent(GameObject child)
-        {
-            Transform current = child.transform;
-            
-            while (current.parent != null)
-            {
-                current = current.parent;
-            }
-            
-            return current.gameObject;
-        }
+    // public GameObject GetHighestParent(GameObject child)
+    //     {
+    //         Transform current = child.transform;
+    //         
+    //         while (current.parent != null)
+    //         {
+    //             current = current.parent;
+    //         }
+    //         
+    //         return current.gameObject;
+    //     }
 
     
     void Start()
@@ -30,20 +30,20 @@ public class bullet : NetworkBehaviour
         rb.linearVelocity = forwardDirection * -bulletSpeed;
     }
     
-    private void OnTriggerEnter2D(Collider2D target)
-    {
-        if (!IsOwner)return;
-        if (GetHighestParent(target.gameObject).CompareTag("player"))
-        {
-            SpawnBloodServerRpc();
-            Destroy(gameObject);
-        }
-    }
-
-    [ServerRpc]
-    private void SpawnBloodServerRpc()
-    {
-        Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
-        blood.GetComponent<NetworkObject>().Spawn(true);
-    }
+    // private void OnTriggerEnter2D(Collider2D target)
+    // {
+    //     if (!IsOwner)return;
+    //     if (GetHighestParent(target.gameObject).CompareTag("player"))
+    //     {
+    //         SpawnBloodServerRpc();
+    //         Destroy(gameObject);
+    //     }
+    // }
+    //
+    // [ServerRpc]
+    // private void SpawnBloodServerRpc()
+    // {
+    //     Transform blood = Instantiate(bloodParticleSystem, transform.position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
+    //     blood.GetComponent<NetworkObject>().Spawn(true);
+    // }
 }

@@ -4,10 +4,11 @@ using Vector3 = System.Numerics.Vector3;
 
 public class weaponHandling : NetworkBehaviour
 {
-    public GameObject bullet;
+    public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
     public LayerMask layerMask;
+    [SerializeField] private 
     
     void Start()
     {
@@ -15,7 +16,7 @@ public class weaponHandling : NetworkBehaviour
     }
 
     public static float BulletCounter = 0;
-    void Update()
+    void FixedUpdate()
     {
         if (!IsOwner) return;
         if (BulletCounter < BulletCount)
@@ -26,6 +27,22 @@ public class weaponHandling : NetworkBehaviour
                 RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right, Mathf.Infinity, layerMask);
                 if (hit2D)
                 {
+                    GameObject lineObject = Instantiate(bulletTracer);
+                    
+                    LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
+                    
+                    lineRenderer.positionCount = 2;
+
+                    lineRenderer.SetPosition(0, bulletSpawn.position);
+                    lineRenderer.SetPosition(1, hit2D.point); 
+
+                    lineRenderer.startWidth = 0.02f; 
+                    lineRenderer.endWidth = 0.009f; 
+                    lineRenderer.useWorldSpace = true; 
+
+                    
+                    
+
                     ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
                     ContactData data;
@@ -33,8 +50,8 @@ public class weaponHandling : NetworkBehaviour
                     NetworkObjectReference netObject = new NetworkObjectReference (
                         hit2D.transform.GetComponent<NetworkObject>());
                     ShootBloodServerRpc(netObject,data);
+                    
                 }
-                
             }
         }
     }
