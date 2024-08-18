@@ -7,12 +7,14 @@ public class PlayerHhandling : NetworkBehaviour
 {
     // NetworkBehaviourpublic NetworkList<int> playersHealth = new NetworkList<int>();
     private static Dictionary<ulong, int> _clientHealthMap = new Dictionary<ulong, int>();
+    private GameObject _gameManager;
     
     public override void OnNetworkSpawn()
     {
         if (IsClient)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            _gameManager = GameObject.Find("Game Manager");
         }
     }
 
@@ -23,13 +25,15 @@ public class PlayerHhandling : NetworkBehaviour
         if (!IsOwner) return;
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            NewClientConnectionServerRpc(NetworkManager.Singleton.LocalClientId);
+            NewClientConnectionServerRpc(clientId);
+            gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
         }
     }
 
     public void PlayerHit(int damageAmount,ulong clientId)
     {
-        PlayerHitServerRpc(damageAmount, clientId);
+        ulong currentClientId = NetworkManager.Singleton.LocalClientId;
+        PlayerHitServerRpc(damageAmount, clientId, currentClientId);
     }
 
     [ServerRpc]
@@ -43,9 +47,8 @@ public class PlayerHhandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void PlayerHitServerRpc(int damageAmount,ulong clientId , ServerRpcParams serverRpcParams = default)
+    private void PlayerHitServerRpc(int damageAmount,ulong clientId , ulong currentClientId, ServerRpcParams serverRpcParams = default)
     {
-        print(clientId);
         print("palyer hit hp: " + _clientHealthMap[clientId]);
         _clientHealthMap[clientId] -= damageAmount;
         foreach (var value  in _clientHealthMap)
@@ -55,6 +58,7 @@ public class PlayerHhandling : NetworkBehaviour
         if (_clientHealthMap[clientId]<=0)
         {
             print("player of id: " + _clientHealthMap[clientId] + "died");
+            gameObject.GetComponent<GameManager>().UpdatePointScoreDictionary(currentClientId);
         }
         
     }
