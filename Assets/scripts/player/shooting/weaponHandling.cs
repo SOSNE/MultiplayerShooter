@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
 using Vector3 = System.Numerics.Vector3;
+using System.Collections;
+
 
 public class weaponHandling : NetworkBehaviour
 {
@@ -16,7 +18,7 @@ public class weaponHandling : NetworkBehaviour
     }
 
     public static float BulletCounter = 0;
-    void FixedUpdate()
+    async void Update()
     {
         if (!IsOwner) return;
         if (BulletCounter < BulletCount)
@@ -27,29 +29,16 @@ public class weaponHandling : NetworkBehaviour
                 RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right, Mathf.Infinity, layerMask);
                 if (hit2D)
                 {
-                    GameObject lineObject = Instantiate(bulletTracer);
-                    
-                    LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
-                    
-                    lineRenderer.positionCount = 2;
-
-                    lineRenderer.SetPosition(0, bulletSpawn.position);
-                    lineRenderer.SetPosition(1, hit2D.point); 
-
-                    lineRenderer.startWidth = 0.02f; 
-                    lineRenderer.endWidth = 0.009f; 
-                    lineRenderer.useWorldSpace = true; 
 
                     
                     
-
                     ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
                     ContactData data;
                     data.Position = hit2D.point;
                     NetworkObjectReference netObject = new NetworkObjectReference (
                         hit2D.transform.GetComponent<NetworkObject>());
-                    ShootBloodServerRpc(netObject,data);
+                    ShootHandlingServerRpc(netObject,data);
                     
                 }
             }
@@ -62,9 +51,21 @@ public class weaponHandling : NetworkBehaviour
         BulletCounter++;
     }
     
-    [ServerRpc]
-    private void ShootBloodServerRpc(NetworkObjectReference  playerGameObject,ContactData contactData,ServerRpcParams serverRpcParams = default)
+    [ClientRpc]
+    private void ShootHandlingRpcClientRpc(NetworkObjectReference lineObject, ContactData contactData, ClientRpcParams clientRpcParams = default)
     {
+        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, 0.01f));
+    }
+    
+    [ServerRpc]
+    private void ShootHandlingServerRpc(NetworkObjectReference playerGameObject,ContactData contactData,ServerRpcParams serverRpcParams = default)
+    {
+        GameObject lineObject = Instantiate(bulletTracer);
+        lineObject.GetComponent<NetworkObject>().SpawnWithOwnership(NetworkManager.Singleton.LocalClientId);
+        
+        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, 0.01f));
+        ShootHandlingRpcClientRpc(lineObject.GetComponent<NetworkObject>(), contactData);
+        
         Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
         blood.GetComponent<NetworkObject>().Spawn(true);
         if (playerGameObject.TryGet(out NetworkObject networkObject))
@@ -92,4 +93,37 @@ public class weaponHandling : NetworkBehaviour
             serializer.SerializeValue(ref Position);
         }
     }
+    
+    IEnumerator DrawLine(GameObject lineObject ,Vector2 startPoint, Vector2 endPoint, float duration)
+    {
+        
+                    
+        LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
+                    
+        lineRenderer.positionCount = 2;
+                    
+        lineRenderer.SetPosition(0, startPoint);
+        lineRenderer.SetPosition(1, endPoint); 
+                    
+        lineRenderer.startWidth = 0.02f; 
+        lineRenderer.endWidth = 0.009f; 
+        lineRenderer.useWorldSpace = true; 
+
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, startPoint);
+        lineRenderer.SetPosition(1, startPoint);
+        float startTime = Time.time;
+        while (Time.time - startTime < duration)
+        {
+            float t = (Time.time - startTime) / duration;
+
+            Vector2 currentEndPosition = Vector2.Lerp(startPoint, endPoint, t);
+
+            lineRenderer.SetPosition(1, currentEndPosition);
+
+            yield return null;
+        }
+        lineRenderer.SetPosition(1, endPoint);
+    }
+
 }
