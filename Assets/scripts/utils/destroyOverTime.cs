@@ -7,12 +7,25 @@ public class destroyOverTime : NetworkBehaviour
     private float _timer;
     private void FixedUpdate()
     {
-        if (!IsOwner) return;
+        
 
         _timer += Time.deltaTime;
         if (_timer > destroyTime)
         {
-            DestroyServerRpc();
+            
+            if (gameObject.GetComponent<NetworkObject>() == null)
+            {
+                
+                
+                Destroy(gameObject);
+            }
+            else
+            {
+                if (!IsOwner) return;
+                DestroyServerRpc();
+            }
+            
+            
         }
     }
     [ServerRpc]
