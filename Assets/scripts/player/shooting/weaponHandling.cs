@@ -9,6 +9,7 @@ public class weaponHandling : NetworkBehaviour
     public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
+    [SerializeField] private float bulletSpeed, tracerLength;
     public LayerMask layerMask;
     [SerializeField] private 
     
@@ -26,6 +27,7 @@ public class weaponHandling : NetworkBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 ShootParticleServerRpc();
+                 
                 RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right.normalized, Mathf.Infinity, layerMask);
                 if (!hit2D)
                 {
@@ -57,6 +59,9 @@ public class weaponHandling : NetworkBehaviour
     [ClientRpc]
     private void ClientRpcNotifyServerRpcClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
+        Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
+        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         BulletCounter++;
     }
     
@@ -64,15 +69,18 @@ public class weaponHandling : NetworkBehaviour
     private void ShootHandlingRpcClientRpc(ContactData contactData, ClientRpcParams clientRpcParams = default)
     {
         if (IsHost) return;
+        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
         GameObject lineObject = Instantiate(bulletTracer);
-        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, 0.099f));
+        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
     }
     
     [ServerRpc]
     private void ShootHandlingBulletTracerServerRpc(ContactData contactData,ServerRpcParams serverRpcParams = default)
     {
         GameObject lineObject = Instantiate(bulletTracer);
-        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, 0.099f));
+        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
+        print(speed);
+        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
         ShootHandlingRpcClientRpc(contactData);
     }
     
@@ -93,7 +101,6 @@ public class weaponHandling : NetworkBehaviour
     private void ShootParticleServerRpc(ServerRpcParams serverRpcParams = default)
     {
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
-        shootParticle.GetComponent<NetworkObject>().Spawn(true);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         ClientRpcNotifyServerRpcClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
@@ -114,6 +121,7 @@ public class weaponHandling : NetworkBehaviour
         
                     
         LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
+        lineObject.GetComponent<destroyOverTime>().destroyTime = duration;
                     
         lineRenderer.positionCount = 2;
                     
@@ -131,8 +139,15 @@ public class weaponHandling : NetworkBehaviour
         while (Time.time - startTime < duration && lineRenderer != null)
         {
             float t = (Time.time - startTime) / duration;
-            Vector2 currentStartPosition = Vector2.Lerp(startPoint, endPoint, t-0.2f);
-            Vector2 currentEndPosition = Vector2.Lerp(startPoint, endPoint, t);
+            
+            Vector2 currentPosition = Vector2.Lerp(startPoint, endPoint, t);
+    
+            
+            Vector2 direction = (endPoint - startPoint).normalized;
+    
+            
+            Vector2 currentStartPosition = currentPosition - direction * (tracerLength);
+            Vector2 currentEndPosition = currentPosition + direction * (tracerLength);
             lineRenderer.SetPosition(0, currentStartPosition);
             lineRenderer.SetPosition(1, currentEndPosition);
             

@@ -1359,6 +1359,8 @@ MonoBehaviour:
   bulletSpawn: {fileID: 1191421928569397352}
   bloodParticleSystem: {fileID: 5866105100215955707, guid: a4467d6e80c3e9d4da8eca9bf5402ea7, type: 3}
   shootParticleParticleSystem: {fileID: 5279721618452076697, guid: 4b430cf2206d22e4ea816e8d76d591c9, type: 3}
+  bulletSpeed: 68.64
+  tracerLength: 0.42
   layerMask:
     serializedVersion: 2
     m_Bits: 17408
