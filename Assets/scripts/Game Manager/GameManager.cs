@@ -10,12 +10,14 @@ public class GameManager : NetworkBehaviour
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
     private static NetworkList<int> _pointScore  = new NetworkList<int>();
     private static int floatIndex;
+    private Transform _team0Spawn, _team1Spawn;
 
 
     private void Start()
     {
         teamOneWinCounter = FindObjectInHierarchy("Team 0").GetComponent<TextMeshProUGUI>();
         teamTwoWinCounter = FindObjectInHierarchy("Team 1").GetComponent<TextMeshProUGUI>();
+        
     }
 
     private static bool _pointScoreInitialize = true;
@@ -39,7 +41,6 @@ public class GameManager : NetworkBehaviour
     
     private void UpdateWinCounter(NetworkListEvent<int> listEvent)
     {
-        print("testt");
         teamOneWinCounter.text = $"{_pointScore[0]}";
         teamTwoWinCounter.text = $"{_pointScore[1]}";
     }
@@ -48,18 +49,46 @@ public class GameManager : NetworkBehaviour
     public void AddClientToTeam(ulong clientId)
     {
         if(!IsClient) return;
-        AddClientToTeamServerRpc(clientId);
+        AddClientToTeamServerRpc(gameObject, clientId);
     }
     [ServerRpc]
-    private void AddClientToTeamServerRpc(ulong clientId, ServerRpcParams serverRpcParams = default)
+    private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId, ServerRpcParams serverRpcParams = default)
     {
+        _team0Spawn = GameObject.Find("Team0Spawn").transform;
+        _team1Spawn = GameObject.Find("Team1Spawn").transform;
         teamsDictionary.Add(clientId, floatIndex%2);
         floatIndex++;
+            if (teamsDictionary[clientId] == 0)
+            {
+                NetworkObjectReference netObject = new NetworkObjectReference (
+                    _team0Spawn.transform.GetComponent<NetworkObject>());
+                SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
+            }else
+            {
+                NetworkObjectReference netObject = new NetworkObjectReference (
+                    _team1Spawn.transform.GetComponent<NetworkObject>());
+                SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
+            }
+        
         foreach (var player in teamsDictionary)
         {
             print(player);
         }
     }
+
+    [ClientRpc]
+    private void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
+    {
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            if(spawnGameObject.TryGet(out NetworkObject spawnNetworkObject))
+            {
+                playerNetworkObject.transform.position = spawnNetworkObject.transform.position;
+            }
+        }
+    }
+    
+    
     private GameObject FindObjectInHierarchy(string name)
     {
         GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>(true);

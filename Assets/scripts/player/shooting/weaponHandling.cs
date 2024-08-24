@@ -22,6 +22,7 @@ public class weaponHandling : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
+        
         if (BulletCounter < BulletCount)
         {
             if (Input.GetMouseButtonDown(0))
@@ -56,14 +57,7 @@ public class weaponHandling : NetworkBehaviour
         }
     }
     
-    [ClientRpc]
-    private void ClientRpcNotifyServerRpcClientRpc(ClientRpcParams clientRpcParams = default)
-    {
-        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
-        Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
-        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
-        BulletCounter++;
-    }
+    
     
     [ClientRpc]
     private void ShootHandlingRpcClientRpc(ContactData contactData, ClientRpcParams clientRpcParams = default)
@@ -95,15 +89,29 @@ public class weaponHandling : NetworkBehaviour
         }
     }
     
-    
-    
     [ServerRpc]
     private void ShootParticleServerRpc(ServerRpcParams serverRpcParams = default)
     {
+        // Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
+        // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
+        // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
+        ShootParticleClientRpc();
+    }
+    
+    [ClientRpc]
+    private void ClientRpcNotifyClientClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        BulletCounter++;
+    }
+    
+    [ClientRpc]
+    private void ShootParticleClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        print("particel");
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
-        ClientRpcNotifyServerRpcClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
     }
     
     struct ContactData : INetworkSerializable
@@ -158,7 +166,5 @@ public class weaponHandling : NetworkBehaviour
         {
             lineRenderer.SetPosition(1, endPoint);
         }
-        
     }
-
 }
