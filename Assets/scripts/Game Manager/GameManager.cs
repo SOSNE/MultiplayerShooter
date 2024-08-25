@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,15 +12,20 @@ public class GameManager : NetworkBehaviour
     private static NetworkList<int> _pointScore  = new NetworkList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
+    [SerializeField] private GameObject camera, pistol;
+    public float cameraSmoothness ;
 
 
     private void Start()
     {
         teamOneWinCounter = FindObjectInHierarchy("Team 0").GetComponent<TextMeshProUGUI>();
         teamTwoWinCounter = FindObjectInHierarchy("Team 1").GetComponent<TextMeshProUGUI>();
+        // Cursor.lockState = CursorLockMode.Confined;
+        // Cursor.visible = true;
         
     }
 
+    private GameObject _createdCamera;
     private static bool _pointScoreInitialize = true;
     public override void OnNetworkSpawn()
     {
@@ -32,7 +38,26 @@ public class GameManager : NetworkBehaviour
         base.OnNetworkSpawn();
         _pointScore.OnListChanged += UpdateWinCounter;
     }
-    
+
+    public void CreateCamera()
+    {
+        if(!IsOwner) return;
+        _createdCamera = Instantiate(camera, transform.position, transform.rotation);
+        pistol.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
+    }
+
+    private void FixedUpdate()
+    {
+        if(!IsOwner) return;
+        Camera camera = _createdCamera.GetComponent<Camera>();
+        Vector3 mouseScreenPosition = Input.mousePosition;
+        Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
+        Vector3 betweenPosition = Vector3.Lerp( transform.position, mouseWorldPosition, 0.4f);
+        Vector3 smoothPosition = Vector3.Lerp( _createdCamera.transform.position, betweenPosition, cameraSmoothness);
+        print(Vector3.Distance(_createdCamera.transform.position, transform.position));
+        _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
+    }
+
     public void UpdatePointScoreDictionary(ulong clientId)
     {
         int teamIndex = teamsDictionary[clientId];

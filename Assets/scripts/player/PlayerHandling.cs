@@ -15,6 +15,7 @@ public class PlayerHhandling : NetworkBehaviour
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             _gameManager = GameObject.Find("Game Manager");
+            gameObject.GetComponent<GameManager>().CreateCamera();
         }
     }
 
@@ -27,6 +28,7 @@ public class PlayerHhandling : NetworkBehaviour
         {
             NewClientConnectionServerRpc(clientId);
             gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
+            
         }
     }
 

@@ -6,11 +6,11 @@ public class pistolMovment : NetworkBehaviour
 {
     public Transform targetL, targetR, positionL, positionR, positionFirstL, positionFirstR;
     public double maxExtension = 1.11931;
-    private Camera _camera;
+    public Camera camera;
     
     private void Start()
     {
-        _camera = Camera.main;
+        // _camera = Camera.main;
     }
 
     void Update()
@@ -18,7 +18,7 @@ public class pistolMovment : NetworkBehaviour
         if (!IsOwner) return;
         
         Vector3 mouseScreenPosition = Input.mousePosition;
-        Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mouseScreenPosition);
+        Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
         
         double leftArmExtenstion = Vector2.Distance(positionFirstL.position, mouseWorldPosition);
         double rightArmExtenstion = Vector2.Distance(positionFirstR.position, mouseWorldPosition);
