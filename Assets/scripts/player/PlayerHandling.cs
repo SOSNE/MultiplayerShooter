@@ -18,8 +18,6 @@ public class PlayerHhandling : NetworkBehaviour
             gameObject.GetComponent<GameManager>().CreateCamera();
         }
     }
-
-    
     
     private void OnClientConnected(ulong clientId)
     {
@@ -28,7 +26,6 @@ public class PlayerHhandling : NetworkBehaviour
         {
             NewClientConnectionServerRpc(clientId);
             gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
-            
         }
     }
 
@@ -61,7 +58,7 @@ public class PlayerHhandling : NetworkBehaviour
         {
             print("player of id: " + _clientHealthMap[clientId] + "died");
             gameObject.GetComponent<GameManager>().UpdatePointScoreDictionary(currentClientId);
+            gameObject.GetComponent<GameManager>().RestartPositions();
         }
-        
     }
 }

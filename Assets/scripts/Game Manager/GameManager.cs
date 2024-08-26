@@ -4,9 +4,18 @@ using System.Runtime.Serialization;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
+public struct PlayerData
+{
+    public ulong ClientId;
+    public int Team;
+    public NetworkObjectReference PlayerNetworkObject;
+}
+
 
 public class GameManager : NetworkBehaviour
 {
+    public static List<PlayerData> AllPlayersData = new List<PlayerData>();
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
     private static NetworkList<int> _pointScore  = new NetworkList<int>();
@@ -54,13 +63,35 @@ public class GameManager : NetworkBehaviour
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
         Vector3 betweenPosition = Vector3.Lerp( transform.position, mouseWorldPosition, 0.4f);
         Vector3 smoothPosition = Vector3.Lerp( _createdCamera.transform.position, betweenPosition, cameraSmoothness);
-        print(Vector3.Distance(_createdCamera.transform.position, transform.position));
         _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
+    }
+
+    public void RestartPositions()
+    {
+        if(!IsOwner) return;
+        
+        _team0Spawn = GameObject.Find("Team0Spawn").transform;
+        _team1Spawn = GameObject.Find("Team1Spawn").transform;
+        foreach (var record in AllPlayersData)
+        {
+            print("ids: " + record.Team);
+            if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == record.ClientId).Team == 0)
+            {
+                NetworkObjectReference netObject = new NetworkObjectReference (
+                    _team0Spawn.transform.GetComponent<NetworkObject>());
+                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
+            }else
+            {
+                NetworkObjectReference netObject = new NetworkObjectReference (
+                    _team1Spawn.transform.GetComponent<NetworkObject>());
+                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
+            } 
+        }
     }
 
     public void UpdatePointScoreDictionary(ulong clientId)
     {
-        int teamIndex = teamsDictionary[clientId];
+        int teamIndex = AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team;
         _pointScore[teamIndex] += 1;
     }
     
@@ -81,9 +112,15 @@ public class GameManager : NetworkBehaviour
     {
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
-        teamsDictionary.Add(clientId, floatIndex%2);
+        PlayerData newUser = new PlayerData();
+        newUser.ClientId = clientId;
+        newUser.Team = floatIndex % 2;
+        newUser.PlayerNetworkObject = playerGameObject;
+        AllPlayersData.Add(newUser);
+        // teamsDictionary.Add(clientId, floatIndex%2);
+        
         floatIndex++;
-            if (teamsDictionary[clientId] == 0)
+            if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
             {
                 NetworkObjectReference netObject = new NetworkObjectReference (
                     _team0Spawn.transform.GetComponent<NetworkObject>());
