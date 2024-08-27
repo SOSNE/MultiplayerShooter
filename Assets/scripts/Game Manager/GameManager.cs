@@ -10,6 +10,7 @@ public struct PlayerData
     public ulong ClientId;
     public int Team;
     public NetworkObjectReference PlayerNetworkObject;
+    public bool Alive;
 }
 
 
@@ -17,6 +18,7 @@ public class GameManager : NetworkBehaviour
 {
     public static List<PlayerData> AllPlayersData = new List<PlayerData>();
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
+    public static List<int> playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
     private static NetworkList<int> _pointScore  = new NetworkList<int>();
     private static int floatIndex;
@@ -42,6 +44,8 @@ public class GameManager : NetworkBehaviour
         {
             _pointScore.Add(0);
             _pointScore.Add(0);
+            playersAlive.Add(0);
+            playersAlive.Add(0);
             _pointScoreInitialize = false;
         }
         base.OnNetworkSpawn();
@@ -66,15 +70,45 @@ public class GameManager : NetworkBehaviour
         _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
     }
 
+    public void HandleGame(ulong currentClientId, ulong hitClientId)
+    {
+        
+        for (int i = 0; i < AllPlayersData.Count; i++)
+        {
+            if (AllPlayersData[i].ClientId == hitClientId)
+            {
+                PlayerData myStruct  = AllPlayersData[i];
+                myStruct.Alive = false;
+                AllPlayersData[i] = myStruct;
+                playersAlive[AllPlayersData[i].Team] -= 1;
+            }
+        }
+        if (AllPlayersData[0].Team == 0 || AllPlayersData[1].Team == 0)
+        {
+            UpdatePointScoreDictionary(currentClientId);
+            ResetHealthMap();
+            RestartPositions();
+        }
+        
+    }
+
+    public void ResetHealthMap()
+    {
+        List<ulong> keys = new List<ulong>(PlayerHhandling.clientHealthMap.Keys);
+
+        foreach (var key in keys)
+        {
+            PlayerHhandling.clientHealthMap[key] = 10;
+        }
+    }
+    
     public void RestartPositions()
     {
-        if(!IsOwner) return;
         
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
         foreach (var record in AllPlayersData)
         {
-            print("ids: " + record.Team);
             if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == record.ClientId).Team == 0)
             {
                 NetworkObjectReference netObject = new NetworkObjectReference (
@@ -100,7 +134,7 @@ public class GameManager : NetworkBehaviour
         teamOneWinCounter.text = $"{_pointScore[0]}";
         teamTwoWinCounter.text = $"{_pointScore[1]}";
     }
-
+    
     
     public void AddClientToTeam(ulong clientId)
     {
@@ -116,7 +150,9 @@ public class GameManager : NetworkBehaviour
         newUser.ClientId = clientId;
         newUser.Team = floatIndex % 2;
         newUser.PlayerNetworkObject = playerGameObject;
+        newUser.Alive = true;
         AllPlayersData.Add(newUser);
+        playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);
         
         floatIndex++;
@@ -131,11 +167,6 @@ public class GameManager : NetworkBehaviour
                     _team1Spawn.transform.GetComponent<NetworkObject>());
                 SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
             }
-        
-        foreach (var player in teamsDictionary)
-        {
-            print(player);
-        }
     }
 
     [ClientRpc]
