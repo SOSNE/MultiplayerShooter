@@ -1,6 +1,4 @@
-using System;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class playerMovment : NetworkBehaviour
@@ -19,6 +17,7 @@ public class playerMovment : NetworkBehaviour
     
     private Quaternion _targetRotation;
     private float _timer;
+    bool _rotateFlag = true;
     
     void Update()
     {
@@ -30,15 +29,21 @@ public class playerMovment : NetworkBehaviour
         float distance = mouseWorldPosition.x - centerOfPlayer.position.x;
         if (Mathf.Abs(distance) > 0.1f)
         {
-            if (distance > 0)
+            if (distance > 0 && _rotateFlag)
             {
-                transform.localScale = new Vector3(-1, 1, 1);
-                weapon.localScale = new Vector3(-1, -1, 1);
+                RotationData scale;
+                scale.PlayerScale  = new Vector3(-1, 1, 1);
+                scale.WeaponScale = new Vector3(-1, -1, 1);
+                RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
+                _rotateFlag = false;
             }
-            else
+            else if (distance <= 0 && !_rotateFlag)
             {
-                transform.localScale = new Vector3(1, 1, 1);
-                weapon.localScale = new Vector3(1, 1, 1);
+                RotationData scale;
+                scale.PlayerScale  = new Vector3(1, 1, 1);
+                scale.WeaponScale = new Vector3(1, 1, 1);
+                RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
+                _rotateFlag = true;
             }
         }
         
@@ -71,6 +76,39 @@ public class playerMovment : NetworkBehaviour
         if (other.gameObject.CompareTag("ground"))
         {
             grounded = false;
+        }
+    }
+
+    [ServerRpc]
+    public void RotatePlayerAndWeaponServerRpc(NetworkObjectReference playerObjectReference, NetworkObjectReference weaponObjectReference, RotationData scaleVector3)
+    {
+        RotatePlayerAndWeaponClientRpc(playerObjectReference, weaponObjectReference, scaleVector3);
+    }
+
+    [ClientRpc]
+    public void RotatePlayerAndWeaponClientRpc(NetworkObjectReference playerObjectReference, NetworkObjectReference weaponObjectReference, RotationData scaleVector3)
+    {
+        if(playerObjectReference.TryGet(out NetworkObject playerNetworkObject))
+        { 
+            playerNetworkObject.transform.localScale = scaleVector3.PlayerScale;
+        }
+        if(weaponObjectReference.TryGet(out NetworkObject weaponNetworkObject))
+        { 
+            // weaponNetworkObject.transform.localScale = scaleVector3.WeaponScale;
+            
+            // TODO create weapon spawning system with weapon that have network
+            // object component.
+        }
+    }
+    
+    public struct RotationData : INetworkSerializable
+    {
+        public Vector3 PlayerScale;
+        public Vector3 WeaponScale;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref PlayerScale);
+            serializer.SerializeValue(ref WeaponScale);
         }
     }
 }

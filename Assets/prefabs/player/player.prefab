@@ -2184,6 +2184,7 @@ MonoBehaviour:
   jumpHeight: 22
   centerOfPlayer: {fileID: 4121016224152418615}
   weapon: {fileID: 4810041679514995996}
+  camera: {fileID: 0}
 --- !u!50 &1799989168919453944
 Rigidbody2D:
   serializedVersion: 5
