@@ -2159,7 +2159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 168810998
+  GlobalObjectIdHash: 4042147263
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2183,6 +2183,7 @@ MonoBehaviour:
   movementSpeed: 5
   jumpHeight: 22
   centerOfPlayer: {fileID: 4121016224152418615}
+  weapon: {fileID: 4810041679514995996}
 --- !u!50 &1799989168919453944
 Rigidbody2D:
   serializedVersion: 5

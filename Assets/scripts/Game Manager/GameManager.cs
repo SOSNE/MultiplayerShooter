@@ -24,7 +24,7 @@ public class GameManager : NetworkBehaviour
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     [SerializeField] private GameObject camera, pistol;
-    public float cameraSmoothness ;
+    public float cameraSmoothness;
 
 
     private void Start()
@@ -57,6 +57,7 @@ public class GameManager : NetworkBehaviour
         if(!IsOwner) return;
         _createdCamera = Instantiate(camera, transform.position, transform.rotation);
         pistol.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
+        gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
 
     private void FixedUpdate()

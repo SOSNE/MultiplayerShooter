@@ -7,41 +7,39 @@ public class playerMovment : NetworkBehaviour
 {
     
     public float movementSpeed, jumpHeight;
-    public Transform centerOfPlayer;
+    public Transform centerOfPlayer, weapon;
     private Rigidbody2D _rb;
     private bool grounded;
-    private Camera _camera;
+    public Camera camera;
 
     void Start()
     { 
-        _camera = Camera.main;
+        // _camera = Camera.main;
     }
     
     private Quaternion _targetRotation;
     private float _timer;
     
-    void FixedUpdate()
+    void Update()
     {
         if (!IsOwner) return;
         
         Vector3 mouseScreenPosition = Input.mousePosition;
-        Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mouseScreenPosition);
+        Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
         
         float distance = mouseWorldPosition.x - centerOfPlayer.position.x;
         if (Mathf.Abs(distance) > 0.1f)
         {
             if (distance > 0)
             {
-                
-                transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+                transform.localScale = new Vector3(-1, 1, 1);
+                weapon.localScale = new Vector3(-1, -1, 1);
             }
             else
             {
-                
-                transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                transform.localScale = new Vector3(1, 1, 1);
+                weapon.localScale = new Vector3(1, 1, 1);
             }
-
-            
         }
         
         _rb = GetComponent<Rigidbody2D>();
