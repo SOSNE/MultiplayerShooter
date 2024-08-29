@@ -44,7 +44,14 @@ public class weaponHandling : NetworkBehaviour
                     data.Position = hit2D.point;
                     NetworkObjectReference netObject = new NetworkObjectReference (
                         hit2D.transform.GetComponent<NetworkObject>());
-                    ShootHandlingBloodServerRpc(netObject,data);
+                    if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+                    {
+                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+                    }
+                    else
+                    {
+                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180f);
+                    }
                     ShootHandlingBulletTracerServerRpc(data);
                 }
                 else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("ground"))
@@ -56,8 +63,6 @@ public class weaponHandling : NetworkBehaviour
             }
         }
     }
-    
-    
     
     [ClientRpc]
     private void ShootHandlingRpcClientRpc(ContactData contactData, ClientRpcParams clientRpcParams = default)
@@ -79,12 +84,14 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void ShootHandlingBloodServerRpc(NetworkObjectReference playerGameObject,ContactData contactData,ServerRpcParams serverRpcParams = default)
+    private void ShootHandlingBloodServerRpc(NetworkObjectReference playerGameObject,ContactData contactData, float transformEulerAnglesZ, ServerRpcParams serverRpcParams = default)
     {
         if (playerGameObject.TryGet(out NetworkObject networkObject))
         {
-            Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transform.eulerAngles.z +180)).transform;
+            print(transformEulerAnglesZ);
+            Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transformEulerAnglesZ)).transform;
             blood.GetComponent<NetworkObject>().Spawn(true);
+            blood.rotation = Quaternion.Euler(0f, 0f, transformEulerAnglesZ);
             blood.SetParent(networkObject.transform);
         }
     }
@@ -108,7 +115,6 @@ public class weaponHandling : NetworkBehaviour
     [ClientRpc]
     private void ShootParticleClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        print("particel");
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
@@ -117,7 +123,6 @@ public class weaponHandling : NetworkBehaviour
     struct ContactData : INetworkSerializable
     {
         public Vector2 Position;
-        
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Position);
@@ -152,7 +157,6 @@ public class weaponHandling : NetworkBehaviour
     
             
             Vector2 direction = (endPoint - startPoint).normalized;
-    
             
             Vector2 currentStartPosition = currentPosition - direction * (tracerLength);
             Vector2 currentEndPosition = currentPosition + direction * (tracerLength);
