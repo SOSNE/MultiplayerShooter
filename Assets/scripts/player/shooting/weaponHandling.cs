@@ -50,7 +50,7 @@ public class weaponHandling : NetworkBehaviour
                     }
                     else
                     {
-                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180f);
+                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
                     }
                     ShootHandlingBulletTracerServerRpc(data);
                 }
