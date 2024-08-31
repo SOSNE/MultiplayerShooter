@@ -46,11 +46,11 @@ public class weaponHandling : NetworkBehaviour
                         hit2D.transform.GetComponent<NetworkObject>());
                     if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
                     {
-                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
                     }
                     else
                     {
-                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
+                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
                     }
                     ShootHandlingBulletTracerServerRpc(data);
                 }
