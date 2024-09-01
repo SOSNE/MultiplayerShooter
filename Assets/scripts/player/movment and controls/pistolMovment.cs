@@ -7,10 +7,13 @@ public class pistolMovment : NetworkBehaviour
     public Transform targetL, targetR, positionL, positionR, positionFirstL, positionFirstR;
     public double maxExtension = 1.11931;
     public Camera camera;
+    private float width;
     
     private void Start()
     {
         // _camera = Camera.main;
+        width = GetComponent<Renderer>().bounds.size.x;
+        maxExtension = maxExtension - width + 0.27;
     }
 
     void Update()
