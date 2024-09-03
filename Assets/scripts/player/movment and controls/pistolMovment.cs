@@ -52,28 +52,26 @@ public class pistolMovment : NetworkBehaviour
         }
         if (leftArmExtenstionToWeapon >= 1.11931 || rightArmExtenstionToWeapon >= 1.11931)
         {
-            print("to long");
-            Vector2 targetPosition = targetL.position;
-            Vector2 currentPosition = Vector2.Lerp(transform.position, targetPosition, 0.19f);
+            Vector2 currentPosition = Vector2.Lerp(transform.position, positionFirstL.position, 0.049f);
 
             transform.position = currentPosition;
             // StartCoroutine(MoveWeaponToHand(gameObject, transform.position, targetR.position, 0.1f, leftArmExtenstionToWeapon, rightArmExtenstionToWeapon));
         }
     }
     
-    IEnumerator MoveWeaponToHand(GameObject weapon ,Vector2 startPoint, Vector2 endPoint, float duration, double leftArmExtenstionToWeapon, double rightArmExtenstionToWeapon)
-    {
-        
-        float startTime = Time.time;
-        while (Time.time - startTime < duration || leftArmExtenstionToWeapon <= 1.11931 || rightArmExtenstionToWeapon <= 1.11931)
-        {
-            float t = (Time.time - startTime) / duration;
-            
-            Vector2 currentPosition = Vector2.Lerp(startPoint, endPoint, t);
-
-            weapon.transform.position = currentPosition;
-            
-            yield return null;
-        }
-    }
+    // IEnumerator MoveWeaponToHand(GameObject weapon ,Vector2 startPoint, Vector2 endPoint, float duration, double leftArmExtenstionToWeapon, double rightArmExtenstionToWeapon)
+    // {
+    //     
+    //     float startTime = Time.time;
+    //     while (Time.time - startTime < duration || leftArmExtenstionToWeapon <= 1.11931 || rightArmExtenstionToWeapon <= 1.11931)
+    //     {
+    //         float t = (Time.time - startTime) / duration;
+    //         
+    //         Vector2 currentPosition = Vector2.Lerp(startPoint, endPoint, t);
+    //
+    //         weapon.transform.position = currentPosition;
+    //         
+    //         yield return null;
+    //     }
+    // }
 }
