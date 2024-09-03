@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -25,6 +26,8 @@ public class pistolMovment : NetworkBehaviour
         
         double leftArmExtenstion = Vector2.Distance(positionFirstL.position, mouseWorldPosition);
         double rightArmExtenstion = Vector2.Distance(positionFirstR.position, mouseWorldPosition);
+        double leftArmExtenstionToWeapon = Vector2.Distance(positionFirstL.position, transform.position);
+        double rightArmExtenstionToWeapon =  Vector2.Distance(positionFirstL.position, transform.position);
         float pistolToMouseDistance = Vector2.Distance(transform.position, mouseWorldPosition);
         float correctionValue = 0.1f;
 
@@ -46,6 +49,31 @@ public class pistolMovment : NetworkBehaviour
         else
         {
             transform.rotation = Quaternion.Euler(new Vector3(0f,0f, angle + Convert.ToSingle(angleCorrection)));
+        }
+        if (leftArmExtenstionToWeapon >= 1.11931 || rightArmExtenstionToWeapon >= 1.11931)
+        {
+            print("to long");
+            Vector2 targetPosition = targetL.position;
+            Vector2 currentPosition = Vector2.Lerp(transform.position, targetPosition, 0.19f);
+
+            transform.position = currentPosition;
+            // StartCoroutine(MoveWeaponToHand(gameObject, transform.position, targetR.position, 0.1f, leftArmExtenstionToWeapon, rightArmExtenstionToWeapon));
+        }
+    }
+    
+    IEnumerator MoveWeaponToHand(GameObject weapon ,Vector2 startPoint, Vector2 endPoint, float duration, double leftArmExtenstionToWeapon, double rightArmExtenstionToWeapon)
+    {
+        
+        float startTime = Time.time;
+        while (Time.time - startTime < duration || leftArmExtenstionToWeapon <= 1.11931 || rightArmExtenstionToWeapon <= 1.11931)
+        {
+            float t = (Time.time - startTime) / duration;
+            
+            Vector2 currentPosition = Vector2.Lerp(startPoint, endPoint, t);
+
+            weapon.transform.position = currentPosition;
+            
+            yield return null;
         }
     }
 }
