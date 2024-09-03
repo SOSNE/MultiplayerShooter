@@ -5,9 +5,10 @@ public class playerMovment : NetworkBehaviour
 {
     
     public float movementSpeed, jumpHeight;
+    [SerializeField] private float ladderSpeed;
     public Transform centerOfPlayer, weapon;
     private Rigidbody2D _rb;
-    private bool grounded;
+    private bool _grounded, _goUp;
     public Camera camera;
 
     void Start()
@@ -52,17 +53,39 @@ public class playerMovment : NetworkBehaviour
         
         _rb = GetComponent<Rigidbody2D>();
         
-        if (Input.GetKeyDown(KeyCode.W) && grounded )
+        if (Input.GetKeyDown(KeyCode.W) && _grounded )
         {
-            GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, jumpHeight);
+            _rb.linearVelocity = new Vector2(0, jumpHeight);
         }
+        
+        if (Input.GetKey(KeyCode.W) && _goUp )
+        { 
+            _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
+            _rb.linearVelocity = new Vector2(0, ladderSpeed);
+        }
+        else if (Input.GetKey(KeyCode.S) && _goUp && !_grounded)
+        {
+            _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
+            _rb.linearVelocity = new Vector2(0, -ladderSpeed/4);
+        }
+        else if(_goUp && !_grounded)
+        {
+            _rb.constraints |= RigidbodyConstraints2D.FreezePositionY;
+            _rb.linearDamping = 18;
+        }
+        else
+        {
+            _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
+            _rb.linearDamping = 3;
+        }
+        
         if (Input.GetKey(KeyCode.D))
         {
-            GetComponent<Rigidbody2D>().linearVelocity = new Vector2(movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
+            _rb.linearVelocity = new Vector2(movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            GetComponent<Rigidbody2D>().linearVelocity = new Vector2(-movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
+            _rb.linearVelocity = new Vector2(-movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
         }
     }
 
@@ -70,7 +93,7 @@ public class playerMovment : NetworkBehaviour
     {
         if (other.gameObject.CompareTag("ground"))
         {
-            grounded = true;
+            _grounded = true;
         }
     }
     
@@ -78,9 +101,25 @@ public class playerMovment : NetworkBehaviour
     {
         if (other.gameObject.CompareTag("ground"))
         {
-            grounded = false;
+            _grounded = false;
         }
     }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("ladder"))
+        {
+            _goUp = true;
+        }
+    }
+    
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("ladder"))
+        {
+            _goUp = false;
+        }
+    }
+    
 
     [ServerRpc]
     public void RotatePlayerAndWeaponServerRpc(NetworkObjectReference playerObjectReference, NetworkObjectReference weaponObjectReference, RotationData scaleVector3)

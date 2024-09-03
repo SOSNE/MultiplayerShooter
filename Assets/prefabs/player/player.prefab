@@ -372,13 +372,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2389196106955506856}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.013, y: 0.096, z: 0}
-  m_LocalScale: {x: 0.39128804, y: 0.2242321, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.702433, w: 0.71174985}
+  m_LocalPosition: {x: 0.0958204, y: 0.014263749, z: 0}
+  m_LocalScale: {x: 0.3912881, y: 0.22423214, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8281483064346611683}
-  m_Father: {fileID: 2344501678799866188}
+  m_Father: {fileID: 915133145892148871}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6147978563336597224
 SpriteRenderer:
@@ -1891,8 +1891,8 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8893469407128632794}
-    - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: 70cc0974af755a744b2901b42220476e, type: 3}
-      insertIndex: -1
+    - targetCorrespondingSourceObject: {fileID: 4257508509235537429, guid: 70cc0974af755a744b2901b42220476e, type: 3}
+      insertIndex: 0
       addedObject: {fileID: 9173395800436477894}
     - targetCorrespondingSourceObject: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
@@ -2025,6 +2025,11 @@ CapsuleCollider2D:
   m_Offset: {x: 0.3075712, y: 0.011537082}
   m_Size: {x: 0.62936676, y: 0.19522431}
   m_Direction: 1
+--- !u!4 &915133145892148871 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4257508509235537429, guid: 70cc0974af755a744b2901b42220476e, type: 3}
+  m_PrefabInstance: {fileID: 4010035256932020370}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1014934846003350247 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4157741701538757237, guid: 70cc0974af755a744b2901b42220476e, type: 3}
@@ -2183,8 +2188,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed2a15c397489c4459f6acff36638d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
+  movementSpeed: 6.45
   jumpHeight: 22
+  ladderSpeed: 8
   centerOfPlayer: {fileID: 4121016224152418615}
   weapon: {fileID: 4810041679514995996}
   camera: {fileID: 0}
@@ -2201,7 +2207,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 3.2472138
-  m_LinearDamping: 0
+  m_LinearDamping: 5.73
   m_AngularDamping: 1.2
   m_GravityScale: 15
   m_Material: {fileID: 0}
@@ -2271,8 +2277,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.02604413, y: 0.47891176}
-  m_Size: {x: 0.5381981, y: 3.396366}
+  m_Offset: {x: 0.02604413, y: 0.48250115}
+  m_Size: {x: 0.5381981, y: 3.389187}
   m_Direction: 0
 --- !u!114 &3447894650520491094
 MonoBehaviour:
