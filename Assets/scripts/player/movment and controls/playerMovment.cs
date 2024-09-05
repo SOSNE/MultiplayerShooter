@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -53,22 +54,24 @@ public class playerMovment : NetworkBehaviour
         
         _rb = GetComponent<Rigidbody2D>();
         
-        if (Input.GetKeyDown(KeyCode.W) && _grounded )
+        if (Input.GetKeyDown(KeyCode.Space) && _grounded )
         {
             _rb.linearVelocity = new Vector2(0, jumpHeight);
         }
         
-        if (Input.GetKey(KeyCode.W) && _goUp )
+        
+        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space)) && _goUp )
         { 
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
             _rb.linearVelocity = new Vector2(0, ladderSpeed);
+            _rb.linearDamping = 18;
         }
-        else if (Input.GetKey(KeyCode.S) && _goUp && !_grounded)
+        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.LeftControl)) && _goUp && !_grounded)
         {
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
             _rb.linearVelocity = new Vector2(0, -ladderSpeed/4);
         }
-        else if(_goUp && !_grounded)
+        else if(_goUp)
         {
             _rb.constraints |= RigidbodyConstraints2D.FreezePositionY;
             _rb.linearDamping = 18;
@@ -76,7 +79,11 @@ public class playerMovment : NetworkBehaviour
         else
         {
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
-            _rb.linearDamping = 3;
+        }
+        
+        if (!_grounded && !_goUp)
+        {
+            _rb.linearDamping = 0;
         }
         
         if (Input.GetKey(KeyCode.D))
@@ -86,6 +93,20 @@ public class playerMovment : NetworkBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             _rb.linearVelocity = new Vector2(-movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        _rb = GetComponent<Rigidbody2D>();
+        
+        if (!_grounded && !_goUp)
+        {
+            _rb.linearDamping = 0;
+        }
+        else
+        {
+            _rb.linearDamping = 10; 
         }
     }
 
