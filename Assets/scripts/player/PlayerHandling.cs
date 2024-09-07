@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class PlayerHhandling : NetworkBehaviour
     // NetworkBehaviourpublic NetworkList<int> playersHealth = new NetworkList<int>();
     public static Dictionary<ulong, int> clientHealthMap = new Dictionary<ulong, int>();
     private GameObject _gameManager;
+    
     
     public override void OnNetworkSpawn()
     {
@@ -18,7 +20,12 @@ public class PlayerHhandling : NetworkBehaviour
             gameObject.GetComponent<GameManager>().CreateCamera();
         }
     }
-    
+
+    // private void Update()
+    // {
+    //     uiControler.DisplayHp(clientHealthMap[NetworkManager.Singleton.LocalClientId]);
+    // }
+
     private void OnClientConnected(ulong clientId)
     {
         if (!IsOwner) return;
