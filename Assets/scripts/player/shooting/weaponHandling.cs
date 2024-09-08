@@ -9,7 +9,7 @@ public class weaponHandling : NetworkBehaviour
     public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
-    [SerializeField] private float bulletSpeed, tracerLength;
+    [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
     public LayerMask layerMask;
     [SerializeField] private 
     
@@ -19,16 +19,27 @@ public class weaponHandling : NetworkBehaviour
     }
 
     public static float BulletCounter = 0;
+    private float _currentTime = 0;
     void Update()
     {
         if (!IsOwner) return;
-        
-        if (BulletCounter < BulletCount)
+
+        if (BulletCounter >= BulletCount)
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Shoot();
-            }
+            return;
+        }
+
+        
+        _currentTime += Time.deltaTime;
+        if (_currentTime < fierRateInSeconds)
+        {
+            return;
+        }
+        
+        if (Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+            _currentTime = 0;
         }
     }
 
@@ -83,7 +94,6 @@ public class weaponHandling : NetworkBehaviour
     {
         GameObject lineObject = Instantiate(bulletTracer);
         float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
-        print(speed);
         StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
         ShootHandlingRpcClientRpc(contactData);
     }

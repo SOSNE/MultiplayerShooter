@@ -1362,6 +1362,7 @@ MonoBehaviour:
   shootParticleParticleSystem: {fileID: 5279721618452076697, guid: 4b430cf2206d22e4ea816e8d76d591c9, type: 3}
   bulletSpeed: 68.64
   tracerLength: 0.42
+  fierRateInSeconds: 0.16
   layerMask:
     serializedVersion: 2
     m_Bits: 17408
