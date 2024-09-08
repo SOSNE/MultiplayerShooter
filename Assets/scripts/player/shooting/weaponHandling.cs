@@ -2,6 +2,8 @@ using UnityEngine;
 using Unity.Netcode;
 using Vector3 = System.Numerics.Vector3;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Mathematics.Geometry;
 
 
 public class weaponHandling : NetworkBehaviour
@@ -10,6 +12,7 @@ public class weaponHandling : NetworkBehaviour
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
+    [SerializeField] private List<Transform> recoilBezierCurvesList = new List<Transform>();
     public LayerMask layerMask;
     [SerializeField] private 
     
@@ -23,7 +26,12 @@ public class weaponHandling : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-
+        
+        if (Input.GetKey(KeyCode.I))
+        {
+            StartCoroutine(WeaponRecoil(GameObject.Find("Cube").transform, 2));
+        }
+        
         if (BulletCounter >= BulletCount)
         {
             return;
@@ -77,6 +85,22 @@ public class weaponHandling : NetworkBehaviour
             ContactData data;
             data.Position = hit2D.point;
             ShootHandlingBulletTracerServerRpc(data);
+        }
+    }
+
+    IEnumerator WeaponRecoil(Transform weapon,float duration)
+    {
+        float startTime = Time.time;
+        while (Time.time - startTime < duration)
+        {
+            float t = (Time.time - startTime) / duration;
+            
+            Vector2 currentPosition = Mathf.Pow((1 - t), 3) * recoilBezierCurvesList[0].position +
+                                      3 * Mathf.Pow((1 - t), 2) * t * recoilBezierCurvesList[1].position +
+                                      3 * (1 - t) * Mathf.Pow(t, 2) * recoilBezierCurvesList[3].position +
+                                      Mathf.Pow(t, 3) * recoilBezierCurvesList[4].position;
+            weapon.position = currentPosition;
+            yield return null;
         }
     }
     
