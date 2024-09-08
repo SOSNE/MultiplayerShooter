@@ -27,40 +27,45 @@ public class weaponHandling : NetworkBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                ShootParticleServerRpc();
-                 
-                RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right.normalized, Mathf.Infinity, layerMask);
-                if (!hit2D)
-                {
-                    ContactData data;
-                    data.Position = bulletSpawn.position+ (-bulletSpawn.right.normalized)*40;
-                    ShootHandlingBulletTracerServerRpc(data);
-                }
-                else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
-                {
-                    ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
-                    ContactData data;
-                    data.Position = hit2D.point;
-                    NetworkObjectReference netObject = new NetworkObjectReference (
-                        hit2D.transform.GetComponent<NetworkObject>());
-                    if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
-                    {
-                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
-                    }
-                    else
-                    {
-                        ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
-                    }
-                    ShootHandlingBulletTracerServerRpc(data);
-                }
-                else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("ground"))
-                {
-                    ContactData data;
-                    data.Position = hit2D.point;
-                    ShootHandlingBulletTracerServerRpc(data);
-                }
+                Shoot();
             }
+        }
+    }
+
+    private void Shoot()
+    {
+        ShootParticleServerRpc();
+                 
+        RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, -bulletSpawn.right.normalized, Mathf.Infinity, layerMask);
+        if (!hit2D)
+        {
+            ContactData data;
+            data.Position = bulletSpawn.position+ (-bulletSpawn.right.normalized)*40;
+            ShootHandlingBulletTracerServerRpc(data);
+        }
+        else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
+        {
+            ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
+            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
+            ContactData data;
+            data.Position = hit2D.point;
+            NetworkObjectReference netObject = new NetworkObjectReference (
+                hit2D.transform.GetComponent<NetworkObject>());
+            if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+            {
+                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
+            }
+            else
+            {
+                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+            }
+            ShootHandlingBulletTracerServerRpc(data);
+        }
+        else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("ground"))
+        {
+            ContactData data;
+            data.Position = hit2D.point;
+            ShootHandlingBulletTracerServerRpc(data);
         }
     }
     

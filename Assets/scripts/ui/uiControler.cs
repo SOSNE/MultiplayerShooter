@@ -15,6 +15,9 @@ public class uiControler : NetworkBehaviour
     {
         float remainingBullets = weaponHandling.BulletCount - weaponHandling.BulletCounter;
         ammoCounter.text = $"Bulets: {weaponHandling.BulletCount} / {remainingBullets}";
-        hpCounter.text = "Hp: "+ PlayerHhandling.clientHealthMap[NetworkManager.Singleton.LocalClientId];
+        if (PlayerHhandling.clientHealthMap.ContainsKey(NetworkManager.Singleton.LocalClientId))
+        {
+            hpCounter.text = "Hp: "+ PlayerHhandling.clientHealthMap[NetworkManager.Singleton.LocalClientId];
+        }
     }
 }
