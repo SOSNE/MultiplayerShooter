@@ -10,7 +10,6 @@ public class pistolMovment : NetworkBehaviour
     public double maxExtension = 1.11931;
     public Camera camera;
     private float width;
-    [SerializeField] private List<Vector3> recoilBezierCurvesList = new List<Vector3>();
     private Vector3 _currentWeaponRecoilPosition;
     
     
@@ -19,21 +18,11 @@ public class pistolMovment : NetworkBehaviour
         // _camera = Camera.main;
         width = GetComponent<Renderer>().bounds.size.x;
         maxExtension = maxExtension - width + 0.27;
-        float distance = 1;
-        Vector3 bottomLeft = transform.position + new Vector3(-distance, -distance, 0); // Bottom-left corner
-        Vector3 topLeft = transform.position + new Vector3(-distance, distance, 0);     // Top-left corner
-        Vector3 topRight = transform.position + new Vector3(distance, distance, 0);     // Top-right corner
-        Vector3 bottomRight = transform.position + new Vector3(distance, -distance, 0); // Bottom-right corner
-
-        recoilBezierCurvesList.Add(bottomLeft);
-        recoilBezierCurvesList.Add(topLeft);
-        recoilBezierCurvesList.Add(topRight);
-        recoilBezierCurvesList.Add(bottomRight);
     }
 
     public void PerformRecoil()
     {
-        StartCoroutine(WeaponRecoil(transform, 0.5f));
+        StartCoroutine(WeaponRecoil(transform, 2f));
     }
     
     void Update()
@@ -83,15 +72,32 @@ public class pistolMovment : NetworkBehaviour
     
     IEnumerator WeaponRecoil(Transform weapon,float duration)
     {
+        List<Vector3> recoilBezierCurvesList = new List<Vector3>();
+        
+        float distance = 0.3f;
+        Vector3 bottomLeft = transform.position + new Vector3(-distance, -distance, 0); // Bottom-left corner
+        Vector3 topLeft = transform.position + new Vector3(-distance, distance, 0);     // Top-left corner
+        Vector3 topRight = transform.position + new Vector3(distance, distance, 0);     // Top-right corner
+        Vector3 bottomRight = transform.position + new Vector3(distance, -distance, 0); // Bottom-right corner
+
+        recoilBezierCurvesList.Add(bottomLeft);
+        recoilBezierCurvesList.Add(topLeft);
+        recoilBezierCurvesList.Add(topRight);
+        recoilBezierCurvesList.Add(bottomRight);
+
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
             float t = (Time.time - startTime) / duration;
-            
             _currentWeaponRecoilPosition = Mathf.Pow((1 - t), 3) * recoilBezierCurvesList[0] +
                                      3 * Mathf.Pow((1 - t), 2) * t * recoilBezierCurvesList[1] +
                                      3 * (1 - t) * Mathf.Pow(t, 2) * recoilBezierCurvesList[2] +
                                      Mathf.Pow(t, 3) * recoilBezierCurvesList[3];
+            
+            Vector3 initialOffset = transform.parent.transform.InverseTransformPoint(_currentWeaponRecoilPosition); 
+            
+            _currentWeaponRecoilPosition += transform.parent.transform.TransformPoint(initialOffset);
+            print(_currentWeaponRecoilPosition);
             yield return null;
         }
 
