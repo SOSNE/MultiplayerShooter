@@ -52,14 +52,14 @@ public class pistolMovment : NetworkBehaviour
         
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
-            transform.position = new Vector3(mouseWorldPosition.x ,mouseWorldPosition.y) + _currentWeaponRecoilPosition;
+            transform.position = new Vector3(mouseWorldPosition.x, mouseWorldPosition.y) + _currentWeaponRecoilPosition;
         }
         else
         {
             transform.rotation = Quaternion.Euler(new Vector3(0f,0f, angle + Convert.ToSingle(angleCorrection)));
             if (_currentWeaponRecoilPosition != new Vector3(0, 0, 0))
             {
-                transform.position =  _currentWeaponRecoilPosition;
+                transform.localPosition =  _currentWeaponRecoilPosition;
             }
         }
         if (leftArmExtenstionToWeapon >= 1.11931 || rightArmExtenstionToWeapon >= 1.11931)
@@ -75,10 +75,10 @@ public class pistolMovment : NetworkBehaviour
         List<Vector3> recoilBezierCurvesList = new List<Vector3>();
         
         float distance = 0.3f;
-        Vector3 bottomLeft = transform.position + new Vector3(-distance, -distance, 0); // Bottom-left corner
-        Vector3 topLeft = transform.position + new Vector3(-distance, distance, 0);     // Top-left corner
-        Vector3 topRight = transform.position + new Vector3(distance, distance, 0);     // Top-right corner
-        Vector3 bottomRight = transform.position + new Vector3(distance, -distance, 0); // Bottom-right corner
+        Vector3 bottomLeft = transform.localPosition + new Vector3(-distance, -distance, 0); // Bottom-left corner
+        Vector3 topLeft = transform.localPosition + new Vector3(-distance, distance, 0);     // Top-left corner
+        Vector3 topRight = transform.localPosition + new Vector3(distance, distance, 0);     // Top-right corner
+        Vector3 bottomRight = transform.localPosition + new Vector3(distance, -distance, 0); // Bottom-right corner
 
         recoilBezierCurvesList.Add(bottomLeft);
         recoilBezierCurvesList.Add(topLeft);
@@ -89,18 +89,13 @@ public class pistolMovment : NetworkBehaviour
         while (Time.time - startTime < duration)
         {
             float t = (Time.time - startTime) / duration;
+
             _currentWeaponRecoilPosition = Mathf.Pow((1 - t), 3) * recoilBezierCurvesList[0] +
-                                     3 * Mathf.Pow((1 - t), 2) * t * recoilBezierCurvesList[1] +
-                                     3 * (1 - t) * Mathf.Pow(t, 2) * recoilBezierCurvesList[2] +
-                                     Mathf.Pow(t, 3) * recoilBezierCurvesList[3];
-            
-            Vector3 initialOffset = transform.parent.transform.InverseTransformPoint(_currentWeaponRecoilPosition); 
-            
-            _currentWeaponRecoilPosition += transform.parent.transform.TransformPoint(initialOffset);
-            print(_currentWeaponRecoilPosition);
+                                           3 * Mathf.Pow((1 - t), 2) * t * recoilBezierCurvesList[1] +
+                                           3 * (1 - t) * Mathf.Pow(t, 2) * recoilBezierCurvesList[2] +
+                                           Mathf.Pow(t, 3) * recoilBezierCurvesList[3];
             yield return null;
         }
-
-        _currentWeaponRecoilPosition = new Vector3(0, 0, 0);
+        _currentWeaponRecoilPosition = Vector3.zero;
     }
 }
