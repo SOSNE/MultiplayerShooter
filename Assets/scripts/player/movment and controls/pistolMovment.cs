@@ -52,7 +52,7 @@ public class pistolMovment : NetworkBehaviour
         
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
-            transform.position = new Vector3(mouseWorldPosition.x, mouseWorldPosition.y) + _currentWeaponRecoilPosition;
+                transform.localPosition = transform.parent.InverseTransformPoint(new Vector3(mouseWorldPosition.x, mouseWorldPosition.y)) + _currentWeaponRecoilPosition;
         }
         else
         {
