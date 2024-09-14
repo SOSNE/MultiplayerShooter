@@ -28,6 +28,7 @@ public class pistolMovment : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
+        if (!camera) return;
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
@@ -52,14 +53,23 @@ public class pistolMovment : NetworkBehaviour
         
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
-                transform.localPosition = transform.parent.InverseTransformPoint(new Vector3(mouseWorldPosition.x, mouseWorldPosition.y)) + _currentWeaponRecoilPosition;
+                
+                // mouseWorldPosition = transform.parent.InverseTransformPoint(mouseWorldPosition) + _currentWeaponRecoilPosition;
+                Vector3 weaponTargetPosition = transform.parent.InverseTransformPoint(new Vector3(mouseWorldPosition.x, mouseWorldPosition.y));
+                
+                Vector3 counterRecoilPosition = weaponTargetPosition + _currentWeaponRecoilPosition * 0.2f;
+
+                transform.localPosition = counterRecoilPosition;
         }
-        else
+        else 
         {
-            transform.rotation = Quaternion.Euler(new Vector3(0f,0f, angle + Convert.ToSingle(angleCorrection)));
+            if (Vector2.Distance(mouseWorldPosition, transform.position) > 0.3f)
+            {
+                transform.rotation = Quaternion.Euler(new Vector3(0f,0f, angle + Convert.ToSingle(angleCorrection)));
+            }
             if (_currentWeaponRecoilPosition != new Vector3(0, 0, 0))
             {
-                transform.localPosition =  _currentWeaponRecoilPosition;
+                transform.localPosition = _currentWeaponRecoilPosition;
             }
         }
         if (leftArmExtenstionToWeapon >= 1.11931 || rightArmExtenstionToWeapon >= 1.11931)
