@@ -11,6 +11,7 @@ public class pistolMovment : NetworkBehaviour
     public Camera camera;
     private float width, _rotationRecoilAngle, _angle;
     private Vector3 _currentWeaponRecoilPosition;
+    public Transform[] playerTransforms;
     
     
     private void Start()
@@ -20,16 +21,41 @@ public class pistolMovment : NetworkBehaviour
         maxExtension = maxExtension - width + 0.27;
     }
 
+    private float GetClosestTransform(Transform[] transforms)
+    {
+        float closestDistance = Mathf.Infinity;
+        foreach (var tr in transforms)
+        {
+            float tempDistance = Vector2.Distance(transform.position, tr.position);
+            
+            if (tempDistance < closestDistance)
+            {
+                closestDistance = tempDistance;
+            }
+        }
+        
+        return closestDistance;
+    }
     public void PerformRecoil()
     {
-        StartCoroutine(WeaponRecoil(transform, 2f));
+        float distance = GetClosestTransform(playerTransforms);
+        
+        float normalizedParam = distance / (float)maxExtension;
+
+        // Check if normalizedParam is less than or equal to the threshold
+        float recoilScaleValue = 0;
+        if (normalizedParam > 0.3f)
+        {
+             recoilScaleValue = Mathf.Lerp(0f, 0.06f, (normalizedParam - 0.3f) / (1 - 0.3f));
+        }
+
+        StartCoroutine(WeaponRecoil(0.2f, recoilScale:  recoilScaleValue));
     }
     
     void Update()
     {
         if (!IsOwner) return;
         if (!camera) return;
-        
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
         
@@ -56,9 +82,11 @@ public class pistolMovment : NetworkBehaviour
                 // local mouse position in relation to player
                 Vector3 weaponTargetPosition = transform.parent.InverseTransformPoint(new Vector3(mouseWorldPosition.x, mouseWorldPosition.y));
                 
-                Vector3 counterRecoilPosition = weaponTargetPosition + _currentWeaponRecoilPosition * 0.2f;
+                // Vector3 counterRecoilPosition = weaponTargetPosition + _currentWeaponRecoilPosition * 0.2f;
+                
+                transform.localPosition = weaponTargetPosition;
+                transform.rotation = Quaternion.Euler(new Vector3(0f,0f, transform.rotation.z + _rotationRecoilAngle));
 
-                transform.localPosition = counterRecoilPosition;
         }
         else 
         {
@@ -68,7 +96,8 @@ public class pistolMovment : NetworkBehaviour
                 transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
             }
             
-            if (_currentWeaponRecoilPosition != new Vector3(0, 0, 0))
+            // check if we are doing recoil and if weapon is not beyond the arms reach.
+            if (_currentWeaponRecoilPosition != new Vector3(0, 0, 0) && !(leftArmExtenstionToWeapon >= 1.11931 || rightArmExtenstionToWeapon >= 1.11931))
             {
                 transform.localPosition = _currentWeaponRecoilPosition;
             }
@@ -81,16 +110,17 @@ public class pistolMovment : NetworkBehaviour
         }
     }
     
-    IEnumerator WeaponRecoil(Transform weapon,float duration,float recoilAngleIncrease = 40, float recoilScale = 0.4f)
+    IEnumerator WeaponRecoil(float duration,float recoilAngleIncrease = 40, float recoilScale = 0.06f)
     {
         List<Vector3> recoilBezierCurvesList = new List<Vector3>();
         
         float distance = 0.3f;
         Vector3 bottomLeft = transform.localPosition; // Bottom-left corner
-        Vector3 topLeft = transform.localPosition + new Vector3(0.38f, 0.34f, 0) * recoilScale;     // Top-left corner
-        Vector3 topRight = transform.localPosition + new Vector3(1.3f, 0.56f, 0) * recoilScale;     // Top-right corner
-        Vector3 bottomRight = transform.localPosition + new Vector3(1.5f, 0.57f, 0) * recoilScale; // Bottom-right corner
-
+        Vector3 topLeft = transform.localPosition + transform.TransformPoint(new Vector3(1.0f, 0.2f, 0)) * recoilScale;  // Top-left corner
+        Vector3 topRight = transform.localPosition + transform.TransformPoint(new Vector3(1.5f, 0.3f, 0)) * recoilScale;  // Top-right corner
+        Vector3 bottomRight = transform.localPosition + transform.TransformPoint(new Vector3(1.8f, 0.3f, 0)) * recoilScale;  // Bottom-right corner
+        
+        
         recoilBezierCurvesList.Add(bottomLeft);
         recoilBezierCurvesList.Add(topLeft);
         recoilBezierCurvesList.Add(topRight);
@@ -107,13 +137,25 @@ public class pistolMovment : NetworkBehaviour
                                            Mathf.Pow(t, 3) * recoilBezierCurvesList[3];
             _rotationRecoilAngle = -Mathf.Lerp(0, recoilAngleIncrease, t);
             
-            
-            print(_rotationRecoilAngle);
             yield return null;
         }
-        // return weapon position to its starting position
-        transform.localPosition = bottomLeft;
+        // return weapon position to it`s starting position
+        StartCoroutine(WeaponRegressionAfterRecoil(0.05f, transform.localPosition, bottomLeft)); 
         _currentWeaponRecoilPosition = Vector3.zero;
         _rotationRecoilAngle = 0;
+    }
+    IEnumerator WeaponRegressionAfterRecoil(float duration, Vector3 start, Vector3 end)
+    {
+        Vector3 weaponRegressionPosition = transform.localPosition;
+        float startTime = Time.time;
+        while (Time.time - startTime < duration)
+        {
+            float t = (Time.time - startTime) / duration;
+            
+            weaponRegressionPosition = Vector3.Lerp(start, end, t);
+            
+            yield return null;
+        }
+        transform.localPosition = weaponRegressionPosition;
     }
 }
