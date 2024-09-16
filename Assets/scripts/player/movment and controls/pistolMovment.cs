@@ -46,9 +46,8 @@ public class pistolMovment : NetworkBehaviour
         float recoilScaleValue = 0;
         if (normalizedParam > 0.3f)
         {
-             recoilScaleValue = Mathf.Lerp(0f, 0.06f, (normalizedParam - 0.3f) / (1 - 0.3f));
+             recoilScaleValue = Mathf.Lerp(0f, 0.1f, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
-
         StartCoroutine(WeaponRecoil(0.2f, recoilScale:  recoilScaleValue));
     }
     
@@ -115,10 +114,10 @@ public class pistolMovment : NetworkBehaviour
         List<Vector3> recoilBezierCurvesList = new List<Vector3>();
         
         float distance = 0.3f;
-        Vector3 bottomLeft = transform.localPosition; // Bottom-left corner
-        Vector3 topLeft = transform.localPosition + transform.TransformPoint(new Vector3(1.0f, 0.2f, 0)) * recoilScale;  // Top-left corner
-        Vector3 topRight = transform.localPosition + transform.TransformPoint(new Vector3(1.5f, 0.3f, 0)) * recoilScale;  // Top-right corner
-        Vector3 bottomRight = transform.localPosition + transform.TransformPoint(new Vector3(1.8f, 0.3f, 0)) * recoilScale;  // Bottom-right corner
+        Vector3 bottomLeft = transform.localPosition; // Bottom-left 
+        Vector3 topLeft = transform.localPosition + new Vector3(1.0f, 0.2f, 0) * recoilScale;  // Top-left corner
+        Vector3 topRight = transform.localPosition + new Vector3(1.5f, 0.3f, 0) * recoilScale;  // Top-right corner
+        Vector3 bottomRight = transform.localPosition + new Vector3(1.8f, 0.3f, 0) * recoilScale;  // Bottom-right corner
         
         
         recoilBezierCurvesList.Add(bottomLeft);
