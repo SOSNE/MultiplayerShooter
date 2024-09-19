@@ -74,26 +74,45 @@ public class GameManager : NetworkBehaviour
 
     public void HandleGame(ulong currentClientId, ulong hitClientId)
     {
-        
+        int teamIndexOverwrite = 10;
         for (int i = 0; i < AllPlayersData.Count; i++)
         {
             if (AllPlayersData[i].ClientId == hitClientId)
             {
-                PlayerData myStruct  = AllPlayersData[i];
+                
+                //calculate teamIndexOverwrite for self killing.
+                //if shoot himself
+                if (currentClientId == hitClientId)
+                {
+                    if (AllPlayersData[i].Team == 0)
+                    {
+                        teamIndexOverwrite = 1;
+                    }
+                    else
+                    {
+                        teamIndexOverwrite = 0;
+                    }  
+                         
+                }
+                PlayerData myStruct = AllPlayersData[i];
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 playersAlive[AllPlayersData[i].Team] -= 1;
             }
         }
-        // print(AllPlayersData[0].Team +"" AllPlayersData[1].Team);
-        if (playersAlive[AllPlayersData[0].Team] == 0 || playersAlive[AllPlayersData[1].Team] == 0)
+        if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
         {
-            print("testt");
-            UpdatePointScoreDictionary(currentClientId);
+            UpdatePointScoreDictionary(currentClientId, teamIndexOverwrite);
             ResetHealthMap();
+            RestartPlayersAliveList();
             RestartPositions();
         }
-        
+    }
+
+    private void RestartPlayersAliveList()
+    {
+        playersAlive[0] = 0;
+        playersAlive[1] = 0;
     }
 
     public void ResetHealthMap()
@@ -127,9 +146,17 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void UpdatePointScoreDictionary(ulong clientId)
+    public void UpdatePointScoreDictionary(ulong clientId, int teamIndexOverwrite)
     {
-        int teamIndex = AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team;
+        int teamIndex;
+        if (teamIndexOverwrite == 10)
+        {
+            teamIndex = AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team;
+        }
+        else
+        {
+            teamIndex = teamIndexOverwrite;
+        }
         _pointScore[teamIndex] += 1;
     }
     
