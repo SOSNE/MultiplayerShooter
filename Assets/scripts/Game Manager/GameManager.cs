@@ -85,8 +85,10 @@ public class GameManager : NetworkBehaviour
                 playersAlive[AllPlayersData[i].Team] -= 1;
             }
         }
-        if (AllPlayersData[0].Team == 0 || AllPlayersData[1].Team == 0)
+        // print(AllPlayersData[0].Team +"" AllPlayersData[1].Team);
+        if (playersAlive[AllPlayersData[0].Team] == 0 || playersAlive[AllPlayersData[1].Team] == 0)
         {
+            print("testt");
             UpdatePointScoreDictionary(currentClientId);
             ResetHealthMap();
             RestartPositions();

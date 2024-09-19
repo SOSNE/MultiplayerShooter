@@ -2261,7 +2261,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 311e0f9e1f0b2d046a2978b4910d06e8, type: 2}
+  m_Material: {fileID: 6200000, guid: 7a49ae4d7727a4fe8b4e06f830b7097a, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2298,7 +2298,7 @@ BoxCollider2D:
   m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 311e0f9e1f0b2d046a2978b4910d06e8, type: 2}
+  m_Material: {fileID: 6200000, guid: 7a49ae4d7727a4fe8b4e06f830b7097a, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
