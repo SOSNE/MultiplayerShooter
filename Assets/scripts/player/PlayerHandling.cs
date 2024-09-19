@@ -47,6 +47,17 @@ public class PlayerHhandling : NetworkBehaviour
     private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
     {
         clientHealthMap.Add(clientId, 10);
+        
+        // update health ui
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]{clientId}
+            }
+        };
+        GameObject.Find("UiControler").GetComponent<uiControler>()
+            .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
     
     [ServerRpc]
@@ -57,5 +68,17 @@ public class PlayerHhandling : NetworkBehaviour
         {
             gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId);
         }
+        
+        // update health ui
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]{clientId}
+            }
+        };
+
+        GameObject.Find("UiControler").GetComponent<uiControler>()
+            .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
 }
