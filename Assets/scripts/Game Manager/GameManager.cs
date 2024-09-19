@@ -146,7 +146,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void UpdatePointScoreDictionary(ulong clientId, int teamIndexOverwrite)
+    private void UpdatePointScoreDictionary(ulong clientId, int teamIndexOverwrite)
     {
         int teamIndex;
         if (teamIndexOverwrite == 10)
