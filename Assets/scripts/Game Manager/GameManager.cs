@@ -31,9 +31,8 @@ public class GameManager : NetworkBehaviour
     {
         teamOneWinCounter = FindObjectInHierarchy("Team 0").GetComponent<TextMeshProUGUI>();
         teamTwoWinCounter = FindObjectInHierarchy("Team 1").GetComponent<TextMeshProUGUI>();
-        // Cursor.lockState = CursorLockMode.Confined;
-        // Cursor.visible = true;
-        
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
     }
 
     private GameObject _createdCamera;
