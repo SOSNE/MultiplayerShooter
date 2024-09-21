@@ -84,6 +84,12 @@ public class pistolMovment : NetworkBehaviour
                 // Vector3 counterRecoilPosition = weaponTargetPosition + _currentWeaponRecoilPosition * 0.2f;
                 
                 transform.localPosition = weaponTargetPosition;
+                
+                if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+                {
+                    // If the object is mirrored, invert the target rotation to compensate for flipping
+                    _rotationRecoilAngle = -_rotationRecoilAngle;
+                }
                 transform.rotation = Quaternion.Euler(new Vector3(0f,0f, transform.rotation.z + _rotationRecoilAngle));
 
         }
@@ -92,6 +98,11 @@ public class pistolMovment : NetworkBehaviour
             
             if (Vector2.Distance(mouseWorldPosition, transform.position) > 0.3f)
             {
+                if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+                {
+                    // If the object is mirrored, invert the target rotation to compensate for flipping
+                    _rotationRecoilAngle = -_rotationRecoilAngle;
+                }
                 transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
             }
             
