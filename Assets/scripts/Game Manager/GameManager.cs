@@ -110,8 +110,20 @@ public class GameManager : NetworkBehaviour
 
     private void RestartPlayersAliveList()
     {
-        playersAlive[0] = 0;
-        playersAlive[1] = 0;
+        foreach (var Data in AllPlayersData)
+        {
+            if (Data.Team == 0)
+            {
+                playersAlive[0] += 1;
+            }
+            else
+            {
+                playersAlive[1] += 1;
+            }
+        }
+        
+        GameObject.Find("UiControler").GetComponent<uiControler>()
+            .GetHealthForUiClientRpc(100, default);
     }
 
     public void ResetHealthMap()
@@ -120,13 +132,12 @@ public class GameManager : NetworkBehaviour
 
         foreach (var key in keys)
         {
-            PlayerHhandling.clientHealthMap[key] = 10;
+            PlayerHhandling.clientHealthMap[key] = 100;
         }
     }
     
     public void RestartPositions()
     {
-        
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
         foreach (var record in AllPlayersData)

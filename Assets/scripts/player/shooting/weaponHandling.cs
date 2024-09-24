@@ -13,12 +13,6 @@ public class weaponHandling : NetworkBehaviour
     public static readonly float  BulletCount = 10;
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
     public LayerMask layerMask;
-    [SerializeField] private 
-    
-    void Start()
-    {
-        
-    }
 
     public static float BulletCounter = 0;
     private float _currentTime = 0;
@@ -64,7 +58,33 @@ public class weaponHandling : NetworkBehaviour
         else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
         {
             ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
-            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(5, shooterNetworkId);
+            switch (hit2D.collider.gameObject.name)
+            {
+                case "head":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId);
+                    break;
+                
+                case "bodyDown" or "bodyUp":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId);
+                    break;
+                
+                case "rightArmStart" or "rightArmEnd":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
+                    break;
+                
+                case "leftArmStart" or "leftArmEnd":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
+                    break;
+                
+                case "leftLegStart" or "leftLegEnd":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
+                    break;
+                
+                case "rightLegStart" or "rightLegEnd":
+                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
+                    break;
+                
+            }
             ContactData data;
             data.Position = hit2D.point;
             NetworkObjectReference netObject = new NetworkObjectReference (
@@ -110,7 +130,6 @@ public class weaponHandling : NetworkBehaviour
     {
         if (playerGameObject.TryGet(out NetworkObject networkObject))
         {
-            print(transformEulerAnglesZ);
             Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transformEulerAnglesZ)).transform;
             blood.GetComponent<NetworkObject>().Spawn(true);
             blood.rotation = Quaternion.Euler(0f, 0f, transformEulerAnglesZ);
