@@ -5,6 +5,8 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using Random = System.Random;
+
 public struct PlayerData
 {
     public ulong ClientId;
@@ -138,6 +140,9 @@ public class GameManager : NetworkBehaviour
     
     public void RestartPositions()
     {
+        //reset position list
+        positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2 ,3 };
+
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
         foreach (var record in AllPlayersData)
@@ -209,6 +214,7 @@ public class GameManager : NetworkBehaviour
                 SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
             }
     }
+    public List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2 ,3 };
 
     [ClientRpc]
     private void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
@@ -217,7 +223,19 @@ public class GameManager : NetworkBehaviour
         {
             if(spawnGameObject.TryGet(out NetworkObject spawnNetworkObject))
             {
-                playerNetworkObject.transform.position = spawnNetworkObject.transform.position;
+                if (positionsDistance.Count != 0)
+                {
+                    Random random = new Random();
+                    int randomIndex = random.Next(positionsDistance.Count);
+                    var randomNumberDistance = positionsDistance[randomIndex];
+                    playerNetworkObject.transform.position = spawnNetworkObject.transform.position +
+                                                             new Vector3(randomNumberDistance, 0, 0);
+                    positionsDistance.RemoveAt(randomIndex);
+                }
+                else
+                {
+                    playerNetworkObject.transform.position = spawnNetworkObject.transform.position;
+                }
             }
         }
     }
