@@ -65,12 +65,16 @@ public class GameManager : NetworkBehaviour
     private void FixedUpdate()
     {
         if(!IsOwner) return;
-        Camera camera = _createdCamera.GetComponent<Camera>();
-        Vector3 mouseScreenPosition = Input.mousePosition;
-        Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
-        Vector3 betweenPosition = Vector3.Lerp( transform.position, mouseWorldPosition, 0.4f);
-        Vector3 smoothPosition = Vector3.Lerp( _createdCamera.transform.position, betweenPosition, cameraSmoothness);
-        _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
+        if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
+        {
+            Camera camera = _createdCamera.GetComponent<Camera>();
+            Vector3 mouseScreenPosition = Input.mousePosition;
+            Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
+            Vector3 betweenPosition = Vector3.Lerp( transform.position, mouseWorldPosition, 0.4f);
+            Vector3 smoothPosition = Vector3.Lerp( _createdCamera.transform.position, betweenPosition, cameraSmoothness);
+            _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
+        }
+        
     }
 
     public void HandleGame(ulong currentClientId, ulong hitClientId)
