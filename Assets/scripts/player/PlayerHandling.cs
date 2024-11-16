@@ -96,18 +96,17 @@ public class PlayerHhandling : NetworkBehaviour
         playerTarget.GetComponent<IKManager2D>().enabled = false;
         playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<playerMovment>().enabled = false;
-        // playerTarget.GetComponent<Rigidbody2D>().simulated = false;
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
         playerTarget.GetComponent<crouchingAnimation>().enabled = false;
         SetLayerRecursively(transform.Find("bodyDown").gameObject, 0);
-        transform.Find("bodyDown").AddComponent<Rigidbody2D>();
+        transform.Find("bodyDown").GetComponent<Rigidbody2D>().simulated = true;
 
         foreach (var joint2D in playerHingeJoints2d)
         {
             joint2D.enabled = true;
-            joint2D.gameObject.AddComponent<Rigidbody2D>();
+            joint2D.gameObject.GetComponent<Rigidbody2D>().simulated = true;
 
         }
     }
