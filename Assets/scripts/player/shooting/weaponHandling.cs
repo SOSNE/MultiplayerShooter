@@ -60,27 +60,27 @@ public class weaponHandling : NetworkBehaviour
             ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
             switch (hit2D.collider.gameObject.name)
             {
-                case "head":
+                case "headCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId);
                     break;
                 
-                case "bodyDown" or "bodyUp":
+                case "bodyDownCollider" or "bodyUpCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId);
                     break;
                 
-                case "rightArmStart" or "rightArmEnd":
+                case "rightArmStartCollider" or "rightArmEndCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
                     break;
                 
-                case "leftArmStart" or "leftArmEnd":
+                case "leftArmStartCollider" or "leftArmEndCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
                     break;
                 
-                case "leftLegStart" or "leftLegEnd":
+                case "leftLegStartCollider" or "leftLegEndCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
                     break;
                 
-                case "rightLegStart" or "rightLegEnd":
+                case "rightLegStartCollider" or "rightLegEndCollider":
                     transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId);
                     break;
                 

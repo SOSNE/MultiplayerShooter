@@ -106,8 +106,9 @@ public class PlayerHhandling : NetworkBehaviour
         foreach (var joint2D in playerHingeJoints2d)
         {
             joint2D.enabled = true;
+            GetChildWithTag(joint2D.gameObject.transform, "playerColliderDetection")
+                .GetComponent<Rigidbody2D>().simulated = false;
             joint2D.gameObject.GetComponent<Rigidbody2D>().simulated = true;
-
         }
     }
     
@@ -120,4 +121,16 @@ public class PlayerHhandling : NetworkBehaviour
             SetLayerRecursively(child.gameObject, layer);
         }
     }
+    Transform GetChildWithTag(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+
 }

@@ -7,6 +7,8 @@ TagManager:
   - ground
   - player
   - ladder
+  - playerColliderDetection
+  - ok
   layers:
   - Default
   - TransparentFX
