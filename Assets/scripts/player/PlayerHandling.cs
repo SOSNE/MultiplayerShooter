@@ -91,14 +91,13 @@ public class PlayerHhandling : NetworkBehaviour
             .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
 
-    public void PerformRagdollOnPlayer(Transform playerTarget)
+    private void PerformRagdollOnPlayer(Transform playerTarget)
     {
-        Vector2 velocityToPass;
         Transform bodyDown = transform.Find("bodyDown");
         playerTarget.GetComponent<IKManager2D>().enabled = false;
         playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<playerMovment>().enabled = false;
-        velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
+        var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
