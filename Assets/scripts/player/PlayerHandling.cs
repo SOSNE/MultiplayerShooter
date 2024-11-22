@@ -93,16 +93,20 @@ public class PlayerHhandling : NetworkBehaviour
 
     public void PerformRagdollOnPlayer(Transform playerTarget)
     {
+        Vector2 velocityToPass;
+        Transform bodyDown = transform.Find("bodyDown");
         playerTarget.GetComponent<IKManager2D>().enabled = false;
         playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<playerMovment>().enabled = false;
+        velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
         playerTarget.GetComponent<crouchingAnimation>().enabled = false;
         SetLayerRecursively(transform.Find("bodyDown").gameObject, 17);
-        transform.Find("bodyDown").GetComponent<Rigidbody2D>().simulated = true;
-        transform.Find("bodyDown").Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
+        bodyDown.GetComponent<Rigidbody2D>().simulated = true;
+        
+        bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
 
         foreach (var joint2D in playerHingeJoints2d)
         {
@@ -112,6 +116,7 @@ public class PlayerHhandling : NetworkBehaviour
             joint2D.gameObject.GetComponent<Rigidbody2D>().simulated = true;
             print(joint2D.gameObject.name);
         }
+        bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
     }
     
     void SetLayerRecursively(GameObject obj, int layer)
