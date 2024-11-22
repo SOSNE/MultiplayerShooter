@@ -100,8 +100,9 @@ public class PlayerHhandling : NetworkBehaviour
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
         playerTarget.GetComponent<crouchingAnimation>().enabled = false;
-        SetLayerRecursively(transform.Find("bodyDown").gameObject, 0);
+        SetLayerRecursively(transform.Find("bodyDown").gameObject, 17);
         transform.Find("bodyDown").GetComponent<Rigidbody2D>().simulated = true;
+        transform.Find("bodyDown").Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
 
         foreach (var joint2D in playerHingeJoints2d)
         {
@@ -109,6 +110,7 @@ public class PlayerHhandling : NetworkBehaviour
             GetChildWithTag(joint2D.gameObject.transform, "playerColliderDetection")
                 .GetComponent<Rigidbody2D>().simulated = false;
             joint2D.gameObject.GetComponent<Rigidbody2D>().simulated = true;
+            print(joint2D.gameObject.name);
         }
     }
     
