@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using TMPro;
@@ -110,10 +111,9 @@ public class GameManager : NetworkBehaviour
         //restart game after all players are dead
         if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
         {
-            UpdatePointScoreDictionary(currentClientId, teamIndexOverwrite);
-            ResetHealthMap();
-            RestartPlayersAliveList();
-            RestartPositions();
+            
+            StartCoroutine(NextRoundCourtione(2, currentClientId, teamIndexOverwrite));
+            
         }
     }
 
@@ -256,8 +256,17 @@ public class GameManager : NetworkBehaviour
             gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform);
         }
     }
-    
-    
+
+    IEnumerator NextRoundCourtione(float duration, ulong clientId, int teamIndexOverwrite)
+    {
+        UpdatePointScoreDictionary(clientId, teamIndexOverwrite);
+        yield return new WaitForSeconds(duration);
+        ResetHealthMap();
+        RestartPlayersAliveList();
+        RestartPositions();
+    }
+
+
     private GameObject FindObjectInHierarchy(string name)
     {
         GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>(true);
