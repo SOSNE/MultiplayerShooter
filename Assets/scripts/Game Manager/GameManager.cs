@@ -65,7 +65,8 @@ public class GameManager : NetworkBehaviour
     private void FixedUpdate()
     {
         if(!IsOwner) return;
-        if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
+        // This part couse bug. I this it should be in ServerRcp because AllPlayersData list is local for host.
+        // if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
         {
             Camera camera = _createdCamera.GetComponent<Camera>();
             Vector3 mouseScreenPosition = Input.mousePosition;
@@ -103,8 +104,10 @@ public class GameManager : NetworkBehaviour
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 playersAlive[AllPlayersData[i].Team] -= 1;
+                performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject);
             }
         }
+        //restart game after all players are dead
         if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
         {
             UpdatePointScoreDictionary(currentClientId, teamIndexOverwrite);
@@ -241,6 +244,16 @@ public class GameManager : NetworkBehaviour
                     playerNetworkObject.transform.position = spawnNetworkObject.transform.position;
                 }
             }
+        }
+    }
+
+    
+    [ClientRpc]
+    private void performRagdollOnSelectedPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
+    {
+        if(playerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
+        {
+            gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform);
         }
     }
     
