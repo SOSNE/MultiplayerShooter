@@ -7,6 +7,8 @@ TagManager:
   - ground
   - player
   - ladder
+  - playerColliderDetection
+  - bodyPart
   layers:
   - Default
   - TransparentFX
@@ -25,7 +27,7 @@ TagManager:
   - ground
   - 
   - 
-  - 
+  - playerRagdollCollider
   - 
   - 
   - 

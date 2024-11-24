@@ -2,13 +2,19 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.U2D.IK;
+
 
 public class PlayerHhandling : NetworkBehaviour
 {
     // NetworkBehaviourpublic NetworkList<int> playersHealth = new NetworkList<int>();
     public static Dictionary<ulong, int> clientHealthMap = new Dictionary<ulong, int>();
     private GameObject _gameManager;
+
+    [SerializeField]
+    private List<HingeJoint2D>  playerHingeJoints2d;
     
     
     public override void OnNetworkSpawn()
@@ -21,10 +27,7 @@ public class PlayerHhandling : NetworkBehaviour
         }
     }
 
-    // private void Update()
-    // {
-    //     uiControler.DisplayHp(clientHealthMap[NetworkManager.Singleton.LocalClientId]);
-    // }
+    
 
     private void OnClientConnected(ulong clientId)
     {
@@ -80,4 +83,64 @@ public class PlayerHhandling : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
+
+    public void PerformRagdollOnPlayer(Transform playerTarget)
+    {
+        Transform bodyDown = playerTarget.Find("bodyDown");
+        playerTarget.GetComponent<IKManager2D>().enabled = false;
+        playerTarget.GetComponent<Animator>().enabled = false;
+        playerTarget.GetComponent<playerMovment>().enabled = false;
+        var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
+        playerTarget.GetComponent<Rigidbody2D>().simulated = false;
+        playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
+        playerTarget.GetComponent<wlakingAnimation>().enabled = false;
+        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
+        SetLayerRecursively(bodyDown.gameObject, 17);
+        bodyDown.GetComponent<Rigidbody2D>().simulated = true;
+        
+        bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
+
+        SearchChildrenByTag(bodyDown, "bodyPart");
+        
+        bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
+    }
+    
+    void SearchChildrenByTag(Transform parent, string tag)
+    {
+        
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                child.GetComponent<Joint2D>().enabled = true;
+                GetChildWithTag(child, "playerColliderDetection")
+                    .GetComponent<Rigidbody2D>().simulated = false;
+                child.GetComponent<Rigidbody2D>().simulated = true;
+            }
+
+            SearchChildrenByTag(child, tag);
+        }
+    }
+    
+    void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
+    }
+    Transform GetChildWithTag(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                return child;
+            }
+        }
+        return null;
+    }
+
 }
