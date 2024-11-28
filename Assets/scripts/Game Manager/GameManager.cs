@@ -264,6 +264,7 @@ public class GameManager : NetworkBehaviour
         ResetHealthMap();
         RestartPlayersAliveList();
         RestartPositions();
+        gameObject.GetComponent<PlayerHhandling>().TurnRagdollOf(transform);
     }
 
 

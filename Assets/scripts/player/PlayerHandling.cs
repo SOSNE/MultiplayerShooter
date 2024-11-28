@@ -100,25 +100,57 @@ public class PlayerHhandling : NetworkBehaviour
         
         bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
 
-        SearchChildrenByTag(bodyDown, "bodyPart");
+        SearchChildrenByTag(bodyDown, "bodyPart", true);
         
         bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
     }
     
-    void SearchChildrenByTag(Transform parent, string tag)
+    public void TurnRagdollOf(Transform playerTarget)
+    {
+        Transform bodyDown = playerTarget.Find("bodyDown");
+        playerTarget.GetComponent<IKManager2D>().enabled = true;
+        playerTarget.GetComponent<Animator>().enabled = true;
+        playerTarget.GetComponent<playerMovment>().enabled = true;
+        // var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
+        playerTarget.GetComponent<Rigidbody2D>().simulated = true;
+        playerTarget.GetComponent<CapsuleCollider2D>().enabled = true;
+        playerTarget.GetComponent<wlakingAnimation>().enabled = true;
+        playerTarget.GetComponent<crouchingAnimation>().enabled = true;
+        SetLayerRecursively(bodyDown.gameObject, 10);
+        bodyDown.GetComponent<Rigidbody2D>().simulated = false;
+        
+        bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = true;
+
+        SearchChildrenByTag(bodyDown, "bodyPart", false);
+        
+        // bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
+    }
+    
+    void SearchChildrenByTag(Transform parent, string tag, bool ragdollOn)
     {
         
         foreach (Transform child in parent)
         {
             if (child.CompareTag(tag))
             {
-                child.GetComponent<Joint2D>().enabled = true;
-                GetChildWithTag(child, "playerColliderDetection")
-                    .GetComponent<Rigidbody2D>().simulated = false;
-                child.GetComponent<Rigidbody2D>().simulated = true;
+                if (ragdollOn)
+                {
+                    child.GetComponent<Joint2D>().enabled = true;
+                    GetChildWithTag(child, "playerColliderDetection")
+                        .GetComponent<Rigidbody2D>().simulated = false;
+                    child.GetComponent<Rigidbody2D>().simulated = true;
+                }
+                else
+                {
+                    child.GetComponent<Joint2D>().enabled = false;
+                    GetChildWithTag(child, "playerColliderDetection")
+                        .GetComponent<Rigidbody2D>().simulated = true;
+                    child.GetComponent<Rigidbody2D>().simulated = false;
+                }
+                
             }
 
-            SearchChildrenByTag(child, tag);
+            SearchChildrenByTag(child, tag, ragdollOn);
         }
     }
     
