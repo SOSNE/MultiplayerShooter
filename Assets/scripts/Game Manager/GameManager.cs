@@ -121,11 +121,11 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var Data in AllPlayersData)
         {
-            if (Data.Team == 0)
+            if (Data is { Team: 0, Alive: true })
             {
                 playersAlive[0] += 1;
             }
-            else
+            if (Data is { Team: 1, Alive: true })
             {
                 playersAlive[1] += 1;
             }
@@ -264,7 +264,19 @@ public class GameManager : NetworkBehaviour
         ResetHealthMap();
         RestartPlayersAliveList();
         RestartPositions();
-        gameObject.GetComponent<PlayerHhandling>().TurnRagdollOf(transform);
+        foreach (PlayerData playerData in AllPlayersData)
+        {
+            turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObject);
+        }
+    }
+    
+    [ClientRpc]
+    private void turnOfRagdollOnSelectedPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
+    {
+        if(playerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
+        {
+            gameObject.GetComponent<PlayerHhandling>().TurnRagdollOf(playerGameObject.transform);
+        }
     }
 
 
