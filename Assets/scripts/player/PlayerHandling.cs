@@ -84,6 +84,7 @@ public class PlayerHhandling : NetworkBehaviour
             .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
 
+    private List<Transform> _allBodyPartsTransformsList = new List<Transform>();
     public void PerformRagdollOnPlayer(Transform playerTarget)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
@@ -99,7 +100,7 @@ public class PlayerHhandling : NetworkBehaviour
         bodyDown.GetComponent<Rigidbody2D>().simulated = true;
         
         bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
-
+        _allBodyPartsTransformsList.Add(bodyDown);
         SearchChildrenByTag(bodyDown, "bodyPart", true);
         
         bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
@@ -108,6 +109,9 @@ public class PlayerHhandling : NetworkBehaviour
     public void TurnRagdollOf(Transform playerTarget)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
+        // bodyDown.position = _allBodyPartsTransformsList[0].position;
+        bodyDown.rotation = _allBodyPartsTransformsList[0].rotation;
+        bodyDown.localScale = _allBodyPartsTransformsList[0].localScale;
         playerTarget.GetComponent<IKManager2D>().enabled = true;
         playerTarget.GetComponent<Animator>().enabled = true;
         playerTarget.GetComponent<playerMovment>().enabled = true;
@@ -120,7 +124,7 @@ public class PlayerHhandling : NetworkBehaviour
         bodyDown.GetComponent<Rigidbody2D>().simulated = false;
         
         bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = true;
-
+        
         SearchChildrenByTag(bodyDown, "bodyPart", false);
         
         // bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
@@ -128,13 +132,14 @@ public class PlayerHhandling : NetworkBehaviour
     
     void SearchChildrenByTag(Transform parent, string tag, bool ragdollOn)
     {
-        
+        int index = 0;
         foreach (Transform child in parent)
         {
             if (child.CompareTag(tag))
             {
                 if (ragdollOn)
                 {
+                    _allBodyPartsTransformsList.Add(child);
                     child.GetComponent<Joint2D>().enabled = true;
                     GetChildWithTag(child, "playerColliderDetection")
                         .GetComponent<Rigidbody2D>().simulated = false;
@@ -142,15 +147,22 @@ public class PlayerHhandling : NetworkBehaviour
                 }
                 else
                 {
+                    // child.position = _allBodyPartsTransformsList[index].position;
+                    child.rotation = _allBodyPartsTransformsList[index].rotation;
+                    child.localScale = _allBodyPartsTransformsList[index].localScale;
                     child.GetComponent<Joint2D>().enabled = false;
                     GetChildWithTag(child, "playerColliderDetection")
                         .GetComponent<Rigidbody2D>().simulated = true;
                     child.GetComponent<Rigidbody2D>().simulated = false;
+                    index++;
                 }
-                
             }
-
             SearchChildrenByTag(child, tag, ragdollOn);
+        }
+
+        if (!ragdollOn)
+        {
+            
         }
     }
     
