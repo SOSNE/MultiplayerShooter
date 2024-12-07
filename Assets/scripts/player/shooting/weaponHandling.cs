@@ -89,7 +89,7 @@ public class weaponHandling : NetworkBehaviour
             ContactData data;
             data.Position = hit2D.point;
             NetworkObjectReference netObject = new NetworkObjectReference (
-                hit2D.transform.GetComponent<NetworkObject>());
+                GetRootParent(hit2D.transform).GetComponent<NetworkObject>());
             if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
             {
                 ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
@@ -212,5 +212,14 @@ public class weaponHandling : NetworkBehaviour
         {
             lineRenderer.SetPosition(1, endPoint);
         }
+    }
+    
+    Transform GetRootParent(Transform obj)
+    {
+        while (obj.parent != null)
+        {
+            obj = obj.parent;
+        }
+        return obj;
     }
 }
