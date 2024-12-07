@@ -16,6 +16,15 @@ public struct PlayerData
     public bool Alive;
 }
 
+public struct DataToSendOverNetwork: INetworkSerializable
+{
+    public Vector2 Direction;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Direction);
+    }
+}
+
 
 public class GameManager : NetworkBehaviour
 {
@@ -79,7 +88,7 @@ public class GameManager : NetworkBehaviour
         
     }
 
-    public void HandleGame(ulong currentClientId, ulong hitClientId)
+    public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString , DataToSendOverNetwork data)
     {
         int teamIndexOverwrite = 10;
         for (int i = 0; i < AllPlayersData.Count; i++)
@@ -105,7 +114,7 @@ public class GameManager : NetworkBehaviour
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 playersAlive[AllPlayersData[i].Team] -= 1;
-                performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject);
+                performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
             }
         }
         //restart game after all players are dead
@@ -249,11 +258,11 @@ public class GameManager : NetworkBehaviour
 
     
     [ClientRpc]
-    private void performRagdollOnSelectedPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
+    private void performRagdollOnSelectedPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference, string hitBodyPartString , DataToSendOverNetwork data)
     {
         if(playerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
         {
-            gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform);
+            gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform, hitBodyPartString, data);
         }
     }
 

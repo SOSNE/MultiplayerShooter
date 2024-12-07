@@ -39,11 +39,12 @@ public class PlayerHhandling : NetworkBehaviour
         }
     }
 
-    public void PlayerHit(int damageAmount,ulong clientId)
+    public void PlayerHit(int damageAmount,ulong clientId, string hitBodyPartName , Vector2 direction)
     {
-        
+        DataToSendOverNetwork data;
+        data.Direction = direction;
         ulong currentClientId = NetworkManager.Singleton.LocalClientId;
-        PlayerHitServerRpc(damageAmount, clientId, currentClientId);
+        PlayerHitServerRpc(damageAmount, clientId, currentClientId, hitBodyPartName, data);
     }
 
     [ServerRpc]
@@ -64,12 +65,12 @@ public class PlayerHhandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void PlayerHitServerRpc(int damageAmount,ulong clientId , ulong currentClientId, ServerRpcParams serverRpcParams = default)
+    private void PlayerHitServerRpc(int damageAmount,ulong clientId , ulong currentClientId, string hitBodyPartString , DataToSendOverNetwork data, ServerRpcParams serverRpcParams = default)
     {
         clientHealthMap[clientId] -= damageAmount;
         if (clientHealthMap[clientId]<=0)
         {
-            gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId);
+            gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId, hitBodyPartString, data);
         }
         
         // update health ui
@@ -85,7 +86,7 @@ public class PlayerHhandling : NetworkBehaviour
     }
 
     private List<Transform> _allBodyPartsTransformsList = new List<Transform>();
-    public void PerformRagdollOnPlayer(Transform playerTarget)
+    public void PerformRagdollOnPlayer(Transform playerTarget, string hitBodyPartString , DataToSendOverNetwork data)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
         playerTarget.GetComponent<IKManager2D>().enabled = false;
@@ -104,6 +105,17 @@ public class PlayerHhandling : NetworkBehaviour
         SearchChildrenByTag(bodyDown, "bodyPart", true);
         
         bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
+        AddForceToShotObject(playerTarget, hitBodyPartString, data);
+    }
+    
+    private void AddForceToShotObject(Transform playerTarget ,string hitBodyPart , DataToSendOverNetwork data)
+    {
+        Transform targetBodyPart = GetChildWithNameRecursively(playerTarget, hitBodyPart).parent;
+        
+        if (targetBodyPart.GetComponent<Rigidbody2D>())
+        {
+            targetBodyPart.GetComponent<Rigidbody2D>().linearVelocity = data.Direction * 20;
+        }
     }
     
     public void TurnRagdollOf(Transform playerTarget)
@@ -186,5 +198,24 @@ public class PlayerHhandling : NetworkBehaviour
         }
         return null;
     }
+    Transform GetChildWithNameRecursively(Transform parent, string nameOfGameObject)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == nameOfGameObject)
+            {
+                return child;
+            }
+            
+            Transform foundChild = GetChildWithNameRecursively(child, nameOfGameObject);
+            if (foundChild != null)
+            {
+                return foundChild;
+            }
+        }
+
+        return null; // No match found
+    }
+
 
 }
