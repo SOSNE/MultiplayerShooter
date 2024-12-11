@@ -9,13 +9,22 @@ using UnityEngine.U2D.IK;
 
 public class PlayerHhandling : NetworkBehaviour
 {
+    private struct BodyPartData
+    {
+        public Vector3 Position;
+        public Quaternion Rotation;
+        public Vector3 Scale;
+        public string Name;
+    }
+    
     // NetworkBehaviourpublic NetworkList<int> playersHealth = new NetworkList<int>();
     public static Dictionary<ulong, int> clientHealthMap = new Dictionary<ulong, int>();
     private GameObject _gameManager;
 
     [SerializeField]
     private List<HingeJoint2D>  playerHingeJoints2d;
-    
+    private List<BodyPartData> _allBodyPartsTransformsList = new List<BodyPartData>();
+
     
     public override void OnNetworkSpawn()
     {
@@ -24,6 +33,24 @@ public class PlayerHhandling : NetworkBehaviour
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             _gameManager = GameObject.Find("Game Manager");
             gameObject.GetComponent<GameManager>().CreateCamera();
+        }
+        SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(transform, "bodyPart");
+    }
+    
+    void SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                BodyPartData Data = new BodyPartData();
+                Data.Position = child.localPosition;
+                Data.Rotation = child.localRotation;
+                Data.Scale = child.localScale;
+                Data.Name = child.name;
+                _allBodyPartsTransformsList.Add(Data);
+            }
+            SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(child, tag);
         }
     }
 
@@ -85,7 +112,6 @@ public class PlayerHhandling : NetworkBehaviour
             .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
     }
 
-    private List<Transform> _allBodyPartsTransformsList = new List<Transform>();
     public void PerformRagdollOnPlayer(Transform playerTarget, string hitBodyPartString , DataToSendOverNetwork data)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
@@ -101,7 +127,7 @@ public class PlayerHhandling : NetworkBehaviour
         bodyDown.GetComponent<Rigidbody2D>().simulated = true;
         
         bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
-        _allBodyPartsTransformsList.Add(bodyDown);
+        // _allBodyPartsTransformsList.Add(bodyDown);
         SearchChildrenByTag(bodyDown, "bodyPart", true);
         
         bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
@@ -121,9 +147,9 @@ public class PlayerHhandling : NetworkBehaviour
     public void TurnRagdollOf(Transform playerTarget)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
-        // bodyDown.position = _allBodyPartsTransformsList[0].position;
-        bodyDown.rotation = _allBodyPartsTransformsList[0].rotation;
-        bodyDown.localScale = _allBodyPartsTransformsList[0].localScale;
+        bodyDown.position = _allBodyPartsTransformsList[0].Position;
+        bodyDown.rotation = _allBodyPartsTransformsList[0].Rotation;
+        bodyDown.localScale = _allBodyPartsTransformsList[0].Scale;
         playerTarget.GetComponent<IKManager2D>().enabled = true;
         playerTarget.GetComponent<Animator>().enabled = true;
         playerTarget.GetComponent<playerMovment>().enabled = true;
@@ -151,7 +177,6 @@ public class PlayerHhandling : NetworkBehaviour
             {
                 if (ragdollOn)
                 {
-                    _allBodyPartsTransformsList.Add(child);
                     child.GetComponent<Joint2D>().enabled = true;
                     GetChildWithTag(child, "playerColliderDetection")
                         .GetComponent<Rigidbody2D>().simulated = false;
@@ -159,9 +184,16 @@ public class PlayerHhandling : NetworkBehaviour
                 }
                 else
                 {
-                    // child.position = _allBodyPartsTransformsList[index].position;
-                    child.rotation = _allBodyPartsTransformsList[index].rotation;
-                    child.localScale = _allBodyPartsTransformsList[index].localScale;
+                    foreach (BodyPartData savedData in _allBodyPartsTransformsList)
+                    {
+                        if (child.name == savedData.Name)
+                        {
+                            child.localPosition = savedData.Position;
+                            child.localRotation = savedData.Rotation;
+                            child.localScale = savedData.Scale;
+                        }
+                    }
+                    
                     child.GetComponent<Joint2D>().enabled = false;
                     GetChildWithTag(child, "playerColliderDetection")
                         .GetComponent<Rigidbody2D>().simulated = true;
@@ -177,6 +209,8 @@ public class PlayerHhandling : NetworkBehaviour
             
         }
     }
+    
+    
     
     void SetLayerRecursively(GameObject obj, int layer)
     {
@@ -216,6 +250,4 @@ public class PlayerHhandling : NetworkBehaviour
 
         return null; // No match found
     }
-
-
 }
