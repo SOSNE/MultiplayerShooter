@@ -5,10 +5,6 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 
 
-// Total hours wasted: 5
-// Status: still not working xd
-// Status: something started working juppi
-
 public class reloading : NetworkBehaviour
 {
     public Transform leftHandTarget, magazineSpawningTarget;
@@ -28,32 +24,11 @@ public class reloading : NetworkBehaviour
     void Update()
     {
         if(!IsOwner) return;
-        // if (_createdMagazine != null)
-        // {
-        //     _magazine = _createdMagazine.transform;
-        // }
         if (Input.GetKeyDown(KeyCode.R) && !_isCoroutineRunning)
         {
             _isCoroutineRunning = true;
             PerformReloadingServerRpc(transform.parent.gameObject);
         }
-        
-        // else if(!IsInside(transform, _magazine) && _ejectMagazine)
-        // {
-        //     _ejectMagazine = false;
-        //     _magazine.transform.SetParent(null);
-        //     _magazine.GetComponent<Rigidbody2D>().simulated = true;
-        //     _magazine.GetComponent<Rigidbody2D>().gravityScale = 2;
-        //     if (!_isCoroutineRunning)
-        //     {
-        //         StartCoroutine(GrabMagazine());
-        //     }
-        // }
-        // if (_createdMagazine != null && !_ejectMagazine && !_isCoroutineRunning)
-        // {
-        //     _createdMagazine.transform.position = magazineSpawningTarget.position;
-        //     _createdMagazine.transform.rotation = magazineSpawningTarget.rotation;
-        // }
     }
     
     bool IsInside(Transform outer, Transform inner)
@@ -75,10 +50,13 @@ public class reloading : NetworkBehaviour
     {
         if (playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
+            if (IsOwner)
+            {
+                playerNetworkObject.transform.Find("pistol_0").GetComponent<weaponHandling>().canShoot = false;
+            }
             playerNetworkObject.transform.Find("pistol_0").
                 GetComponent<reloading>().
                 StartCoroutine(GrabMagazine(playerNetworkObject.transform.Find("pistol_0")));
-            
         }
     }
     
@@ -117,10 +95,6 @@ public class reloading : NetworkBehaviour
             {
                 leftHandTarget.position = Vector2.MoveTowards(leftHandTarget.position, waypoint[index].position,
                     2 * Time.deltaTime);
-                // if (_createdMagazine != null && _index > 2)
-                // {
-                //     // _createdMagazine.transform.position = leftHandTarget.position;
-                // }
                 yield return null;
             }
             
@@ -139,6 +113,10 @@ public class reloading : NetworkBehaviour
             index++;
         }
         weapon.GetComponent<weaponHandling>().bulletCounter = 0;
+        if (IsOwner)
+        {
+            weapon.GetComponent<weaponHandling>().canShoot = true;
+        }
         _isCoroutineRunning = false;
     }
 }

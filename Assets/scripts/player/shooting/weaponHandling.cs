@@ -14,17 +14,13 @@ public class weaponHandling : NetworkBehaviour
     public static readonly float  BulletCount = 10;
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
     public LayerMask layerMask;
+    public bool canShoot = true;
 
     [FormerlySerializedAs("BulletCounter")] public float bulletCounter = 0;
     private float _currentTime = 0;
     void Update()
     {
         if (!IsOwner) return;
-        
-        // if (Input.GetKey(KeyCode.I))
-        // {
-        //     StartCoroutine(WeaponRecoil(GameObject.Find("Cube").transform, 2));
-        // }
         
         if (bulletCounter >= BulletCount)
         {
@@ -38,7 +34,7 @@ public class weaponHandling : NetworkBehaviour
             return;
         }
         
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && canShoot)
         {
             
             Shoot();
