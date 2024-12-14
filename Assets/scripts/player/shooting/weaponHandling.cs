@@ -4,6 +4,7 @@ using Vector3 = System.Numerics.Vector3;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
+using UnityEngine.Serialization;
 
 
 public class weaponHandling : NetworkBehaviour
@@ -14,7 +15,7 @@ public class weaponHandling : NetworkBehaviour
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
     public LayerMask layerMask;
 
-    public static float BulletCounter = 0;
+    [FormerlySerializedAs("BulletCounter")] public float bulletCounter = 0;
     private float _currentTime = 0;
     void Update()
     {
@@ -25,7 +26,7 @@ public class weaponHandling : NetworkBehaviour
         //     StartCoroutine(WeaponRecoil(GameObject.Find("Cube").transform, 2));
         // }
         
-        if (BulletCounter >= BulletCount)
+        if (bulletCounter >= BulletCount)
         {
             return;
         }
@@ -39,6 +40,7 @@ public class weaponHandling : NetworkBehaviour
         
         if (Input.GetMouseButtonDown(0))
         {
+            
             Shoot();
             _currentTime = 0;
         }
@@ -151,7 +153,7 @@ public class weaponHandling : NetworkBehaviour
     [ClientRpc]
     private void ClientRpcNotifyClientClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        BulletCounter++;
+        bulletCounter++;
     }
     
     [ClientRpc]

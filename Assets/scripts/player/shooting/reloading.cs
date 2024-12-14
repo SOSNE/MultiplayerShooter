@@ -27,14 +27,13 @@ public class reloading : NetworkBehaviour
     private bool _ejectMagazine = false;
     void Update()
     {
-        // if(!IsOwner) return;
+        if(!IsOwner) return;
         // if (_createdMagazine != null)
         // {
         //     _magazine = _createdMagazine.transform;
         // }
         if (Input.GetKeyDown(KeyCode.R) && !_isCoroutineRunning)
         {
-            weaponHandling.BulletCounter = 0;
             _isCoroutineRunning = true;
             PerformReloadingServerRpc(transform.parent.gameObject);
         }
@@ -77,11 +76,13 @@ public class reloading : NetworkBehaviour
         if (playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
             playerNetworkObject.transform.Find("pistol_0").
-                GetComponent<reloading>().StartCoroutine(GrabMagazine());
+                GetComponent<reloading>().
+                StartCoroutine(GrabMagazine(playerNetworkObject.transform.Find("pistol_0")));
+            
         }
     }
     
-    IEnumerator GrabMagazine()
+    IEnumerator GrabMagazine(Transform weapon)
     {
         
         _magazine = Instantiate(magazine, magazineSpawningTarget.position, transform.rotation).transform;
@@ -137,7 +138,7 @@ public class reloading : NetworkBehaviour
             }
             index++;
         }
-
+        weapon.GetComponent<weaponHandling>().bulletCounter = 0;
         _isCoroutineRunning = false;
     }
 }

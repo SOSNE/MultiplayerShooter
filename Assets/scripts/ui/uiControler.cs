@@ -6,11 +6,18 @@ public class uiControler : NetworkBehaviour
 {
     public TextMeshProUGUI ammoCounter;
     [SerializeField] private TextMeshProUGUI hpCounter;
-    
+    public Transform trackingTransform;
+    private 
     void Update()
     {
-        float remainingBullets = weaponHandling.BulletCount - weaponHandling.BulletCounter;
-        ammoCounter.text = $"Bulets: {weaponHandling.BulletCount} / {remainingBullets}";
+        if (trackingTransform)
+        {
+            Transform weapon = trackingTransform.Find("pistol_0").transform;
+            float remainingBullets = weaponHandling.BulletCount -
+                                 weapon.GetComponent<weaponHandling>()
+                                      .bulletCounter;
+            ammoCounter.text = $"Bullets: {weaponHandling.BulletCount} / {remainingBullets}";
+        }
     }
     
     [ClientRpc]

@@ -34,6 +34,13 @@ public class PlayerHhandling : NetworkBehaviour
             _gameManager = GameObject.Find("Game Manager");
             gameObject.GetComponent<GameManager>().CreateCamera();
         }
+        
+        if (IsOwner)
+        {
+            GameObject.Find("UiControler").
+                GetComponent<uiControler>().trackingTransform = transform;
+        }
+        
         SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(transform, "bodyPart");
     }
     
