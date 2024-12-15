@@ -102,6 +102,7 @@ public class pistolMovment : NetworkBehaviour
                 {
                     // If the object is mirrored, invert the target rotation to compensate for flipping
                     _rotationRecoilAngle = -_rotationRecoilAngle;
+                    angleCorrection = -angleCorrection;
                 }
                 transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
             }
