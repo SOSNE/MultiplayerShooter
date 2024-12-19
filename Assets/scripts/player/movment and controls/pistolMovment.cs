@@ -36,8 +36,19 @@ public class pistolMovment : NetworkBehaviour
         
         return closestDistance;
     }
+
+    public float  lastTime;
     public void PerformRecoil()
     {
+        float elapsedTime = Time.time - lastTime;
+        //strengthen the value to better display it on a function.
+        elapsedTime *= 7f;
+        //function that calculate Angle bay time between shoots. g(x)=10^(-(0.9 (x-0.51)))+0.3
+        float recoilAngleIncreaseValue = Mathf.Pow(10, -0.9f * (elapsedTime - 0.51f))+0.3f;
+        lastTime = Time.time;
+        //strengthen the value.
+        recoilAngleIncreaseValue *= 10;
+        print(elapsedTime);
         float distance = GetClosestTransform(playerTransforms);
         
         float normalizedParam = distance / (float)maxExtension;
@@ -46,10 +57,9 @@ public class pistolMovment : NetworkBehaviour
         float recoilScaleValue = 0;
         if (normalizedParam > 0.3f)
         {
-            print(normalizedParam + "param");
             recoilScaleValue = Mathf.Lerp(0f, 0.06f, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
-        StartCoroutine(WeaponRecoil(0.2f,0.1f, recoilScale:  recoilScaleValue));
+        StartCoroutine(WeaponRecoil(0.2f,0.1f, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
     }
     
     void Update()
@@ -124,7 +134,6 @@ public class pistolMovment : NetworkBehaviour
     
     IEnumerator WeaponRecoil(float durationOfRagdoll, float durationOfRagdollRegression,float recoilAngleIncrease = 20, float recoilScale = 0.03f)
     {
-        print(recoilScale);
         List<Vector3> recoilBezierCurvesList = new List<Vector3>();
 
         Vector3 bottomLeft = transform.localPosition; // Bottom-left 
