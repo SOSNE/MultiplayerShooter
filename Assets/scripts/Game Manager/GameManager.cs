@@ -75,7 +75,7 @@ public class GameManager : NetworkBehaviour
     private void FixedUpdate()
     {
         if(!IsOwner) return;
-        // This part couse bug. I this it should be in ServerRcp because AllPlayersData list is local for host.
+        // This part cause bug. I think this it should be in ServerRcp because AllPlayersData list is local for host.
         // if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
         {
             Camera camera = _createdCamera.GetComponent<Camera>();

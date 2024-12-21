@@ -37,12 +37,12 @@ public class CameraControl : MonoBehaviour
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
-            // float t = (Time.time - startTime) / duration;
-            float x = Random.Range(-1f, 1f) * magnitude;
-            float y = Random.Range(-1f, 1f) * magnitude;
-
+            float t = (Time.time - startTime) / duration;
+            float currentMagnitude = Mathf.Lerp(magnitude, 0, t);
+            float x = Random.Range(-1f, 1f) * currentMagnitude;
+            float y = Random.Range(-1f, 1f) * currentMagnitude;
             Camera.main.transform.localPosition = new Vector3(cameraStartPosition.x + x, cameraStartPosition.y + y, cameraStartPosition.z);
-            
+            //TODO send new data to camera position control in GameManager to allow camera movement while shaking.
             yield return null;
         }
     }
