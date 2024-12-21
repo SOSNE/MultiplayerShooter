@@ -39,6 +39,8 @@ public class PlayerHhandling : NetworkBehaviour
         {
             GameObject.Find("UiControler").
                 GetComponent<uiControler>().trackingTransform = transform;
+            GameObject.Find("Camera Control").
+                GetComponent<CameraControl>().currentPlayer = transform;
         }
         
         SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(transform, "bodyPart");

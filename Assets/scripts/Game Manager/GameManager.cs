@@ -36,7 +36,6 @@ public class GameManager : NetworkBehaviour
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     [SerializeField] private GameObject camera, pistol;
-    public float cameraSmoothness;
 
 
     private void Start()
@@ -72,21 +71,7 @@ public class GameManager : NetworkBehaviour
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
 
-    private void FixedUpdate()
-    {
-        if(!IsOwner) return;
-        // This part cause bug. I think this it should be in ServerRcp because AllPlayersData list is local for host.
-        // if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
-        {
-            Camera camera = _createdCamera.GetComponent<Camera>();
-            Vector3 mouseScreenPosition = Input.mousePosition;
-            Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
-            Vector3 betweenPosition = Vector3.Lerp( transform.position, mouseWorldPosition, 0.4f);
-            Vector3 smoothPosition = Vector3.Lerp( _createdCamera.transform.position, betweenPosition, cameraSmoothness);
-            _createdCamera.transform.position = new Vector3(smoothPosition.x, smoothPosition.y, -10f);
-        }
-        
-    }
+    
 
     public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString , DataToSendOverNetwork data)
     {

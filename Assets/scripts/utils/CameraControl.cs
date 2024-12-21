@@ -1,8 +1,11 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class CameraControl : MonoBehaviour
+public class CameraControl : NetworkBehaviour
 {
+    public Transform currentPlayer;
+    [SerializeField] private float cameraSmoothness;
     void Start()
     {
         float screenAspect = (float)Screen.width / Screen.height;
@@ -25,6 +28,23 @@ public class CameraControl : MonoBehaviour
         }
     }
 
+    private Vector3 _smoothPosition;
+    private void FixedUpdate()
+    {
+        if(!IsOwner) return;
+        // This part cause bug. I think this it should be in ServerRcp because AllPlayersData list is local for host.
+        // if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
+        if (currentPlayer) 
+        {
+            Camera camera = Camera.main.GetComponent<Camera>();
+            Vector3 mouseScreenPosition = Input.mousePosition;
+            Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
+            Vector3 betweenPosition = Vector3.Lerp( currentPlayer.transform.position, mouseWorldPosition, 0.4f);
+            _smoothPosition = Vector3.Lerp( Camera.main.transform.position, betweenPosition, cameraSmoothness);
+            Camera.main.transform.position = new Vector3(_smoothPosition.x, _smoothPosition.y, -10f);
+        }
+    }
+
     public void CameraShake(float duration, float magnitude)
     {
         StartCoroutine(Shake(duration, magnitude));
@@ -32,8 +52,7 @@ public class CameraControl : MonoBehaviour
 
     private IEnumerator Shake(float duration, float magnitude)
     {
-        Vector3 cameraStartPosition = Camera.main.transform.position;
-         
+        // Vector3 start = Camera.main.transform.position
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
@@ -41,8 +60,7 @@ public class CameraControl : MonoBehaviour
             float currentMagnitude = Mathf.Lerp(magnitude, 0, t);
             float x = Random.Range(-1f, 1f) * currentMagnitude;
             float y = Random.Range(-1f, 1f) * currentMagnitude;
-            Camera.main.transform.localPosition = new Vector3(cameraStartPosition.x + x, cameraStartPosition.y + y, cameraStartPosition.z);
-            //TODO send new data to camera position control in GameManager to allow camera movement while shaking.
+            Camera.main.transform.localPosition = new Vector3(_smoothPosition.x + x, _smoothPosition.y + y, -10f);
             yield return null;
         }
     }
