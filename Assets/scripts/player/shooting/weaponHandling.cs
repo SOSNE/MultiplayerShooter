@@ -38,6 +38,8 @@ public class weaponHandling : NetworkBehaviour
         {
             
             Shoot();
+            GameObject.Find("Camera Control").
+                GetComponent<CameraControl>().CameraShake(0.1f,0.07f);
             _currentTime = 0;
         }
     }

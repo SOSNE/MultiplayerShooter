@@ -47,16 +47,16 @@ public class pistolMovment : NetworkBehaviour
         float recoilAngleIncreaseValue = Mathf.Pow(10, -0.9f * (elapsedTime - 0.51f))+0.3f;
         lastTime = Time.time;
         //strengthen the value.
-        recoilAngleIncreaseValue *= 10;
-        print(elapsedTime);
+        recoilAngleIncreaseValue *= 15;
         float distance = GetClosestTransform(playerTransforms);
         
         float normalizedParam = distance / (float)maxExtension;
 
-        // Check if normalizedParam is less than threshold
+        // Check if normalizedParam is less than threshold.
         float recoilScaleValue = 0;
         if (normalizedParam > 0.3f)
         {
+            //this function ensures that recoil is smaller when weapon is closer to a body part.
             recoilScaleValue = Mathf.Lerp(0f, 0.06f, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
         StartCoroutine(WeaponRecoil(0.2f,0.1f, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));

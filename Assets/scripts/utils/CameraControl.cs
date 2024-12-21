@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CameraControl : MonoBehaviour
@@ -21,6 +22,28 @@ public class CameraControl : MonoBehaviour
             //when screen is wider then higher
             float widthScale = (16f / 9f) / screenAspect;
             Camera.main.rect = new Rect((1f - widthScale) / 2f, 0f, widthScale, 1f);
+        }
+    }
+
+    public void CameraShake(float duration, float magnitude)
+    {
+        StartCoroutine(Shake(duration, magnitude));
+    }
+
+    private IEnumerator Shake(float duration, float magnitude)
+    {
+        Vector3 cameraStartPosition = Camera.main.transform.position;
+         
+        float startTime = Time.time;
+        while (Time.time - startTime < duration)
+        {
+            // float t = (Time.time - startTime) / duration;
+            float x = Random.Range(-1f, 1f) * magnitude;
+            float y = Random.Range(-1f, 1f) * magnitude;
+
+            Camera.main.transform.localPosition = new Vector3(cameraStartPosition.x + x, cameraStartPosition.y + y, cameraStartPosition.z);
+            
+            yield return null;
         }
     }
 }
