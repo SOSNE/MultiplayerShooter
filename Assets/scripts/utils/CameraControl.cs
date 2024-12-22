@@ -31,11 +31,12 @@ public class CameraControl : NetworkBehaviour
     private Vector3 _smoothPosition;
     private void FixedUpdate()
     {
-        if(!IsOwner) return;
+        // if(!IsOwner) return;
         // This part cause bug. I think this it should be in ServerRcp because AllPlayersData list is local for host.
         // if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == NetworkManager.Singleton.LocalClientId).Alive)
         if (currentPlayer) 
         {
+            
             Camera camera = Camera.main.GetComponent<Camera>();
             Vector3 mouseScreenPosition = Input.mousePosition;
             Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
