@@ -113,16 +113,19 @@ public class GameManager : NetworkBehaviour
 
     private void RestartPlayersAliveList()
     {
-        foreach (var Data in AllPlayersData)
+        for (int i = 0; i < AllPlayersData.Count; i++)
         {
-            if (Data is { Team: 0, Alive: true })
+            var data = AllPlayersData[i];
+            if (data is { Team: 0, Alive: false })
             {
                 playersAlive[0] += 1;
             }
-            if (Data is { Team: 1, Alive: true })
+            if (data is { Team: 1, Alive: false })
             {
                 playersAlive[1] += 1;
             }
+            data.Alive = true;
+            AllPlayersData[i] = data;
         }
         
         GameObject.Find("UiControler").GetComponent<uiControler>()
