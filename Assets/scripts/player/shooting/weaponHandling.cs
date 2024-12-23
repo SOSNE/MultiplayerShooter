@@ -158,6 +158,8 @@ public class weaponHandling : NetworkBehaviour
     private void ShootParticleClientRpc(ClientRpcParams clientRpcParams = default)
     {
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
+        // print("setting parent");
+        shootParticle.transform.SetParent(transform);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
     }
