@@ -32,7 +32,7 @@ public class GameManager : NetworkBehaviour
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
     public static List<int> playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
-    private static NetworkList<int> _pointScore  = new NetworkList<int>();
+    private static NetworkList<int> _pointScore = new NetworkList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     [SerializeField] private GameObject camera, pistol;
@@ -48,6 +48,7 @@ public class GameManager : NetworkBehaviour
 
     private GameObject _createdCamera;
     private static bool _pointScoreInitialize = true;
+
     public override void OnNetworkSpawn()
     {
         if (IsServer && _pointScoreInitialize)
@@ -58,29 +59,31 @@ public class GameManager : NetworkBehaviour
             playersAlive.Add(0);
             _pointScoreInitialize = false;
         }
+
         base.OnNetworkSpawn();
         _pointScore.OnListChanged += UpdateWinCounter;
     }
 
     public void CreateCamera()
     {
-        if(!IsOwner) return;
+        if (!IsOwner) return;
         _createdCamera = Camera.main.gameObject;
         // _createdCamera = Instantiate(camera, transform.position, transform.rotation);
         pistol.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
 
-    
 
-    public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString , DataToSendOverNetwork data)
+
+    public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString,
+        DataToSendOverNetwork data)
     {
         int teamIndexOverwrite = 10;
         for (int i = 0; i < AllPlayersData.Count; i++)
         {
             if (AllPlayersData[i].ClientId == hitClientId)
             {
-                
+
                 //calculate teamIndexOverwrite for self killing.
                 //if shoot himself
                 if (currentClientId == hitClientId)
@@ -92,9 +95,10 @@ public class GameManager : NetworkBehaviour
                     else
                     {
                         teamIndexOverwrite = 0;
-                    }  
-                         
+                    }
+
                 }
+
                 PlayerData myStruct = AllPlayersData[i];
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
@@ -102,12 +106,13 @@ public class GameManager : NetworkBehaviour
                 performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
             }
         }
+
         //restart game after all players are dead
         if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
         {
-            
+
             StartCoroutine(NextRoundCourtione(2, currentClientId, teamIndexOverwrite));
-            
+
         }
     }
 
@@ -120,14 +125,16 @@ public class GameManager : NetworkBehaviour
             {
                 playersAlive[0] += 1;
             }
+
             if (data is { Team: 1, Alive: false })
             {
                 playersAlive[1] += 1;
             }
+
             data.Alive = true;
             AllPlayersData[i] = data;
         }
-        
+
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .GetHealthForUiClientRpc(100, default);
     }
@@ -141,11 +148,11 @@ public class GameManager : NetworkBehaviour
             PlayerHhandling.clientHealthMap[key] = 100;
         }
     }
-    
+
     public void RestartPositions()
     {
         //reset position list
-        positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2 ,3 };
+        positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };
 
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
@@ -153,15 +160,16 @@ public class GameManager : NetworkBehaviour
         {
             if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == record.ClientId).Team == 0)
             {
-                NetworkObjectReference netObject = new NetworkObjectReference (
+                NetworkObjectReference netObject = new NetworkObjectReference(
                     _team0Spawn.transform.GetComponent<NetworkObject>());
                 SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
-            }else
+            }
+            else
             {
-                NetworkObjectReference netObject = new NetworkObjectReference (
+                NetworkObjectReference netObject = new NetworkObjectReference(
                     _team1Spawn.transform.GetComponent<NetworkObject>());
                 SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
-            } 
+            }
         }
     }
 
@@ -176,23 +184,26 @@ public class GameManager : NetworkBehaviour
         {
             teamIndex = teamIndexOverwrite;
         }
+
         _pointScore[teamIndex] += 1;
     }
-    
+
     private void UpdateWinCounter(NetworkListEvent<int> listEvent)
     {
         teamOneWinCounter.text = $"{_pointScore[0]}";
         teamTwoWinCounter.text = $"{_pointScore[1]}";
     }
-    
-    
+
+
     public void AddClientToTeam(ulong clientId)
     {
-        if(!IsClient) return;
+        if (!IsClient) return;
         AddClientToTeamServerRpc(gameObject, clientId);
     }
+
     [ServerRpc]
-    private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId, ServerRpcParams serverRpcParams = default)
+    private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId,
+        ServerRpcParams serverRpcParams = default)
     {
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
@@ -204,22 +215,52 @@ public class GameManager : NetworkBehaviour
         AllPlayersData.Add(newUser);
         playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);
-        
-        floatIndex++;
-            if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
-            {
-                NetworkObjectReference netObject = new NetworkObjectReference (
-                    _team0Spawn.transform.GetComponent<NetworkObject>());
-                SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
-            }else
-            {
-                NetworkObjectReference netObject = new NetworkObjectReference (
-                    _team1Spawn.transform.GetComponent<NetworkObject>());
-                SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
-            }
-    }
-    public List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2 ,3 };
 
+        floatIndex++;
+        if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
+        {
+            NetworkObjectReference netObject = new NetworkObjectReference(
+                _team0Spawn.transform.GetComponent<NetworkObject>());
+            SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
+        }
+        else
+        {
+            NetworkObjectReference netObject = new NetworkObjectReference(
+                _team1Spawn.transform.GetComponent<NetworkObject>());
+            SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
+        }
+
+        for (int i =0; i<AllPlayersData.Count;i++)
+        {
+            if (AllPlayersData[i].PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObject))
+            {
+                if (AllPlayersData[i].Team == 0)
+                {
+                    AddTagToNewPlayerClientRpc(playerNetworkObject, "playerColliderTeam0");
+                }
+                else
+                {
+                    AddTagToNewPlayerClientRpc(playerNetworkObject, "playerColliderTeam1");
+                }
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void AddTagToNewPlayerClientRpc(NetworkObjectReference playerGameObject, string playerLayerName)
+    {
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            //Check if current player is no longer assigned a layer
+            if (playerNetworkObject.gameObject.layer == LayerMask.NameToLayer("playerColliderDeafult"))
+            {
+                playerNetworkObject.gameObject.layer = LayerMask.NameToLayer(playerLayerName);
+                print("test");
+            }
+        }
+    }
+    public List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };
+    
     [ClientRpc]
     private void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
     {

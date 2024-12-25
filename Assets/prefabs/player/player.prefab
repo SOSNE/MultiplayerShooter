@@ -55,7 +55,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 754329281186446847}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.9719495, w: -0.2351896}
+  m_LocalRotation: {x: -0, y: -0, z: 0.9719495, w: -0.23518953}
   m_LocalPosition: {x: 0.563, y: -0.001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1398,7 +1398,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6659275031050715120}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.3866709, w: 0.92221785}
+  m_LocalRotation: {x: -0, y: -0, z: 0.3866708, w: 0.9222178}
   m_LocalPosition: {x: 0.533, y: -0.007, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1642,6 +1642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6272ae185dccdb74483a0852145c989d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   targetL: {fileID: 983756107961207999}
   targetR: {fileID: 6324298351696276778}
   positionL: {fileID: 9008495798954885300}
@@ -1656,6 +1657,7 @@ MonoBehaviour:
   - {fileID: 6160716904867120064}
   - {fileID: 2357360210050387584}
   - {fileID: 3743746022633657600}
+  lastTime: 0
 --- !u!114 &3627826219644054864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,6 +1670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cf77da7fae868e4caad127a018ee0e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   bulletTracer: {fileID: 5568403953743324852, guid: 57ba1a6ed28cd5846b27ab610d803b81, type: 3}
   bulletSpawn: {fileID: 1191421928569397352}
   bloodParticleSystem: {fileID: 5866105100215955707, guid: a4467d6e80c3e9d4da8eca9bf5402ea7, type: 3}
@@ -1692,6 +1695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2becdb66995bf4e99bf4f00139589fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   leftHandTarget: {fileID: 6324298351696276778}
   magazineSpawningTarget: {fileID: 4642775322003075950}
   waypoint:
@@ -1714,6 +1718,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -1731,6 +1739,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!1 &7814692940921864806
@@ -2069,7 +2078,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_TagString
@@ -2289,7 +2298,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -485990856666115531, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.24323153
+      value: 0.2432317
       objectReference: {fileID: 0}
     - target: {fileID: -485990856666115531, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2429,7 +2438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5907915
+      value: 0.59079164
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2441,7 +2450,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.80682427
+      value: -0.80682415
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -2457,7 +2466,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2471920254983572574, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8044102
+      value: 0.80441034
       objectReference: {fileID: 0}
     - target: {fileID: 2471920254983572574, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2469,7 +2478,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2471920254983572574, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.59407425
+      value: -0.59407413
       objectReference: {fileID: 0}
     - target: {fileID: 2471920254983572574, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -2557,7 +2566,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7905440446968883676, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.3425976
+      value: -0.34259772
       objectReference: {fileID: 0}
     - target: {fileID: 7905440446968883676, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2569,7 +2578,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7905440446968883676, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.9394823
+      value: -0.9394822
       objectReference: {fileID: 0}
     - target: {fileID: 7905440446968883676, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -2818,7 +2827,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.6170584, y: 0.012982432}
+  m_ConnectedAnchor: {x: 0.6170583, y: 0.012982428}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:
@@ -3093,6 +3102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 4042147263
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -3100,6 +3111,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &9072768927191672002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3112,6 +3125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed2a15c397489c4459f6acff36638d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   movementSpeed: 5.88
   jumpHeight: 18.6
   ladderSpeed: 9.77
@@ -3262,6 +3276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 517b74e59da26d848a8a089ee400d5fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &1541486162962915160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3274,6 +3289,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -3291,6 +3310,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!114 &5074213736961596255
@@ -3305,6 +3325,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!114 &8373251539412687381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3317,6 +3342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 778a8c9902ba88c47a95c6dd529d67cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   playerHingeJoints2d:
   - {fileID: 7886628362534341483}
   - {fileID: 1930615231375132275}
@@ -3340,9 +3366,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff9673e6cc6f53a42b3687756d8cf313, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   camera: {fileID: 1062943222018729907, guid: b9dee91aa6224e446b1be6661f1fd139, type: 3}
   pistol: {fileID: 7205272057624192262}
-  cameraSmoothness: 0.19
   positionsDistance: fdfffffffeffffffffffffff00000000010000000200000003000000
 --- !u!114 &4900007992998673341
 MonoBehaviour:
@@ -3356,6 +3382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85df67215d331fa43a48f4e28f8fdeb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   _weapon: {fileID: 7205272057624192262}
 --- !u!114 &5234942705381225173
 MonoBehaviour:
@@ -3369,6 +3396,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!1 &3672872067797742068 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 386791141387813222, guid: 70cc0974af755a744b2901b42220476e, type: 3}
@@ -4049,7 +4081,7 @@ HingeJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 0.6050216, y: -0.007844448}
+  m_ConnectedAnchor: {x: 0.60502154, y: -0.007844568}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:

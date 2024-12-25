@@ -17,9 +17,9 @@ TagManager:
   - Water
   - UI
   - 
-  - 
-  - 
-  - playerColider
+  - playerColliderDeafult
+  - playerColliderTeam0
+  - playerColliderTeam1
   - player body
   - 
   - bullet
