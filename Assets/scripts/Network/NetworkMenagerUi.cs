@@ -10,25 +10,29 @@ public class NetworkMenagerUi : MonoBehaviour
 {
     public Button host, client;
     private NetworkManager networkManager;
+    private string _ip;
     
     public void OnInputIp(string ipAddress)
     {
         // UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         // unityTransport.SetConnectionData(ipAddress, 7777);
+        _ip = ipAddress;
     }
     
     private void Awake()
     {
         host.onClick.AddListener((() =>
         {
-            SceneManager.LoadScene("SampleScene");
             // NetworkManager.Singleton.StartHost();
+            PlayerPrefs.SetString("ip", "HOSTDONOTPASSASSIP");
+            SceneManager.LoadScene("SampleScene");
         }));
         
         client.onClick.AddListener((() =>
         {
-            SceneManager.LoadScene("SampleScene");
             // NetworkManager.Singleton.StartClient();
+            PlayerPrefs.SetString("ip", _ip);
+            SceneManager.LoadScene("SampleScene");
         }));
     }
 }
