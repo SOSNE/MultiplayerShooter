@@ -125,13 +125,14 @@ public class PlayerHhandling : NetworkBehaviour
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
         playerTarget.GetComponent<IKManager2D>().enabled = false;
+        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
         playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<playerMovment>().enabled = false;
         var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
-        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
+        
         SetLayerRecursively(bodyDown.gameObject, 17);
         bodyDown.GetComponent<Rigidbody2D>().simulated = true;
         

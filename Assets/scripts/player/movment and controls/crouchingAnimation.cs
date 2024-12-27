@@ -5,10 +5,12 @@ using UnityEngine;
 public class crouchingAnimation : NetworkBehaviour
 {
     [SerializeField] private GameObject _weapon;
-    private bool _crouch;
-    void Start()
+    private bool _crouch = false;
+    void OnDisable()
     {
         _crouch = false;
+        SetWalkServerRpc(_crouch, gameObject);
+        
     }
     
     void Update()
