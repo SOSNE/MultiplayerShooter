@@ -9,8 +9,8 @@ public class crouchingAnimation : NetworkBehaviour
     void OnDisable()
     {
         _crouch = false;
+        TurnToIdleInstantlyServerRpc(gameObject);
         SetWalkServerRpc(_crouch, gameObject);
-        
     }
     
     void Update()
@@ -51,6 +51,25 @@ public class crouchingAnimation : NetworkBehaviour
                 playerNetworkObject.GetComponent<CapsuleCollider2D>().size = new Vector2(0.5381981f, 3.396366f);
             }
         }
+    }
+    [ServerRpc]
+    void TurnToIdleInstantlyServerRpc(NetworkObjectReference playerNetworkObjectReference) {
+        TurnToIdleInstantlyClientRpc(playerNetworkObjectReference);
+    }
+
+    [ClientRpc]
+    void TurnToIdleInstantlyClientRpc(NetworkObjectReference playerNetworkObjectReference) {
+        if(playerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
+        {
+            playerNetworkObject.GetComponent<Animator>().Play("idle");
+            // StartCoroutine(TurnToIdleInstantlyInNextFrame(playerNetworkObject.gameObject));
+        }
+    }
+
+    IEnumerator TurnToIdleInstantlyInNextFrame(GameObject player)
+    {
+        yield return new WaitForEndOfFrame();
+        player.GetComponent<Animator>().Play("idle");
     }
 
     // IEnumerator DrawLine(GameObject weapon, float duration)

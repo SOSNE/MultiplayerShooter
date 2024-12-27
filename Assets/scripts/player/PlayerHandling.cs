@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D.IK;
 
@@ -124,15 +126,20 @@ public class PlayerHhandling : NetworkBehaviour
     public void PerformRagdollOnPlayer(Transform playerTarget, string hitBodyPartString , DataToSendOverNetwork data)
     {
         Transform bodyDown = playerTarget.Find("bodyDown");
-        playerTarget.GetComponent<IKManager2D>().enabled = false;
-        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
-        playerTarget.GetComponent<Animator>().enabled = false;
-        playerTarget.GetComponent<playerMovment>().enabled = false;
         var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
-        playerTarget.GetComponent<Rigidbody2D>().simulated = false;
-        playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
+        playerTarget.GetComponent<IKManager2D>().enabled = false;
+        playerTarget.GetComponent<playerMovment>().enabled = false;
+        // StartCoroutine(PerformPlayerMovementStop(playerTarget));
+        // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        // playerTarget.GetComponent<Animator>().Update(1f);
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
-        
+        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
+        // EditorApplication.isPaused = true;
+        StartCoroutine(PerformAnimationStop(playerTarget));
+        // playerTarget.GetComponent<Animator>().enabled = false;
+        playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
+        playerTarget.GetComponent<Rigidbody2D>().simulated = false;
+
         SetLayerRecursively(bodyDown.gameObject, 17);
         bodyDown.GetComponent<Rigidbody2D>().simulated = true;
         
@@ -142,6 +149,18 @@ public class PlayerHhandling : NetworkBehaviour
         
         bodyDown.Find("bodyUp").GetComponent<Rigidbody2D>().linearVelocity = velocityToPass * 1.5f;
         AddForceToShotObject(playerTarget, hitBodyPartString, data);
+    }
+
+    IEnumerator PerformAnimationStop(Transform playerTarget)
+    {
+        yield return new WaitForEndOfFrame(); 
+        // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        playerTarget.GetComponent<Animator>().enabled = false;
+    }
+    IEnumerator PerformPlayerMovementStop(Transform playerTarget)
+    {
+        yield return new WaitForEndOfFrame(); 
+        playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
     }
     
     private void AddForceToShotObject(Transform playerTarget ,string hitBodyPart , DataToSendOverNetwork data)
