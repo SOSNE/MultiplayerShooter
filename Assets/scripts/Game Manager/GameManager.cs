@@ -14,6 +14,7 @@ public struct PlayerData
     public int Team;
     public NetworkObjectReference PlayerNetworkObject;
     public bool Alive;
+    public List<string> PlayerLoadout;
 }
 
 public struct DataToSendOverNetwork: INetworkSerializable
@@ -212,6 +213,7 @@ public class GameManager : NetworkBehaviour
         newUser.Team = floatIndex % 2;
         newUser.PlayerNetworkObject = playerGameObject;
         newUser.Alive = true;
+        newUser.PlayerLoadout.Add("pistol");
         AllPlayersData.Add(newUser);
         playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);

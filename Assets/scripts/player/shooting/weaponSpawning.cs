@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.U2D.IK;
@@ -17,9 +19,18 @@ public class weaponSpawning : NetworkBehaviour
         if (!IsOwner) return;
         if (_isParent == false)
         {
-            SpawnWeaponServerRpc();
+            // SpawnWeaponServerRpc(gameObject);
             _isParent = true;
         }
+    }
+
+    private void Start()
+    {
+        if (!IsOwner) return;
+        
+        // SpawnWeaponServerRpc(gameObject);
+        // _isParent = true;
+        
     }
 
     void Update()
@@ -28,40 +39,66 @@ public class weaponSpawning : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void ClientRpcNotifyServerRpcClientRpc(ClientRpcParams clientRpcParams = default)
+    private void ClientRpcNotifyServerRpcClientRpc(NetworkObjectReference targetPlayer)
     {
-        _createdWeapon.transform.parent = transform;
-        leftHandSolverTarget = _createdWeapon.Find("left arm solver_Target");
-        rightHandSolverTarget = _createdWeapon.Find("right arm solver_Target");
+        if (targetPlayer.TryGet(out NetworkObject playerNetworkObject))
+        {
+            Transform targetTransform = playerNetworkObject.transform;
+            _createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
+            _createdWeapon.transform.SetParent(targetTransform);
+            
+            Transform positionFirstL = _createdWeapon.Find("rightArmStart");
+            Transform positionFirstR = _createdWeapon.Find("leftArmStart");
+            
+            _createdWeapon.GetComponent<pistolMovment>().positionFirstL = positionFirstL;
+            _createdWeapon.GetComponent<pistolMovment>().positionFirstR = positionFirstR;
+
+            List<Transform> playerTransformsList = new List<Transform>();
+            playerTransformsList.Add(FindChildByName(targetTransform,"bodyDown"));
+            playerTransformsList.Add(FindChildByName(targetTransform,"bodyUp"));
+            playerTransformsList.Add(FindChildByName(targetTransform,"leftLegStart"));
+            playerTransformsList.Add(FindChildByName(targetTransform,"rightLegStart"));
+            playerTransformsList.Add(FindChildByName(targetTransform,"head"));
+            _createdWeapon.GetComponent<pistolMovment>().playerTransforms = playerTransformsList.ToArray();
+
+            
+            List<Transform> waypointsList = new List<Transform>();
+            waypointsList.Add(FindChildByName(targetTransform,"target (1)"));
+            waypointsList.Add(FindChildByName(targetTransform,"target"));
+            waypointsList.Add(FindChildByName(targetTransform,"AmmoBoxTarget"));
+            waypointsList.Add(FindChildByName(_createdWeapon,"target (2)"));
+            waypointsList.Add(FindChildByName(_createdWeapon,"left arm target"));
+
+            _createdWeapon.GetComponent<reloading>().waypoint = waypointsList.ToArray();
+
+            
+            leftHandSolverTarget = _createdWeapon.Find("left arm solver_Target");
+            rightHandSolverTarget = _createdWeapon.Find("right arm solver_Target");
+
+            var chainL = leftArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
+            chainL.target = leftHandSolverTarget;
         
-        var chainL = leftArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
-        chainL.target = leftHandSolverTarget;
+            var chainR = rightArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
+            chainR.target = leftHandSolverTarget;
+        }
         
-        var chainR = rightArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
-        chainR.target = leftHandSolverTarget;
     }
 
     [ServerRpc]
-    private void SpawnWeaponServerRpc(ServerRpcParams serverRpcParams = default)
+    private void SpawnWeaponServerRpc(NetworkObjectReference targetPlayer)
     {
-        _createdWeapon = Instantiate(weapon, transform.position, weapon.rotation);
-        NetworkObject networkObject =_createdWeapon.GetComponent<NetworkObject>();
-        networkObject.SpawnWithOwnership(OwnerClientId);
-        
-        
-        
-        ClientRpcNotifyServerRpcClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
+        ClientRpcNotifyServerRpcClientRpc(targetPlayer);
     }
-    private GameObject FindChildByName(Transform parent, string childName)
+    private Transform FindChildByName(Transform parent, string childName)
     {
         foreach (Transform child in parent)
         {
             if (child.name == childName)
             {
-                return child.gameObject;
+                return child;
             }
 
-            GameObject result = FindChildByName(child, childName);
+            Transform result = FindChildByName(child, childName);
             if (result != null)
             {
                 return result;
