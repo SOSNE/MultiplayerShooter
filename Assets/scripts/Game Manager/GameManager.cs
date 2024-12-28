@@ -14,7 +14,16 @@ public struct PlayerData
     public int Team;
     public NetworkObjectReference PlayerNetworkObject;
     public bool Alive;
-    public List<string> PlayerLoadout;
+    public string[] PlayerLoadout;
+    public PlayerData(int loadoutSize)
+    {
+        ClientId = 0; 
+        Team = 0; 
+        PlayerNetworkObject = default; 
+        Alive = false; 
+        PlayerLoadout = new string[loadoutSize]; // Initialize the array with a specific size
+    }
+
 }
 
 public struct DataToSendOverNetwork: INetworkSerializable
@@ -208,12 +217,12 @@ public class GameManager : NetworkBehaviour
     {
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
-        PlayerData newUser = new PlayerData();
+        PlayerData newUser = new PlayerData(5);
         newUser.ClientId = clientId;
         newUser.Team = floatIndex % 2;
         newUser.PlayerNetworkObject = playerGameObject;
         newUser.Alive = true;
-        newUser.PlayerLoadout.Add("pistol");
+        newUser.PlayerLoadout[0] = "pistol";
         AllPlayersData.Add(newUser);
         playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);
