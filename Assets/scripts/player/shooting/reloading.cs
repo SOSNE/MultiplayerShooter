@@ -52,11 +52,11 @@ public class reloading : NetworkBehaviour
         {
             if (IsOwner)
             {
-                playerNetworkObject.transform.Find("pistol_0").GetComponent<weaponHandling>().canShoot = false;
+                playerNetworkObject.transform.Find("pistol_0(Clone)").GetComponent<weaponHandling>().canShoot = false;
             }
-            playerNetworkObject.transform.Find("pistol_0").
+            playerNetworkObject.transform.Find("pistol_0(Clone)").
                 GetComponent<reloading>().
-                StartCoroutine(GrabMagazine(playerNetworkObject.transform.Find("pistol_0")));
+                StartCoroutine(GrabMagazine(playerNetworkObject.transform.Find("pistol_0(Clone)")));
         }
     }
     

@@ -12,7 +12,7 @@ public class uiControler : NetworkBehaviour
     {
         if (trackingTransform)
         {
-            Transform weapon = trackingTransform.Find("pistol_0").transform;
+            Transform weapon = trackingTransform.Find("pistol_0(Clone)").transform;
             float remainingBullets = weaponHandling.BulletCount -
                                  weapon.GetComponent<weaponHandling>()
                                       .bulletCounter;

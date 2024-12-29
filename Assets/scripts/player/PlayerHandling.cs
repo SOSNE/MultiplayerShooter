@@ -34,6 +34,7 @@ public class PlayerHhandling : NetworkBehaviour
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             _gameManager = GameObject.Find("Game Manager");
+            gameObject.GetComponent<weaponSpawning>().SpawnWeapon();
             gameObject.GetComponent<GameManager>().CreateCamera();
         }
         

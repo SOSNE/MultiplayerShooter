@@ -11,7 +11,6 @@ public class weaponSpawning : NetworkBehaviour
     private Transform _createdWeapon, _leftHandTarget, _rightHandTarget, leftHandSolverTarget, rightHandSolverTarget;
     private bool _isParent = false;
     public LimbSolver2D leftArmSolver2D, rightArmSolver2D;
-    [SerializeField] private Flare somthing;
 
     public override void OnNetworkSpawn()
     {
@@ -35,7 +34,12 @@ public class weaponSpawning : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner) return;
+        // if (!IsOwner) return;
+    }
+
+    public void SpawnWeapon()
+    {
+        SpawnWeaponServerRpc(gameObject);
     }
     
     [ClientRpc]
@@ -45,10 +49,20 @@ public class weaponSpawning : NetworkBehaviour
         {
             Transform targetTransform = playerNetworkObject.transform;
             _createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
-            _createdWeapon.transform.SetParent(targetTransform);
             
-            Transform positionFirstL = _createdWeapon.Find("rightArmStart");
-            Transform positionFirstR = _createdWeapon.Find("leftArmStart");
+            NetworkObject networkObject = _createdWeapon.GetComponent<NetworkObject>();
+            NetworkObject parentNetworkObject = transform.GetComponent<NetworkObject>();
+
+            networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
+            
+            _createdWeapon.transform.SetParent(targetTransform);
+
+            targetTransform.GetComponent<GameManager>().pistol = _createdWeapon.gameObject;
+            targetTransform.GetComponent<playerMovment>().weapon = _createdWeapon;
+
+            
+            Transform positionFirstL = FindChildByName(targetTransform,"rightArmStart");
+            Transform positionFirstR = FindChildByName(targetTransform,"leftArmStart");
             
             _createdWeapon.GetComponent<pistolMovment>().positionFirstL = positionFirstL;
             _createdWeapon.GetComponent<pistolMovment>().positionFirstR = positionFirstR;
@@ -79,7 +93,9 @@ public class weaponSpawning : NetworkBehaviour
             chainL.target = leftHandSolverTarget;
         
             var chainR = rightArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
-            chainR.target = leftHandSolverTarget;
+            chainR.target = rightHandSolverTarget;
+            
+
         }
         
     }

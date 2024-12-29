@@ -45,7 +45,7 @@ public class GameManager : NetworkBehaviour
     private static NetworkList<int> _pointScore = new NetworkList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
-    [SerializeField] private GameObject camera, pistol;
+    public GameObject camera, pistol;
 
 
     private void Start()
@@ -266,7 +266,6 @@ public class GameManager : NetworkBehaviour
             if (playerNetworkObject.gameObject.layer == LayerMask.NameToLayer("playerColliderDeafult"))
             {
                 playerNetworkObject.gameObject.layer = LayerMask.NameToLayer(playerLayerName);
-                print("test");
             }
         }
     }
