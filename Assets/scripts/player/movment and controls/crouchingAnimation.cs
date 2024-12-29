@@ -8,6 +8,7 @@ public class crouchingAnimation : NetworkBehaviour
     private bool _crouch = false;
     void OnDisable()
     {
+        if(!IsOwner) return;
         _crouch = false;
         TurnToIdleInstantlyServerRpc(gameObject);
         SetWalkServerRpc(_crouch, gameObject);
