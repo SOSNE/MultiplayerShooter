@@ -71,7 +71,24 @@ public class GameManager : NetworkBehaviour
         }
 
         base.OnNetworkSpawn();
+        if(!IsOwner) return;
+        
+        StartCoroutine(StartGameLoadingQueue());
         _pointScore.OnListChanged += UpdateWinCounter;
+    }
+
+    private IEnumerator StartGameLoadingQueue()
+    {
+        gameObject.GetComponent<weaponSpawning>().SpawnWeapon();
+        
+        yield return new WaitUntil(() => gameObject.GetComponent<weaponSpawning>().isWeaponSpawned);
+        
+        gameObject.GetComponent<GameManager>().CreateCamera();
+        
+        GameObject.Find("UiControler").
+            GetComponent<uiControler>().trackingTransform = transform;
+        GameObject.Find("Camera Control").
+            GetComponent<CameraControl>().currentPlayer = transform;
     }
 
     public void CreateCamera()

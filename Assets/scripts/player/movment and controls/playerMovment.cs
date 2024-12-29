@@ -24,6 +24,8 @@ public class playerMovment : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
+        if (!camera) return;
+        
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));

@@ -30,21 +30,14 @@ public class PlayerHhandling : NetworkBehaviour
     
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         if (IsClient)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             _gameManager = GameObject.Find("Game Manager");
-            gameObject.GetComponent<weaponSpawning>().SpawnWeapon();
-            gameObject.GetComponent<GameManager>().CreateCamera();
         }
         
-        if (IsOwner)
-        {
-            GameObject.Find("UiControler").
-                GetComponent<uiControler>().trackingTransform = transform;
-            GameObject.Find("Camera Control").
-                GetComponent<CameraControl>().currentPlayer = transform;
-        }
+        
         
         SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(transform, "bodyPart");
     }
