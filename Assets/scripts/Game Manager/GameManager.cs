@@ -46,6 +46,7 @@ public class GameManager : NetworkBehaviour
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera, pistol;
+    private bool _teamAddingSetupDone = false;
 
 
     private void Start()
@@ -79,6 +80,10 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator StartGameLoadingQueue()
     {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+
+        yield return new WaitUntil(() => _teamAddingSetupDone);
+
         gameObject.GetComponent<weaponSpawning>().SpawnWeapon();
         
         yield return new WaitUntil(() => gameObject.GetComponent<weaponSpawning>().isWeaponSpawned);
@@ -89,6 +94,40 @@ public class GameManager : NetworkBehaviour
             GetComponent<uiControler>().trackingTransform = transform;
         GameObject.Find("Camera Control").
             GetComponent<CameraControl>().currentPlayer = transform;
+    }
+    
+    private void OnClientConnected(ulong clientId)
+    {
+        if (!IsOwner) return;
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            NewClientConnectionServerRpc(clientId);
+            gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
+        }
+    }
+    
+    [ServerRpc]
+    private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
+    {
+        PlayerHhandling.clientHealthMap.Add(clientId, 100);
+        
+        // update health ui
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]{clientId}
+            }
+        };
+        GameObject.Find("UiControler").GetComponent<uiControler>()
+            .GetHealthForUiClientRpc(PlayerHhandling.clientHealthMap[clientId], clientRpcParams);
+        AcknowledgeTeamAddingSetupClientRpc();
+    }
+    
+    [ClientRpc]
+    private void AcknowledgeTeamAddingSetupClientRpc()
+    {
+        _teamAddingSetupDone = true;
     }
 
     public void CreateCamera()
@@ -137,9 +176,7 @@ public class GameManager : NetworkBehaviour
         //restart game after all players are dead
         if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
         {
-
-            StartCoroutine(NextRoundCourtione(2, currentClientId, teamIndexOverwrite));
-
+            StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
     }
 
@@ -321,8 +358,8 @@ public class GameManager : NetworkBehaviour
             gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform, hitBodyPartString, data);
         }
     }
-
-    IEnumerator NextRoundCourtione(float duration, ulong clientId, int teamIndexOverwrite)
+    
+    IEnumerator NextRoundCoroutine(float duration, ulong clientId, int teamIndexOverwrite)
     {
         UpdatePointScoreDictionary(clientId, teamIndexOverwrite);
         yield return new WaitForSeconds(duration);

@@ -10,7 +10,8 @@ public class weaponSpawning : NetworkBehaviour
     public Transform weapon;
     private Transform _leftHandTarget, _rightHandTarget, leftHandSolverTarget, rightHandSolverTarget;
     public bool isWeaponSpawned = false;
-    public LimbSolver2D leftArmSolver2D, rightArmSolver2D;
+    // public LimbSolver2D leftArmSolver2D, rightArmSolver2D;
+    public bool _weaponSeatUpDone = false;
     
 
     private void Start()
@@ -33,15 +34,14 @@ public class weaponSpawning : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void ClientRpcNotifyClientRpc(NetworkObjectReference targetPlayer, NetworkObjectReference createdWeapon)
+    private void PerformWeaponSetupClientRpc(NetworkObjectReference targetPlayer)
     {
+        if (_weaponSeatUpDone) return;
         if (targetPlayer.TryGet(out NetworkObject playerNetworkObject))
         {
-            if (createdWeapon.TryGet(out NetworkObject createdWeaponNetworkObject))
-            {
-                
+            
                 Transform targetTransform = playerNetworkObject.transform;
-                Transform _createdWeapon = createdWeaponNetworkObject.transform;
+                Transform createdWeapon = targetTransform.Find("pistol_0(Clone)");
                 // if(FindChildByName(targetTransform, "pistol_0(Clone)") != null) return;
                 //
                 // _createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
@@ -54,15 +54,15 @@ public class weaponSpawning : NetworkBehaviour
                 //
                 // _createdWeapon.transform.SetParent(targetTransform);
 
-                targetTransform.GetComponent<GameManager>().pistol = _createdWeapon.gameObject;
-                targetTransform.GetComponent<playerMovment>().weapon = _createdWeapon;
+                targetTransform.GetComponent<GameManager>().pistol = createdWeapon.gameObject;
+                targetTransform.GetComponent<playerMovment>().weapon = createdWeapon;
 
 
                 Transform positionFirstL = FindChildByName(targetTransform, "rightArmStart");
                 Transform positionFirstR = FindChildByName(targetTransform, "leftArmStart");
 
-                _createdWeapon.GetComponent<pistolMovment>().positionFirstL = positionFirstL;
-                _createdWeapon.GetComponent<pistolMovment>().positionFirstR = positionFirstR;
+                createdWeapon.GetComponent<pistolMovment>().positionFirstL = positionFirstL;
+                createdWeapon.GetComponent<pistolMovment>().positionFirstR = positionFirstR;
 
                 List<Transform> playerTransformsList = new List<Transform>();
                 playerTransformsList.Add(FindChildByName(targetTransform, "bodyDown"));
@@ -70,29 +70,34 @@ public class weaponSpawning : NetworkBehaviour
                 playerTransformsList.Add(FindChildByName(targetTransform, "leftLegStart"));
                 playerTransformsList.Add(FindChildByName(targetTransform, "rightLegStart"));
                 playerTransformsList.Add(FindChildByName(targetTransform, "head"));
-                _createdWeapon.GetComponent<pistolMovment>().playerTransforms = playerTransformsList.ToArray();
+                createdWeapon.GetComponent<pistolMovment>().playerTransforms = playerTransformsList.ToArray();
 
 
                 List<Transform> waypointsList = new List<Transform>();
                 waypointsList.Add(FindChildByName(targetTransform, "target (1)"));
                 waypointsList.Add(FindChildByName(targetTransform, "target"));
                 waypointsList.Add(FindChildByName(targetTransform, "AmmoBoxTarget"));
-                waypointsList.Add(FindChildByName(_createdWeapon, "target (2)"));
-                waypointsList.Add(FindChildByName(_createdWeapon, "left arm target"));
+                waypointsList.Add(FindChildByName(createdWeapon, "target (2)"));
+                waypointsList.Add(FindChildByName(createdWeapon, "left arm target"));
 
-                _createdWeapon.GetComponent<reloading>().waypoint = waypointsList.ToArray();
+                createdWeapon.GetComponent<reloading>().waypoint = waypointsList.ToArray();
 
 
-                leftHandSolverTarget = _createdWeapon.Find("left arm solver_Target");
-                rightHandSolverTarget = _createdWeapon.Find("right arm solver_Target");
+                leftHandSolverTarget = createdWeapon.Find("left arm solver_Target");
+                rightHandSolverTarget = createdWeapon.Find("right arm solver_Target");
 
+                LimbSolver2D leftArmSolver2D = targetTransform.Find("right arm solver").GetComponent<LimbSolver2D>();
+                LimbSolver2D rightArmSolver2D = targetTransform.Find("left arm solver").GetComponent<LimbSolver2D>();
+
+                
                 var chainL = leftArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
                 chainL.target = leftHandSolverTarget;
 
                 var chainR = rightArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
                 chainR.target = rightHandSolverTarget;
                 isWeaponSpawned = true;
-            }
+                targetTransform.GetComponent<weaponSpawning>()._weaponSeatUpDone = true;
+                // Debug.Break();
         }
     }
     
@@ -110,7 +115,11 @@ public class weaponSpawning : NetworkBehaviour
         
             networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
             createdWeapon.transform.SetParent(targetTransform);
-            ClientRpcNotifyClientRpc(targetPlayer, createdWeapon.gameObject);
+            foreach (var data in GameManager.AllPlayersData)
+            {
+                PerformWeaponSetupClientRpc(data.PlayerNetworkObject);
+            }
+            
         }
     }
     private Transform FindChildByName(Transform parent, string childName)

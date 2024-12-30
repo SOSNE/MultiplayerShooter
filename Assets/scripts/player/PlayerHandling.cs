@@ -33,12 +33,8 @@ public class PlayerHhandling : NetworkBehaviour
         base.OnNetworkSpawn();
         if (IsClient)
         {
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             _gameManager = GameObject.Find("Game Manager");
         }
-        
-        
-        
         SearchChildrenByTagForCurrentPlayerRagdollBodyPartsList(transform, "bodyPart");
     }
     
@@ -59,18 +55,6 @@ public class PlayerHhandling : NetworkBehaviour
         }
     }
 
-    
-
-    private void OnClientConnected(ulong clientId)
-    {
-        if (!IsOwner) return;
-        if (clientId == NetworkManager.Singleton.LocalClientId)
-        {
-            NewClientConnectionServerRpc(clientId);
-            gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
-        }
-    }
-
     public void PlayerHit(int damageAmount,ulong clientId, string hitBodyPartName , Vector2 direction)
     {
         DataToSendOverNetwork data;
@@ -79,22 +63,7 @@ public class PlayerHhandling : NetworkBehaviour
         PlayerHitServerRpc(damageAmount, clientId, currentClientId, hitBodyPartName, data);
     }
 
-    [ServerRpc]
-    private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
-    {
-        clientHealthMap.Add(clientId, 100);
-        
-        // update health ui
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[]{clientId}
-            }
-        };
-        GameObject.Find("UiControler").GetComponent<uiControler>()
-            .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
-    }
+    
     
     [ServerRpc]
     private void PlayerHitServerRpc(int damageAmount,ulong clientId , ulong currentClientId, string hitBodyPartString , DataToSendOverNetwork data, ServerRpcParams serverRpcParams = default)
