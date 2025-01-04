@@ -1,17 +1,19 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class crouchingAnimation : NetworkBehaviour
 {
     [SerializeField] private GameObject _weapon;
     private bool _crouch = false;
+    public bool turnToIdleInstantlyDone = false;
     void OnDisable()
     {
         if(!IsOwner) return;
         _crouch = false;
-        TurnToIdleInstantlyServerRpc(gameObject);
         SetWalkServerRpc(_crouch, gameObject);
+        TurnToIdleInstantlyServerRpc(gameObject);
     }
     
     void Update()
@@ -63,29 +65,7 @@ public class crouchingAnimation : NetworkBehaviour
         if(playerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
         {
             playerNetworkObject.GetComponent<Animator>().Play("idle");
-            // StartCoroutine(TurnToIdleInstantlyInNextFrame(playerNetworkObject.gameObject));
+            playerNetworkObject.GetComponent<crouchingAnimation>().turnToIdleInstantlyDone = true;
         }
     }
-
-    IEnumerator TurnToIdleInstantlyInNextFrame(GameObject player)
-    {
-        yield return new WaitForEndOfFrame();
-        player.GetComponent<Animator>().Play("idle");
-    }
-
-    // IEnumerator DrawLine(GameObject weapon, float duration)
-    // {
-    //
-    //     Vector2 weaponStartPosition = weapon.transform.position;
-    //     float startTime = Time.time;
-    //     while (Time.time - startTime < duration && weaponStartPosition.y != weaponStartPosition.y - 1)
-    //     {
-    //         float t = (Time.time - startTime) / duration;
-    //
-    //         Vector2 currentPosition = Vector2.Lerp(weaponStartPosition,
-    //             new Vector2(weaponStartPosition.x, weaponStartPosition.y - 1), t);
-    //         weapon.transform.position = currentPosition;
-    //         yield return null;
-    //     }
-    // }
 }

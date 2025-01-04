@@ -91,7 +91,6 @@ public class PlayerHhandling : NetworkBehaviour
         Transform bodyDown = playerTarget.Find("bodyDown");
         var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
         playerTarget.GetComponent<IKManager2D>().enabled = false;
-        playerTarget.GetComponent<playerMovment>().enabled = false;
         // StartCoroutine(PerformPlayerMovementStop(playerTarget));
         // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         // playerTarget.GetComponent<Animator>().Update(1f);
@@ -104,6 +103,8 @@ public class PlayerHhandling : NetworkBehaviour
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
 
         SetLayerRecursively(bodyDown.gameObject, 17);
+        playerTarget.GetComponent<playerMovment>().enabled = false;
+
         bodyDown.GetComponent<Rigidbody2D>().simulated = true;
         
         bodyDown.Find("bodyDownCollider").GetComponent<Rigidbody2D>().simulated = false;
@@ -116,9 +117,11 @@ public class PlayerHhandling : NetworkBehaviour
 
     IEnumerator PerformAnimationStop(Transform playerTarget)
     {
+        yield return new WaitUntil(() => playerTarget.GetComponent<crouchingAnimation>().turnToIdleInstantlyDone);
         yield return new WaitForEndOfFrame(); 
-        // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        
         playerTarget.GetComponent<Animator>().enabled = false;
+        playerTarget.GetComponent<crouchingAnimation>().turnToIdleInstantlyDone = false;
     }
     IEnumerator PerformPlayerMovementStop(Transform playerTarget)
     {
