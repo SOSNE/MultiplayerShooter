@@ -8,6 +8,40 @@ using UnityEngine;
 using System.Linq;
 using Random = System.Random;
 
+public class ObservableList<T>
+{
+    private List<T> _list = new List<T>();
+
+    public event Action OnListChanged;
+
+    public void Add(T item)
+    {
+        _list.Add(item);
+        OnListChanged?.Invoke();
+    }
+
+    public void Remove(T item)
+    {
+        if (_list.Remove(item))
+        {
+            OnListChanged?.Invoke();
+        }
+    }
+
+    // public int Count => _list.Count;
+
+    public T this[int index]
+    {
+        get => _list[index];
+        set
+        {
+            _list[index] = value;
+            OnListChanged?.Invoke();
+        }
+    }
+}
+
+
 public struct PlayerData
 {
     public ulong ClientId;
@@ -42,13 +76,18 @@ public class GameManager : NetworkBehaviour
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
     public static List<int> playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
-    public NetworkList<int> _pointScore = new NetworkList<int>();
+    private static ObservableList<int> _pointScore = new ObservableList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera, pistol;
     private bool _teamAddingSetupDone = false;
-
-
+    
+    // private void Awake()
+    // {
+    //     if(!IsServer) return;
+    //     _pointScore = new NetworkList<int>();
+    // }
+    
     private void Start()
     {
         teamOneWinCounter = FindObjectInHierarchy("Team 0").GetComponent<TextMeshProUGUI>();
@@ -72,10 +111,12 @@ public class GameManager : NetworkBehaviour
         }
 
         base.OnNetworkSpawn();
+        
         if(!IsOwner) return;
         
         StartCoroutine(StartGameLoadingQueue());
-        _pointScore.OnListChanged += UpdateWinCounter;
+        if(!IsServer) return;
+        _pointScore.OnListChanged += UpdateWinCounterServerRpc;
     }
 
     private IEnumerator StartGameLoadingQueue()
@@ -92,6 +133,7 @@ public class GameManager : NetworkBehaviour
         
         GameObject.Find("UiControler").
             GetComponent<uiControler>().trackingTransform = transform;
+        UpdateWinCounterServerRpc();
         GameObject.Find("Camera Control").
             GetComponent<CameraControl>().currentPlayer = transform;
     }
@@ -251,13 +293,19 @@ public class GameManager : NetworkBehaviour
 
         _pointScore[teamIndex] += 1;
     }
-
-    private void UpdateWinCounter(NetworkListEvent<int> listEvent)
+    
+    [ServerRpc]
+    private void UpdateWinCounterServerRpc()
     {
-        teamOneWinCounter.text = $"{_pointScore[0]}";
-        teamTwoWinCounter.text = $"{_pointScore[1]}";
+        UpdateWinCounterClientRpc(_pointScore[0], _pointScore[1]);
     }
-
+    
+    [ClientRpc]
+    private void UpdateWinCounterClientRpc(int team0, int team1)
+    {
+        teamOneWinCounter.text = $"{team0}";
+        teamTwoWinCounter.text = $"{team1}";
+    }
 
     public void AddClientToTeam(ulong clientId)
     {
