@@ -42,7 +42,7 @@ public class GameManager : NetworkBehaviour
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
     public static List<int> playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
-    private static NetworkList<int> _pointScore = new NetworkList<int>();
+    public NetworkList<int> _pointScore = new NetworkList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera, pistol;
