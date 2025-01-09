@@ -74,7 +74,7 @@ public class GameManager : NetworkBehaviour
 {
     public static List<PlayerData> AllPlayersData = new List<PlayerData>();
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
-    public static List<int> playersAlive = new List<int>();
+    private static List<int> _playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
     private static ObservableList<int> _pointScore = new ObservableList<int>();
     private static int floatIndex;
@@ -105,8 +105,8 @@ public class GameManager : NetworkBehaviour
         {
             _pointScore.Add(0);
             _pointScore.Add(0);
-            playersAlive.Add(0);
-            playersAlive.Add(0);
+            _playersAlive.Add(0);
+            _playersAlive.Add(0);
             _pointScoreInitialize = false;
         }
 
@@ -210,13 +210,13 @@ public class GameManager : NetworkBehaviour
                 PlayerData myStruct = AllPlayersData[i];
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
-                playersAlive[AllPlayersData[i].Team] -= 1;
+                _playersAlive[AllPlayersData[i].Team] -= 1;
                 performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
             }
         }
 
         //restart game after all players are dead
-        if (playersAlive[0] <= 0 || playersAlive[1] <= 0)
+        if (_playersAlive[0] <= 0 || _playersAlive[1] <= 0)
         {
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
@@ -229,12 +229,12 @@ public class GameManager : NetworkBehaviour
             var data = AllPlayersData[i];
             if (data is { Team: 0, Alive: false })
             {
-                playersAlive[0] += 1;
+                _playersAlive[0] += 1;
             }
 
             if (data is { Team: 1, Alive: false })
             {
-                playersAlive[1] += 1;
+                _playersAlive[1] += 1;
             }
 
             data.Alive = true;
@@ -326,7 +326,7 @@ public class GameManager : NetworkBehaviour
         newUser.Alive = true;
         newUser.PlayerLoadout[0] = "pistol";
         AllPlayersData.Add(newUser);
-        playersAlive[floatIndex % 2] += 1;
+        _playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);
 
         floatIndex++;
