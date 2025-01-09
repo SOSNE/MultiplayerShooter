@@ -24,7 +24,8 @@ public class reloading : NetworkBehaviour
     void Update()
     {
         if(!IsOwner) return;
-        if (Input.GetKeyDown(KeyCode.R) && !_isCoroutineRunning)
+        float currentMagazineCount = GetComponent<weaponHandling>().bulletCounter;
+        if (Input.GetKeyDown(KeyCode.R) && !_isCoroutineRunning && currentMagazineCount != 0)
         {
             _isCoroutineRunning = true;
             PerformReloadingServerRpc(transform.parent.gameObject);
