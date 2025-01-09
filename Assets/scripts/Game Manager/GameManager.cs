@@ -279,6 +279,12 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void RestartWeaponsMagazinesClientRpc()
+    {
+        pistol.GetComponent<weaponHandling>().bulletCounter = 0;
+    }
+
     private void UpdatePointScoreDictionary(ulong clientId, int teamIndexOverwrite)
     {
         int teamIndex;
@@ -414,6 +420,7 @@ public class GameManager : NetworkBehaviour
         ResetHealthMap();
         RestartPlayersAliveList();
         RestartPositions();
+        RestartWeaponsMagazinesClientRpc();
         foreach (PlayerData playerData in AllPlayersData)
         {
             turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObject);
