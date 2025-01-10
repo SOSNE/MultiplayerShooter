@@ -6,6 +6,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Serialization;
 using Random = System.Random;
 
 public class ObservableList<T>
@@ -79,7 +80,8 @@ public class GameManager : NetworkBehaviour
     private static ObservableList<int> _pointScore = new ObservableList<int>();
     private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
-    public GameObject camera, pistol;
+    public GameObject camera;
+    [FormerlySerializedAs("pistol")] public GameObject weapon;
     private bool _teamAddingSetupDone = false;
     
     // private void Awake()
@@ -177,7 +179,7 @@ public class GameManager : NetworkBehaviour
         if (!IsOwner) return;
         _createdCamera = Camera.main.gameObject;
         // _createdCamera = Instantiate(camera, transform.position, transform.rotation);
-        pistol.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
+        weapon.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
 
@@ -282,7 +284,7 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void RestartWeaponsMagazinesClientRpc()
     {
-        pistol.GetComponent<weaponHandling>().bulletCounter = 0;
+        weapon.GetComponent<weaponHandling>().bulletCounter = 0;
     }
 
     private void UpdatePointScoreDictionary(ulong clientId, int teamIndexOverwrite)

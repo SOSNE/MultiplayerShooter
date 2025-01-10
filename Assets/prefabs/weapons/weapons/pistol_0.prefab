@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3216852378954723465}
   m_Layer: 0
-  m_Name: right arm solver_Target
+  m_Name: RightArmTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5909975487269419199}
   m_Layer: 0
-  m_Name: left arm target
+  m_Name: LeftArmTargetReloadTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -246,7 +246,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3193461764652747164}
   m_Layer: 0
-  m_Name: target (2)
+  m_Name: ReloadingAnimTarget 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -466,8 +466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1360433565
+  InScenePlacedSourceGlobalObjectIdHash: 2792715716
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -628,7 +628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8559061481719632156}
   m_Layer: 0
-  m_Name: left arm solver_Target
+  m_Name: LeftArmTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

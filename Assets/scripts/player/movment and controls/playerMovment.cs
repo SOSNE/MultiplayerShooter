@@ -11,20 +11,25 @@ public class playerMovment : NetworkBehaviour
     private Rigidbody2D _rb;
     private bool _grounded, _goUp;
     public Camera camera;
+    public Vector3 _weaponStartScale;
 
     void Start()
     { 
         // _camera = Camera.main;
+        
     }
     
     private Quaternion _targetRotation;
     private float _timer;
     bool _rotateFlag = true;
     
+    
+    
     void Update()
     {
         if (!IsOwner) return;
         if (!camera) return;
+        if (weapon && _weaponStartScale == Vector3.zero)  _weaponStartScale = weapon.localScale;
         
         
         Vector3 mouseScreenPosition = Input.mousePosition;
@@ -37,7 +42,7 @@ public class playerMovment : NetworkBehaviour
             {
                 RotationData scale;
                 scale.PlayerScale  = new Vector3(-1, 1, 1);
-                scale.WeaponScale = new Vector3(-1, -1, 1);
+                scale.WeaponScale = new Vector3(-_weaponStartScale.x, -_weaponStartScale.y, _weaponStartScale.z);
                 RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
                 weapon.transform.localScale = scale.WeaponScale;
 
@@ -47,7 +52,7 @@ public class playerMovment : NetworkBehaviour
             {
                 RotationData scale;
                 scale.PlayerScale  = new Vector3(1, 1, 1);
-                scale.WeaponScale = new Vector3(1, 1, 1);
+                scale.WeaponScale = new Vector3(_weaponStartScale.x, _weaponStartScale.y, _weaponStartScale.z);
                 RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
                 weapon.transform.localScale = scale.WeaponScale;
                 _rotateFlag = true;

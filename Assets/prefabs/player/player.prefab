@@ -1699,7 +1699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -188458474966055407, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9887319
+      value: 0.98873186
       objectReference: {fileID: 0}
     - target: {fileID: -188458474966055407, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
@@ -1711,7 +1711,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -188458474966055407, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.1496974
+      value: -0.14969741
       objectReference: {fileID: 0}
     - target: {fileID: -188458474966055407, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1811,15 +1811,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.59079134
+      value: 0.5907914
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalRotation.z
@@ -1827,7 +1827,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2319998805419544334, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -83.182
+      value: -107.574
       objectReference: {fileID: 0}
     - target: {fileID: 2471920254983572574, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2191,7 +2191,7 @@ HingeJoint2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 392143429483063801}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_EnableCollision: 0
   m_ConnectedRigidBody: {fileID: 3558140356539594959}
@@ -2473,7 +2473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4042147263
+  GlobalObjectIdHash: 168810998
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2499,9 +2499,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  weapon: {fileID: 7188657230575694122, guid: d9784550a1a614159a1669a596b7e31b, type: 3}
-  leftArmSolver2D: {fileID: 6304919209586161132}
-  rightArmSolver2D: {fileID: 1735596991170470242}
+  weapon: {fileID: 2089097055469182062, guid: 164524b8d02a7440b9075bc4ae305b9a, type: 3}
+  isWeaponSpawned: 0
+  _weaponSeatUpDone: 0
 --- !u!114 &4996798501281288926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2516,7 +2516,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   camera: {fileID: 1062943222018729907, guid: b9dee91aa6224e446b1be6661f1fd139, type: 3}
-  pistol: {fileID: 0}
+  weapon: {fileID: 0}
   positionsDistance: fdfffffffeffffffffffffff00000000010000000200000003000000
 --- !u!114 &9072768927191672002
 MonoBehaviour:
@@ -2537,6 +2537,7 @@ MonoBehaviour:
   centerOfPlayer: {fileID: 4121016224152418615}
   weapon: {fileID: 0}
   camera: {fileID: 0}
+  _weaponStartScale: {x: 0, y: 0, z: 0}
 --- !u!50 &1799989168919453944
 Rigidbody2D:
   serializedVersion: 5
@@ -2773,6 +2774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _weapon: {fileID: 0}
+  turnToIdleInstantlyDone: 0
 --- !u!114 &5234942705381225173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3461,7 +3463,7 @@ HingeJoint2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9120262006081296601}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_EnableCollision: 0
   m_ConnectedRigidBody: {fileID: 2303539762325029317}
