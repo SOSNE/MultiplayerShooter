@@ -7,9 +7,9 @@ using Unity.Netcode;
 public class pistolMovment : NetworkBehaviour
 {
     public Transform positionFirstL, positionFirstR;
-    public double maxExtension = 1.11931;
+    public double maxExtension, width;
     public Camera camera;
-    private float width, _rotationRecoilAngle, _angle;
+    private float _rotationRecoilAngle, _angle;
     private Vector3 _currentWeaponRecoilPosition;
     public Transform[] playerTransforms;
     
@@ -17,7 +17,7 @@ public class pistolMovment : NetworkBehaviour
     private void Start()
     {
         // _camera = Camera.main;
-        width = GetComponent<Renderer>().bounds.size.x;
+        // width = GetComponent<Renderer>().bounds.size.x;
         maxExtension = maxExtension - width + 0.27;
     }
 

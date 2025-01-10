@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEngine.Serialization;
 
 
 public class reloading : NetworkBehaviour
@@ -10,14 +11,20 @@ public class reloading : NetworkBehaviour
     public Transform leftHandTarget, magazineSpawningTarget;
     private Transform _magazine;
     public Transform[] waypoint;
-    public bool _isCoroutineRunning = false;
-    public GameObject magazine;
+    private bool _isCoroutineRunning = false, _isMagazineStickingOut = false;
+    public GameObject magazinePrefab, existingMagazine;
+    
+    
     
     
     private GameObject _createdMagazine = null;
     void Start()
     {
-        //_magazine = transform.Find("magazine");
+        if (existingMagazine)
+        {
+            _magazine = existingMagazine.transform;
+            _isMagazineStickingOut = true;
+        }
     }
 
     private bool _ejectMagazine = false;
@@ -64,11 +71,10 @@ public class reloading : NetworkBehaviour
     
     IEnumerator GrabMagazine(Transform weapon)
     {
-        
-        _magazine = Instantiate(magazine, magazineSpawningTarget.position, transform.rotation).transform;
+        if (!_isMagazineStickingOut) _magazine = Instantiate(magazinePrefab, magazineSpawningTarget.position, transform.rotation).transform;
         _magazine.SetParent(transform);
         Vector2 backDirection;
-        if (transform.localScale == new Vector3(-1, -1, 1))
+        if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
         {
             backDirection = transform.up;
         }
@@ -103,14 +109,24 @@ public class reloading : NetworkBehaviour
             if (index == 2)
             {
                 yield return new WaitForSeconds(0.3f);
-                _createdMagazine = Instantiate(magazine, leftHandTarget.position, magazine.transform.rotation);
+                _createdMagazine = Instantiate(magazinePrefab, leftHandTarget.position, magazinePrefab.transform.rotation);
                 _createdMagazine.transform.SetParent(leftHandTarget);
             }
 
             if (index == waypoint.Length - 1)
             {
                 leftHandTarget.SetParent(transform);
-                Destroy(_createdMagazine);
+                if (!_isMagazineStickingOut)
+                {
+                    Destroy(_createdMagazine);
+                }
+                else
+                {
+                    Destroy(_createdMagazine);
+                    _magazine = Instantiate(magazinePrefab, magazineSpawningTarget.position, transform.rotation).transform;
+                    _magazine.transform.SetParent(transform);
+                }
+                
             }
             index++;
         }
