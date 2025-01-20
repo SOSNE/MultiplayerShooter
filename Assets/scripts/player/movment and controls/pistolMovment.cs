@@ -6,13 +6,14 @@ using Unity.Netcode;
 
 public class pistolMovment : NetworkBehaviour
 {
-    public Transform positionFirstL, positionFirstR;
+    public Transform positionFirstL, positionFirstR, bulletSpawn;
     public double maxExtension, width;
     public Camera camera;
-    private float _rotationRecoilAngle, _angle;
+    private float _rotationRecoilAngle, _angleTarget;
     private Vector3 _currentWeaponRecoilPosition;
     public Transform[] playerTransforms;
-    
+    [SerializeField] private Transform rotationCenterPoint;
+    [SerializeField] private float correctionValue = 0.1f;
     
     private void Start()
     {
@@ -73,19 +74,12 @@ public class pistolMovment : NetworkBehaviour
         double rightArmExtenstion = Vector2.Distance(positionFirstR.position, mouseWorldPosition);
         double leftArmExtenstionToWeapon = Vector2.Distance(positionFirstL.position, transform.position);
         double rightArmExtenstionToWeapon =  Vector2.Distance(positionFirstL.position, transform.position);
-        float pistolToMouseDistance = Vector2.Distance(transform.position, mouseWorldPosition);
-        float correctionValue = 0.1f;
+        
+        float angleTarget = Mathf.Atan2(mouseWorldPosition.y - bulletSpawn.position.y, mouseWorldPosition.x - bulletSpawn.position.x);
+        angleTarget *= Mathf.Rad2Deg;
+        float angle = angleTarget + 180f;
+        angle = Mathf.LerpAngle(transform.eulerAngles.z, angle, Time.deltaTime * 10f);
 
-        float sin = correctionValue / pistolToMouseDistance;
-
-        float angleCorrection = Mathf.Atan(sin);
-        angleCorrection = (180 / Mathf.PI) * angleCorrection - 180;
-        
-        
-        _angle = Mathf.Atan2(mouseWorldPosition.y - transform.position.y, mouseWorldPosition.x - transform.position.x);
-        _angle = (180 / Mathf.PI) * _angle;
-        
-        
         
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
@@ -113,9 +107,12 @@ public class pistolMovment : NetworkBehaviour
                 {
                     // If the object is mirrored, invert the target rotation to compensate for flipping
                     _rotationRecoilAngle = -_rotationRecoilAngle;
-                    angleCorrection = -angleCorrection;
+                    // angleCorrection = -angleCorrection;
                 }
-                transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
+                // transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
+                transform.RotateAround(rotationCenterPoint.position, Vector3.forward,
+                    angle - transform.eulerAngles.z);
+                // print(angleCorrection + "angle");
             }
             
             // check if we are doing recoil and if weapon is not beyond the arms reach.
