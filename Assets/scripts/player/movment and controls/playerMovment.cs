@@ -42,10 +42,10 @@ public class playerMovment : NetworkBehaviour
             {
                 RotationData scale;
                 scale.PlayerScale  = new Vector3(-1, 1, 1);
-                scale.WeaponScale = new Vector3(-_weaponStartScale.x, -_weaponStartScale.y, _weaponStartScale.z);
+                scale.WeaponScale = new Vector3(_weaponStartScale.x, _weaponStartScale.y, _weaponStartScale.z);
                 RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
                 weapon.transform.localScale = scale.WeaponScale;
-
+                // Debug.Break();
                 _rotateFlag = false;
             }
             else if (distance <= 0 && !_rotateFlag)
@@ -164,7 +164,6 @@ public class playerMovment : NetworkBehaviour
         }
         if(weaponObjectReference.TryGet(out NetworkObject weaponNetworkObject))
         { 
-            // TODO create weapon spawning system with weapon that have network
             // object component.
         }
     }

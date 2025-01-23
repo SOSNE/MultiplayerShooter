@@ -7,7 +7,8 @@ using Unity.Netcode;
 public class pistolMovment : NetworkBehaviour
 {
     public Transform positionFirstL, positionFirstR, bulletSpawn;
-    public double maxExtension, width;
+    public double partOfTheWeaponWithMaxExtendedHands, maxExtension;
+    private double _width;
     public Camera camera;
     private float _rotationRecoilAngle, _angleTarget;
     private Vector3 _currentWeaponRecoilPosition;
@@ -18,8 +19,10 @@ public class pistolMovment : NetworkBehaviour
     private void Start()
     {
         // _camera = Camera.main;
-        // width = GetComponent<Renderer>().bounds.size.x;
-        maxExtension = maxExtension - width + 0.27;
+        // _width = GetComponent<Renderer>().bounds.size.x; 
+        
+        maxExtension = maxExtension - _width + 0.27;
+        maxExtension = Mathf.Lerp(0, (float)maxExtension, (float)partOfTheWeaponWithMaxExtendedHands);
     }
 
     private float GetClosestTransform(Transform[] transforms)
@@ -77,10 +80,22 @@ public class pistolMovment : NetworkBehaviour
         
         float angleTarget = Mathf.Atan2(mouseWorldPosition.y - bulletSpawn.position.y, mouseWorldPosition.x - bulletSpawn.position.x);
         angleTarget *= Mathf.Rad2Deg;
-        float angle = angleTarget + 180f;
-        angle = Mathf.LerpAngle(transform.eulerAngles.z, angle, Time.deltaTime * 10f);
-
+        Transform playerParent = transform.parent;
+        float angle = angleTarget;
+        if (playerParent.localScale.x < 0 || playerParent.localScale.y < 0 || playerParent.localScale.z < 0)
+        {
+            // If the object is mirrored, invert the target rotation to compensate for flipping
+            _rotationRecoilAngle = -_rotationRecoilAngle;
+            // angleCorrection = -angleCorrection;
+        }
+        else
+        {
+            angle = angleTarget + 180f;
+        }
         
+        angle = Mathf.LerpAngle(transform.eulerAngles.z, angle, Time.deltaTime * 10f);
+        
+        print(leftArmExtenstion+ " " + rightArmExtenstion);
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
                 // local mouse position in relation to player
@@ -103,12 +118,6 @@ public class pistolMovment : NetworkBehaviour
             
             if (Vector2.Distance(mouseWorldPosition, transform.position) > 0.3f)
             {
-                if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
-                {
-                    // If the object is mirrored, invert the target rotation to compensate for flipping
-                    _rotationRecoilAngle = -_rotationRecoilAngle;
-                    // angleCorrection = -angleCorrection;
-                }
                 // transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
                 transform.RotateAround(rotationCenterPoint.position, Vector3.forward,
                     angle - transform.eulerAngles.z);
