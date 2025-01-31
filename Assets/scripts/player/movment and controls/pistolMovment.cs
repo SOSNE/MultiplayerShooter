@@ -95,7 +95,6 @@ public class pistolMovment : NetworkBehaviour
         
         angle = Mathf.LerpAngle(transform.eulerAngles.z, angle, Time.deltaTime * 10f);
         
-        print(leftArmExtenstion+ " " + rightArmExtenstion);
         if (leftArmExtenstion <= maxExtension || rightArmExtenstion <= maxExtension)
         {
                 // local mouse position in relation to player

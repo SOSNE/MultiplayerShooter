@@ -22,6 +22,8 @@ public class weaponHandling : NetworkBehaviour
     {
         if (!IsOwner) return;
         
+        float shotAngle = transform.rotation.eulerAngles.z;    
+
         if (bulletCounter >= BulletCount)
         {
             return;
@@ -46,8 +48,17 @@ public class weaponHandling : NetworkBehaviour
 
     private void Shoot()
     {
-        Vector2 shotDirection = -bulletSpawn.right.normalized;
-        ShootParticleServerRpc();
+        Vector2 shotDirection= -bulletSpawn.right.normalized;
+        float shotAngle = transform.rotation.eulerAngles.z;    
+
+        Transform playerParent = transform.parent;
+        if (playerParent.localScale.x < 0 || playerParent.localScale.y < 0 || playerParent.localScale.z < 0)
+        {
+            shotDirection= bulletSpawn.right.normalized;
+            shotAngle -= 180;
+        }
+        
+        ShootParticleServerRpc(shotAngle);
         GetComponent<pistolMovment>().PerformRecoil();    
         RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
         if (!hit2D)
@@ -90,13 +101,13 @@ public class weaponHandling : NetworkBehaviour
             data.Position = hit2D.point;
             NetworkObjectReference netObject = new NetworkObjectReference (
                 GetRootParent(hit2D.transform).GetComponent<NetworkObject>());
-            if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+            if (transform.parent.localScale.x < 0 || transform.parent.localScale.y < 0 || transform.parent.localScale.z < 0)
             {
-                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
+                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
             }
             else
             {
-                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
             }
             ShootHandlingBulletTracerServerRpc(data);
         }
@@ -139,13 +150,13 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void ShootParticleServerRpc(ServerRpcParams serverRpcParams = default)
+    private void ShootParticleServerRpc(float shotAngle ,ServerRpcParams serverRpcParams = default)
     {
         // Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
         // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
-        ShootParticleClientRpc();
+        ShootParticleClientRpc(shotAngle);
     }
     
     [ClientRpc]
@@ -155,9 +166,9 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void ShootParticleClientRpc(ClientRpcParams clientRpcParams = default)
+    private void ShootParticleClientRpc(float shotAngle, ClientRpcParams clientRpcParams = default)
     {
-        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
+        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,shotAngle));
         // print("setting parent");
         // shootParticle.transform.SetParent(transform);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
