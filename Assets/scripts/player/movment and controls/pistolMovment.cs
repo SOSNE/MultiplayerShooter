@@ -14,7 +14,7 @@ public class pistolMovment : NetworkBehaviour
     private Vector3 _currentWeaponRecoilPosition;
     public Transform[] playerTransforms;
     [SerializeField] private Transform rotationCenterPoint;
-    [SerializeField] private float correctionValue = 0.1f;
+    [SerializeField] private float recoilAngleMultiplicationRate;
     
     private void Start()
     {
@@ -51,7 +51,7 @@ public class pistolMovment : NetworkBehaviour
         float recoilAngleIncreaseValue = Mathf.Pow(10, -0.9f * (elapsedTime - 0.51f))+0.3f;
         lastTime = Time.time;
         //strengthen the value.
-        recoilAngleIncreaseValue *= 15;
+        recoilAngleIncreaseValue *= recoilAngleMultiplicationRate;
         float distance = GetClosestTransform(playerTransforms);
         
         float normalizedParam = distance / (float)maxExtension;
@@ -119,7 +119,7 @@ public class pistolMovment : NetworkBehaviour
             {
                 // transform.rotation = Quaternion.Euler(new Vector3(0f,0f, _angle + Convert.ToSingle(angleCorrection) + _rotationRecoilAngle));
                 transform.RotateAround(rotationCenterPoint.position, Vector3.forward,
-                    angle - transform.eulerAngles.z);
+                    angle - transform.eulerAngles.z + _rotationRecoilAngle);
                 // print(angleCorrection + "angle");
             }
             
