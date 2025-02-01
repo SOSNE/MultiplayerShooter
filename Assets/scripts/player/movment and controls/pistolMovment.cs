@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 public class pistolMovment : NetworkBehaviour
 {
-    public Transform positionFirstL, positionFirstR, bulletSpawn;
+    public Transform positionFirstL, positionFirstR, bulletSpawn, weaponEnd;
     public double partOfTheWeaponWithMaxExtendedHands, maxExtension;
     private double _width;
     public Camera camera;
@@ -30,7 +30,7 @@ public class pistolMovment : NetworkBehaviour
         float closestDistance = Mathf.Infinity;
         foreach (var tr in transforms)
         {
-            float tempDistance = Vector2.Distance(transform.position, tr.position);
+            float tempDistance = Vector2.Distance(weaponEnd.position, tr.position);
             
             if (tempDistance < closestDistance)
             {

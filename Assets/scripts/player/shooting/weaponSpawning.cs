@@ -71,6 +71,8 @@ public class weaponSpawning : NetworkBehaviour
                 playerTransformsList.Add(FindChildByName(targetTransform, "leftLegStart"));
                 playerTransformsList.Add(FindChildByName(targetTransform, "rightLegStart"));
                 playerTransformsList.Add(FindChildByName(targetTransform, "head"));
+                playerTransformsList.Add(FindChildByName(targetTransform, "rightArmStart"));
+                playerTransformsList.Add(FindChildByName(targetTransform, "leftArmStart"));
                 createdWeapon.GetComponent<pistolMovment>().playerTransforms = playerTransformsList.ToArray();
 
 
