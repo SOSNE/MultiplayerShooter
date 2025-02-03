@@ -50,6 +50,7 @@ public struct PlayerData
     public NetworkObjectReference PlayerNetworkObject;
     public bool Alive;
     public string[] PlayerLoadout;
+    public string PlayerName;
     public PlayerData(int loadoutSize)
     {
         ClientId = 0; 
@@ -57,6 +58,7 @@ public struct PlayerData
         PlayerNetworkObject = default; 
         Alive = false; 
         PlayerLoadout = new string[loadoutSize]; // Initialize the array with a specific size
+        PlayerName = "player";
     }
 
 }
@@ -100,7 +102,9 @@ public class GameManager : NetworkBehaviour
 
     private GameObject _createdCamera;
     private static bool _pointScoreInitialize = true;
-
+    private static int _playerNameCount = 1;
+    
+    //this is called when someone connect
     public override void OnNetworkSpawn()
     {
         if (IsServer && _pointScoreInitialize)
@@ -321,6 +325,7 @@ public class GameManager : NetworkBehaviour
         AddClientToTeamServerRpc(gameObject, clientId);
     }
 
+    //Possible change for name of this function to ClientSetupServerRpc
     [ServerRpc]
     private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId,
         ServerRpcParams serverRpcParams = default)
@@ -333,10 +338,14 @@ public class GameManager : NetworkBehaviour
         newUser.PlayerNetworkObject = playerGameObject;
         newUser.Alive = true;
         newUser.PlayerLoadout[0] = "pistol";
+        newUser.PlayerName = "player: " + _playerNameCount;
         AllPlayersData.Add(newUser);
         _playersAlive[floatIndex % 2] += 1;
         // teamsDictionary.Add(clientId, floatIndex%2);
 
+        _playerNameCount++;
+        print(_playerNameCount);
+        print(gameObject.name);
         floatIndex++;
         if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
         {
@@ -353,6 +362,7 @@ public class GameManager : NetworkBehaviour
 
         for (int i =0; i<AllPlayersData.Count;i++)
         {
+            //The following is done for every player that is connected.
             if (AllPlayersData[i].PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObject))
             {
                 if (AllPlayersData[i].Team == 0)
@@ -363,7 +373,21 @@ public class GameManager : NetworkBehaviour
                 {
                     AddTagToNewPlayerClientRpc(playerNetworkObject, "playerColliderTeam1");
                 }
+                
+                //Change name of new player on host and each client. 
+                ChangeClientsNameClientRpc(playerNetworkObject, AllPlayersData[i].PlayerName);
             }
+        }
+        
+        
+    }
+    
+    [ClientRpc]
+    private void ChangeClientsNameClientRpc(NetworkObjectReference playerGameObject, string playerName)
+    {
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            playerNetworkObject.name = playerName;
         }
     }
 
