@@ -9,6 +9,7 @@ TagManager:
   - ladder
   - playerColliderDetection
   - bodyPart
+  - weapon
   layers:
   - Default
   - TransparentFX

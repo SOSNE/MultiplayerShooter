@@ -344,8 +344,6 @@ public class GameManager : NetworkBehaviour
         // teamsDictionary.Add(clientId, floatIndex%2);
 
         _playerNameCount++;
-        print(_playerNameCount);
-        print(gameObject.name);
         floatIndex++;
         if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
         {

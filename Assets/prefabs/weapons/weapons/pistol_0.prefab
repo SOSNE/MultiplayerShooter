@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &262604031411005312
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2014705871819212919}
+  m_Layer: 0
+  m_Name: weaponEnd
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2014705871819212919
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262604031411005312}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.155, y: -0.003, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7188657230575694122}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &435497730820239246
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,7 +404,7 @@ GameObject:
   - component: {fileID: 129204444920376228}
   m_Layer: 0
   m_Name: pistol_0
-  m_TagString: Untagged
+  m_TagString: weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -397,6 +428,8 @@ Transform:
   - {fileID: 8559061481719632156}
   - {fileID: 3570027566895733854}
   - {fileID: 3193461764652747164}
+  - {fileID: 2014705871819212919}
+  - {fileID: 5306113966992115189}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -2.607}
 --- !u!212 &1016274777555021382
@@ -466,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1360433565
+  GlobalObjectIdHash: 2792715716
   InScenePlacedSourceGlobalObjectIdHash: 2792715716
   DeferredDespawnTick: 0
   Ownership: 1
@@ -494,6 +527,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   positionFirstL: {fileID: 0}
   positionFirstR: {fileID: 0}
+  bulletSpawn: {fileID: 3570027566895733854}
+  weaponEnd: {fileID: 2014705871819212919}
+  partOfTheWeaponWithMaxExtendedHands: 1.56
   maxExtension: 1.11931
   camera: {fileID: 0}
   playerTransforms:
@@ -502,6 +538,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  rotationCenterPoint: {fileID: 5306113966992115189}
+  recoilAngleMultiplicationRate: 0
   lastTime: 0
 --- !u!114 &1394759636731171174
 MonoBehaviour:
@@ -549,8 +587,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 3193461764652747164}
   - {fileID: 5909975487269419199}
-  _isCoroutineRunning: 0
-  magazine: {fileID: 6521936320489191920, guid: 7170ef5110b5e654689af02e0f2ab3ec, type: 3}
+  magazinePrefab: {fileID: 6521936320489191920, guid: 7170ef5110b5e654689af02e0f2ab3ec, type: 3}
+  existingMagazine: {fileID: 0}
 --- !u!114 &129204444920376228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -645,6 +683,37 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: 0.039916348, w: 0.999203}
   m_LocalPosition: {x: 0.167, y: -0.073, z: 0}
   m_LocalScale: {x: 1.196597, y: 1.1108587, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7188657230575694122}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8290720053051772048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5306113966992115189}
+  m_Layer: 0
+  m_Name: rotationCenterPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5306113966992115189
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8290720053051772048}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.07, y: 0.006, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7188657230575694122}

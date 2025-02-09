@@ -2473,7 +2473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4042147263
+  GlobalObjectIdHash: 168810998
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2499,7 +2499,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  weapon: {fileID: 2089097055469182062, guid: 164524b8d02a7440b9075bc4ae305b9a, type: 3}
+  weapons:
+  - {fileID: 7188657230575694122, guid: d9784550a1a614159a1669a596b7e31b, type: 3}
+  - {fileID: 2089097055469182062, guid: 164524b8d02a7440b9075bc4ae305b9a, type: 3}
   isWeaponSpawned: 0
   _weaponSeatUpDone: 0
 --- !u!114 &4996798501281288926

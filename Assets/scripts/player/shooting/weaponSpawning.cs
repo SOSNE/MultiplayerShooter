@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.U2D.IK;
@@ -7,7 +8,7 @@ using UnityEngine.U2D.IK;
 
 public class weaponSpawning : NetworkBehaviour
 {
-    public Transform weapon;
+    public List<Transform> weapons;
     private Transform _leftHandTarget, _rightHandTarget, leftHandSolverTarget, rightHandSolverTarget;
     public bool isWeaponSpawned = false;
     // public LimbSolver2D leftArmSolver2D, rightArmSolver2D;
@@ -30,18 +31,20 @@ public class weaponSpawning : NetworkBehaviour
 
     public void SpawnWeapon()
     {
-        SpawnWeaponServerRpc(gameObject);
+        print("spawn weapon for: " + gameObject.name);
+        SpawnWeaponServerRpc(gameObject, 1);
     }
     
     [ClientRpc]
     private void PerformWeaponSetupClientRpc(NetworkObjectReference targetPlayer, NetworkObjectReference weaponNetworkObjectReference)
     {
-        if (_weaponSeatUpDone) return;
+        
         if (targetPlayer.TryGet(out NetworkObject playerNetworkObject))
         {
             if (weaponNetworkObjectReference.TryGet(out NetworkObject networkObjectWeapon))
             {
                 Transform targetTransform = playerNetworkObject.transform;
+                if (targetTransform.GetComponent<weaponSpawning>()._weaponSeatUpDone) return;
                 Transform createdWeapon = networkObjectWeapon.transform;
                 // if(FindChildByName(targetTransform, "pistol_0(Clone)") != null) return;
                 //
@@ -97,21 +100,22 @@ public class weaponSpawning : NetworkBehaviour
                 chainL.target = leftHandSolverTarget;
 
                 var chainR = rightArmSolver2D.GetComponent<LimbSolver2D>().GetChain(0);
+                
                 chainR.target = rightHandSolverTarget;
                 isWeaponSpawned = true;
                 targetTransform.GetComponent<weaponSpawning>()._weaponSeatUpDone = true;
-                // Debug.Break();
             }
         }
     }
     
 
     [ServerRpc]
-    private void SpawnWeaponServerRpc(NetworkObjectReference targetPlayer)
+    private void SpawnWeaponServerRpc(NetworkObjectReference targetPlayer, int weaponToSpawnIndex)
     {
         if (targetPlayer.TryGet(out NetworkObject playerNetworkObject))
         {
             Transform targetTransform = playerNetworkObject.transform;
+            Transform weapon = weapons[weaponToSpawnIndex];
             Transform createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
             
             NetworkObject networkObject = createdWeapon.GetComponent<NetworkObject>();
@@ -119,11 +123,15 @@ public class weaponSpawning : NetworkBehaviour
         
             networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
             createdWeapon.transform.SetParent(targetTransform);
+            PerformWeaponSetupClientRpc(targetPlayer, createdWeapon.gameObject);
             foreach (var data in GameManager.AllPlayersData)
             {
-                PerformWeaponSetupClientRpc(data.PlayerNetworkObject, createdWeapon.gameObject);
+                //Find weapon that is already created at clint.
+                if (!data.PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) ;
+                GameObject weaponOfThisPlayer = GetChildWithTag(playerNetworkObjectForEachPlayer.transform, "weapon").gameObject;
+                PerformWeaponSetupClientRpc(data.PlayerNetworkObject, weaponOfThisPlayer);
+
             }
-            
         }
     }
     private Transform FindChildByName(Transform parent, string childName)
@@ -139,6 +147,18 @@ public class weaponSpawning : NetworkBehaviour
             if (result != null)
             {
                 return result;
+            }
+        }
+        return null;
+    }
+    
+    Transform GetChildWithTag(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                return child;
             }
         }
         return null;
