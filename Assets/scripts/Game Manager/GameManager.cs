@@ -84,7 +84,7 @@ public class GameManager : NetworkBehaviour
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera;
     [FormerlySerializedAs("pistol")] public GameObject weapon;
-    private bool _teamAddingSetupDone = false;
+    private bool _teamAddingSetupDone = false, _roundIsRestarting = false;
     
     // private void Awake()
     // {
@@ -222,8 +222,9 @@ public class GameManager : NetworkBehaviour
         }
 
         //restart game after all players are dead
-        if (_playersAlive[0] <= 0 || _playersAlive[1] <= 0)
+        if ((_playersAlive[0] <= 0 || _playersAlive[1] <= 0) && !_roundIsRestarting)
         {
+            _roundIsRestarting = true;
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
     }
@@ -449,6 +450,8 @@ public class GameManager : NetworkBehaviour
         {
             turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObject);
         }
+
+        _roundIsRestarting = false;
     }
     
     [ClientRpc]
