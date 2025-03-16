@@ -44,8 +44,6 @@ public class playerMovment : NetworkBehaviour
                 scale.PlayerScale  = new Vector3(-1, 1, 1);
                 scale.WeaponScale = new Vector3(_weaponStartScale.x, _weaponStartScale.y, _weaponStartScale.z);
                 RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
-                weapon.transform.localScale = scale.WeaponScale;
-                // Debug.Break();
                 _rotateFlag = false;
             }
             else if (distance <= 0 && !_rotateFlag)
@@ -54,7 +52,6 @@ public class playerMovment : NetworkBehaviour
                 scale.PlayerScale  = new Vector3(1, 1, 1);
                 scale.WeaponScale = new Vector3(_weaponStartScale.x, _weaponStartScale.y, _weaponStartScale.z);
                 RotatePlayerAndWeaponServerRpc(gameObject, gameObject, scale);
-                weapon.transform.localScale = scale.WeaponScale;
                 _rotateFlag = true;
             }
         }
@@ -164,7 +161,7 @@ public class playerMovment : NetworkBehaviour
         }
         if(weaponObjectReference.TryGet(out NetworkObject weaponNetworkObject))
         { 
-            // object component.
+            // weaponNetworkObject.transform.localScale = scaleVector3.WeaponScale;
         }
     }
     

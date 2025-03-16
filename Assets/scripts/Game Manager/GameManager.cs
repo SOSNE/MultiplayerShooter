@@ -182,8 +182,6 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsOwner) return;
         _createdCamera = Camera.main.gameObject;
-        // _createdCamera = Instantiate(camera, transform.position, transform.rotation);
-        weapon.GetComponent<pistolMovment>().camera = _createdCamera.GetComponent<Camera>();
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
 

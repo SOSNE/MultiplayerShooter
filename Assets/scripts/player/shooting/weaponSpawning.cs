@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.Netcode;
@@ -23,16 +24,62 @@ public class weaponSpawning : NetworkBehaviour
         // _isParent = true;
         
     }
-
+    private bool _isItOnFlag = true;
     void Update()
     {
-        // if (!IsOwner) return;
+        if (!IsOwner) return;
+        
+        if( Input.GetKeyDown(KeyCode.Y) && _isItOnFlag)
+        {
+            _isItOnFlag = false;
+            StartCoroutine(ChangeWeaponCoroutine());
+        }
+    }
+
+    private bool _acknowledgmentFlag = false;
+    private IEnumerator ChangeWeaponCoroutine()
+    {
+        gameObject.GetComponent<weaponSpawning>()._weaponSeatUpDone = false;
+        PreparesAllClientsForWeaponChangeServerRpc(gameObject);
+        yield return new WaitUntil(() => _acknowledgmentFlag);
+        SpawnWeaponServerRpc(gameObject, 1);
+        _acknowledgmentFlag = false;
+    }
+    
+    [ServerRpc]
+    private void PreparesAllClientsForWeaponChangeServerRpc(NetworkObjectReference targetPlayer, ServerRpcParams rpcParams = default)
+    {
+        if (!targetPlayer.TryGet(out NetworkObject playerNetworkObject)) return;
+        GetChildWithTag(playerNetworkObject.transform, "weapon").GetComponent<NetworkObject>().Despawn();
+       
+        ResetIsSetupDoneForEveryClientRpc();
+        
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId }
+            }
+        };
+        AcknowledgeChangeWeaponClientRpc(clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void ResetIsSetupDoneForEveryClientRpc()
+    {
+        gameObject.GetComponent<weaponSpawning>()._weaponSeatUpDone = false;
+    }
+    [ClientRpc]
+    private void AcknowledgeChangeWeaponClientRpc(ClientRpcParams clientRpcParams)
+    {
+        Debug.Log("Acknowledgment received: Server processed your request!");
+        _acknowledgmentFlag = true;
     }
 
     public void SpawnWeapon()
     {
         print("spawn weapon for: " + gameObject.name);
-        SpawnWeaponServerRpc(gameObject, 1);
+        SpawnWeaponServerRpc(gameObject, 0);
     }
     
     [ClientRpc]
@@ -44,6 +91,7 @@ public class weaponSpawning : NetworkBehaviour
             if (weaponNetworkObjectReference.TryGet(out NetworkObject networkObjectWeapon))
             {
                 Transform targetTransform = playerNetworkObject.transform;
+                // if(targetTransform.name == "player: 1") Debug.Break();
                 if (targetTransform.GetComponent<weaponSpawning>()._weaponSeatUpDone) return;
                 Transform createdWeapon = networkObjectWeapon.transform;
                 // if(FindChildByName(targetTransform, "pistol_0(Clone)") != null) return;
@@ -60,8 +108,9 @@ public class weaponSpawning : NetworkBehaviour
 
                 targetTransform.GetComponent<GameManager>().weapon = createdWeapon.gameObject;
                 targetTransform.GetComponent<playerMovment>().weapon = createdWeapon;
-
-
+                
+                createdWeapon.GetComponent<pistolMovment>().camera = Camera.main;
+                
                 Transform positionFirstL = FindChildByName(targetTransform, "rightArmStart");
                 Transform positionFirstR = FindChildByName(targetTransform, "leftArmStart");
 
@@ -107,7 +156,7 @@ public class weaponSpawning : NetworkBehaviour
             }
         }
     }
-    
+
 
     [ServerRpc]
     private void SpawnWeaponServerRpc(NetworkObjectReference targetPlayer, int weaponToSpawnIndex)
@@ -127,10 +176,10 @@ public class weaponSpawning : NetworkBehaviour
             foreach (var data in GameManager.AllPlayersData)
             {
                 //Find weapon that is already created at clint.
-                if (!data.PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) ;
+                if (!data.PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) return;
+                if (playerNetworkObjectForEachPlayer.gameObject == gameObject) return;
                 GameObject weaponOfThisPlayer = GetChildWithTag(playerNetworkObjectForEachPlayer.transform, "weapon").gameObject;
                 PerformWeaponSetupClientRpc(data.PlayerNetworkObject, weaponOfThisPlayer);
-
             }
         }
     }

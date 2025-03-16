@@ -7,10 +7,9 @@ public class uiControler : NetworkBehaviour
     public TextMeshProUGUI ammoCounter;
     [SerializeField] private TextMeshProUGUI hpCounter;
     public Transform trackingTransform;
-    private 
     void Update()
     {
-        if (trackingTransform)
+        if (trackingTransform && GetChildWithTag(trackingTransform, "weapon"))
         {
             Transform weapon = trackingTransform.GetComponent<GameManager>().weapon.transform;
             float remainingBullets = weaponHandling.BulletCount -
@@ -24,5 +23,17 @@ public class uiControler : NetworkBehaviour
     public void GetHealthForUiClientRpc(int currentHealth, ClientRpcParams clientRpcParams)
     {
         hpCounter.text = "Hp: "+ currentHealth;
+    }
+    
+    Transform GetChildWithTag(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                return child;
+            }
+        }
+        return null;
     }
 }
