@@ -105,7 +105,13 @@ public class weaponSpawning : NetworkBehaviour
                 // networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
                 //
                 // _createdWeapon.transform.SetParent(targetTransform);
-
+                
+                if (targetTransform.localScale.x < 0 || targetTransform.localScale.y < 0 || targetTransform.localScale.z < 0)
+                {
+                    createdWeapon.localScale = new Vector3(-createdWeapon.localScale.x, createdWeapon.localScale.y,
+                        createdWeapon.localScale.z);
+                }
+                
                 targetTransform.GetComponent<GameManager>().weapon = createdWeapon.gameObject;
                 targetTransform.GetComponent<playerMovment>().weapon = createdWeapon;
                 
