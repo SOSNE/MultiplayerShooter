@@ -1,22 +1,26 @@
+using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 public class uiControler : NetworkBehaviour
 {
+    
     public TextMeshProUGUI ammoCounter;
-    [SerializeField] private TextMeshProUGUI hpCounter;
+    [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter;
     public Transform trackingTransform;
+    
+
     void Update()
     {
-        if (trackingTransform && GetChildWithTag(trackingTransform, "weapon"))
-        {
-            Transform weapon = trackingTransform.GetComponent<GameManager>().weapon.transform;
-            float remainingBullets = weaponHandling.BulletCount -
-                                 weapon.GetComponent<weaponHandling>()
-                                      .bulletCounter;
-            ammoCounter.text = $"Bullets: {weaponHandling.BulletCount} / {remainingBullets}";
-        }
+        if (!trackingTransform) return;
+        if (!GetChildWithTag(trackingTransform, "weapon")) return;
+        
+        Transform weapon = trackingTransform.GetComponent<GameManager>().weapon.transform;
+        float remainingBullets = weaponHandling.BulletCount -
+                             weapon.GetComponent<weaponHandling>()
+                                  .bulletCounter;
+        ammoCounter.text = $"Bullets: {weaponHandling.BulletCount} / {remainingBullets}";
     }
     
     [ClientRpc]

@@ -51,6 +51,8 @@ public struct PlayerData
     public bool Alive;
     public string[] PlayerLoadout;
     public string PlayerName;
+    public int MoneyAmount;
+    
     public PlayerData(int loadoutSize)
     {
         ClientId = 0; 
@@ -59,6 +61,7 @@ public struct PlayerData
         Alive = false; 
         PlayerLoadout = new string[loadoutSize]; // Initialize the array with a specific size
         PlayerName = "player";
+        MoneyAmount = 60;
     }
 
 }
@@ -98,6 +101,14 @@ public class GameManager : NetworkBehaviour
         teamTwoWinCounter = FindObjectInHierarchy("Team 1").GetComponent<TextMeshProUGUI>();
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            print(gameObject.GetComponent<MoneyOperationUtils>().TryToBuy("pistol"));
+        }
     }
 
     private GameObject _createdCamera;
@@ -184,9 +195,7 @@ public class GameManager : NetworkBehaviour
         _createdCamera = Camera.main.gameObject;
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
-
-
-
+    
     public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString,
         DataToSendOverNetwork data)
     {
