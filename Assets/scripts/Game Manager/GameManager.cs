@@ -150,6 +150,8 @@ public class GameManager : NetworkBehaviour
         
         GameObject.Find("UiControler").
             GetComponent<uiControler>().trackingTransform = transform;
+        GameObject.Find("UiControler").
+            GetComponent<shopUi>().trackingTransform = transform;
         UpdateWinCounterServerRpc();
         GameObject.Find("Camera Control").
             GetComponent<CameraControl>().currentPlayer = transform;

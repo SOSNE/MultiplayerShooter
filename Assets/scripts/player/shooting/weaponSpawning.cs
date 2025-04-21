@@ -32,17 +32,18 @@ public class weaponSpawning : NetworkBehaviour
         if( Input.GetKeyDown(KeyCode.Y) && _isItOnFlag)
         {
             _isItOnFlag = false;
-            StartCoroutine(ChangeWeaponCoroutine());
+            StartCoroutine(ChangeWeaponCoroutine(1));
         }
     }
 
     private bool _acknowledgmentFlag = false;
-    private IEnumerator ChangeWeaponCoroutine()
+    public IEnumerator ChangeWeaponCoroutine(int weaponNumber)
     {
         gameObject.GetComponent<weaponSpawning>()._weaponSeatUpDone = false;
+        
         PreparesAllClientsForWeaponChangeServerRpc(gameObject);
         yield return new WaitUntil(() => _acknowledgmentFlag);
-        SpawnWeaponServerRpc(gameObject, 1);
+        SpawnWeaponServerRpc(gameObject, weaponNumber);
         _acknowledgmentFlag = false;
     }
     
