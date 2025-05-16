@@ -12,8 +12,8 @@ public class MoneyOperationUtils : NetworkBehaviour
 
     private void Start()
     {
-        CostsDictionary["pistol"] = 50;
-        CostsDictionary["arWeapon"] = 100;
+        CostsDictionary["pistol"] = 850;
+        CostsDictionary["arWeapon"] = 2000;
     }
     
     // public bool TryToBuy(string productString)

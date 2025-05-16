@@ -44,12 +44,21 @@ public class shopUi : NetworkBehaviour
 
     void BuyPistol()
     {
-        // if (!_moneyOperationUtils.TryToBuy("pistol")) return;
-        StartCoroutine(trackingTransform.GetComponent<weaponSpawning>().ChangeWeaponCoroutine(0));
+        StartCoroutine(_moneyOperationUtils.TryToBuyCoroutine("pistol", result =>
+        {
+            if (!result) return;
+                
+            StartCoroutine(trackingTransform.GetComponent<weaponSpawning>().ChangeWeaponCoroutine(0));
+        }));
     }
+    
     void BuyAr()
     {
-        // if (!_moneyOperationUtils.TryToBuy("arWeapon")) return;
-        StartCoroutine(trackingTransform.GetComponent<weaponSpawning>().ChangeWeaponCoroutine(1));
+        StartCoroutine(_moneyOperationUtils.TryToBuyCoroutine("arWeapon", result =>
+        {
+            if (!result) return;
+                
+            StartCoroutine(trackingTransform.GetComponent<weaponSpawning>().ChangeWeaponCoroutine(1));
+        }));
     }
 }
