@@ -26,7 +26,13 @@ public class uiControler : NetworkBehaviour
     [ClientRpc]
     public void GetHealthForUiClientRpc(int currentHealth, ClientRpcParams clientRpcParams)
     {
-        hpCounter.text = "Hp: "+ currentHealth;
+        hpCounter.text = "Hp: " + currentHealth;
+    }
+    
+    [ClientRpc]
+    public void UpdateMoneyAmountUiClientRpc(int moneyAmount, ClientRpcParams clientRpcParams)
+    {
+        moneyCounter.text = "Golden Shekels: " + moneyAmount;
     }
     
     Transform GetChildWithTag(Transform parent, string tag)

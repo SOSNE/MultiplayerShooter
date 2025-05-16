@@ -105,10 +105,7 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            print(gameObject.GetComponent<MoneyOperationUtils>().TryToBuy("pistol"));
-        }
+        
     }
 
     private GameObject _createdCamera;
@@ -155,6 +152,9 @@ public class GameManager : NetworkBehaviour
         UpdateWinCounterServerRpc();
         GameObject.Find("Camera Control").
             GetComponent<CameraControl>().currentPlayer = transform;
+        GameObject.Find("UiControler").GetComponent<uiControler>()
+            .UpdateMoneyAmountUiClientRpc(60, default);
+        print("start");
     }
     
     private void OnClientConnected(ulong clientId)

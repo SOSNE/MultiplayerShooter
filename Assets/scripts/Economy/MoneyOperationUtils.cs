@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class MoneyOperationUtils : NetworkBehaviour
 {
-    private int _moneyAmount = 0;
+    public int _moneyAmount = 0;
     private bool _doneFlag = false;
     private static Dictionary<string, int> CostsDictionary = new Dictionary<string, int>();
 
@@ -16,26 +16,35 @@ public class MoneyOperationUtils : NetworkBehaviour
         CostsDictionary["arWeapon"] = 100;
     }
     
-    public bool TryToBuy(string productString)
+    // public bool TryToBuy(string productString)
+    // {
+    // StartCoroutine(TryToBuyCoroutine(productString, result =>
+    // {
+    //     return result;
+    // }));
+    //     
+    // }
+    public IEnumerator TryToBuyCoroutine(string productString, System.Action<bool> callback)
     {
-        StartCoroutine(BuyCoroutine());
+        _doneFlag = false;
+        CheckMoneyAmountForServerRpc(NetworkManager.Singleton.LocalClientId);
+
+        yield return new WaitUntil(() => _doneFlag);
+
+        
         if (CostsDictionary[productString] <= _moneyAmount)
         {
-            return true;
+            UpdatePlayerMoneyAmountServerRpc(-CostsDictionary[productString], NetworkManager.Singleton.LocalClientId);
+            callback(true); 
         }
         else
         {
-            return false;
+            callback(false);
         }
     }
-    private IEnumerator BuyCoroutine()
-    {
-        CheckMoneyAmountForServerRpc(NetworkManager.Singleton.LocalClientId);
-        yield return new WaitUntil(() => _doneFlag);
-        _doneFlag = false;
-    }
 
-    [ServerRpc]
+
+    [ServerRpc(RequireOwnership = false)]
     private void CheckMoneyAmountForServerRpc(ulong clientId, ServerRpcParams rpcParams = default)
     {
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -45,6 +54,7 @@ public class MoneyOperationUtils : NetworkBehaviour
 
         foreach (var data in  GameManager.AllPlayersData)
         {
+            
             if (data.ClientId == clientId)
             {
                 CallbackAckClientRpc(data.MoneyAmount, clientRpcParams);
@@ -57,5 +67,28 @@ public class MoneyOperationUtils : NetworkBehaviour
     {
         _moneyAmount = moneyAmount;
         _doneFlag = true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdatePlayerMoneyAmountServerRpc(int moneyAmountToAdd, ulong clientId, ServerRpcParams rpcParams = default)
+    {
+        for (int i = 0; i < GameManager.AllPlayersData.Count; i++)
+        {
+            
+            if (GameManager.AllPlayersData[i].ClientId == clientId)
+            {
+                ClientRpcParams clientRpcParams = new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
+                };
+                
+                var data = GameManager.AllPlayersData[i];
+                data.MoneyAmount += moneyAmountToAdd;
+                GameManager.AllPlayersData[i] = data;
+                GameObject.Find("UiControler").GetComponent<uiControler>()
+                    .UpdateMoneyAmountUiClientRpc(data.MoneyAmount, clientRpcParams);
+                break;
+            }
+        }
     }
 }

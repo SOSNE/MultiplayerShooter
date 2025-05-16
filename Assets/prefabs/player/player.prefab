@@ -2061,9 +2061,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5234942705381225173}
-    - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8845101143355756029}
     - targetCorrespondingSourceObject: {fileID: 386791141387813222, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4783747034548855946}
@@ -2476,7 +2473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4042147263
+  GlobalObjectIdHash: 168810998
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2797,19 +2794,6 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &8845101143355756029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3477146210293715247}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caa4b8a753ef74897bf38bba53e94ff0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &3672872067797742068 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 386791141387813222, guid: 70cc0974af755a744b2901b42220476e, type: 3}
