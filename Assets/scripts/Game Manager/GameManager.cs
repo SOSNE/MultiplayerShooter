@@ -153,7 +153,7 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("Camera Control").
             GetComponent<CameraControl>().currentPlayer = transform;
         GameObject.Find("UiControler").GetComponent<uiControler>()
-            .UpdateMoneyAmountUiClientRpc(60, default);
+            .UpdateMoneyAmountUiServerRpc(60);
         print("start");
     }
     

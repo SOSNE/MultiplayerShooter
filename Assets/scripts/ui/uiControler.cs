@@ -28,6 +28,15 @@ public class uiControler : NetworkBehaviour
     {
         hpCounter.text = "Hp: " + currentHealth;
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdateMoneyAmountUiServerRpc(int moneyAmount, ServerRpcParams rpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
+        };
+        UpdateMoneyAmountUiClientRpc(moneyAmount, clientRpcParams);
+    } 
     
     [ClientRpc]
     public void UpdateMoneyAmountUiClientRpc(int moneyAmount, ClientRpcParams clientRpcParams)
