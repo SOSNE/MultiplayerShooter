@@ -206,7 +206,6 @@ public class GameManager : NetworkBehaviour
         {
             if (AllPlayersData[i].ClientId == hitClientId)
             {
-
                 //calculate teamIndexOverwrite for self killing.
                 //if shoot himself
                 if (currentClientId == hitClientId)
@@ -219,7 +218,6 @@ public class GameManager : NetworkBehaviour
                     {
                         teamIndexOverwrite = 0;
                     }
-
                 }
 
                 PlayerData myStruct = AllPlayersData[i];
@@ -227,6 +225,12 @@ public class GameManager : NetworkBehaviour
                 AllPlayersData[i] = myStruct;
                 _playersAlive[AllPlayersData[i].Team] -= 1;
                 performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
+            }
+            
+            // Add money for player after kill
+            if (AllPlayersData[i].ClientId == currentClientId)
+            {
+                MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, AllPlayersData[i].ClientId);
             }
         }
 

@@ -9,7 +9,12 @@ public class MoneyOperationUtils : NetworkBehaviour
     public int _moneyAmount = 0;
     private bool _doneFlag = false;
     private static Dictionary<string, int> CostsDictionary = new Dictionary<string, int>();
-
+    public static MoneyOperationUtils Instance;
+    
+    private void Awake()
+    {
+        Instance = this;
+    }
     private void Start()
     {
         CostsDictionary["pistol"] = 850;
@@ -70,7 +75,7 @@ public class MoneyOperationUtils : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void UpdatePlayerMoneyAmountServerRpc(int moneyAmountToAdd, ulong clientId, ServerRpcParams rpcParams = default)
+    public void UpdatePlayerMoneyAmountServerRpc(int moneyAmountToAdd, ulong clientId)
     {
         for (int i = 0; i < GameManager.AllPlayersData.Count; i++)
         {
@@ -79,7 +84,10 @@ public class MoneyOperationUtils : NetworkBehaviour
             {
                 ClientRpcParams clientRpcParams = new ClientRpcParams
                 {
-                    Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new List<ulong> { clientId }
+                    }                
                 };
                 
                 var data = GameManager.AllPlayersData[i];
