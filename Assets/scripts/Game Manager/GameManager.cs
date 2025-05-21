@@ -230,7 +230,16 @@ public class GameManager : NetworkBehaviour
             // Add money for player after kill
             if (AllPlayersData[i].ClientId == currentClientId)
             {
-                MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, AllPlayersData[i].ClientId);
+                for (int j = 0; j < AllPlayersData.Count; j++)
+                {
+                    if (AllPlayersData[j].ClientId == hitClientId)
+                    {
+                        if (currentClientId != hitClientId && AllPlayersData[i].Team != AllPlayersData[j].Team)
+                        {
+                            MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, currentClientId);
+                        }
+                    }
+                }
             }
         }
 
