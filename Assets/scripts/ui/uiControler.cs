@@ -7,9 +7,14 @@ public class uiControler : NetworkBehaviour
 {
     
     public TextMeshProUGUI ammoCounter;
-    [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter;
+    [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter, timer;
     public Transform trackingTransform;
+    public static uiControler Instance;
     
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Update()
     {
@@ -42,6 +47,12 @@ public class uiControler : NetworkBehaviour
     public void UpdateMoneyAmountUiClientRpc(int moneyAmount, ClientRpcParams clientRpcParams)
     {
         moneyCounter.text = "Golden Shekels: " + moneyAmount;
+    }
+    
+    
+    public void UpdateTimer(float time)
+    {
+        timer.text = "Time left: " + time;
     }
     
     Transform GetChildWithTag(Transform parent, string tag)

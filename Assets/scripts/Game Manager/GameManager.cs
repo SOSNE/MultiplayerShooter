@@ -6,6 +6,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine.Serialization;
 using Random = System.Random;
 
@@ -88,6 +89,7 @@ public class GameManager : NetworkBehaviour
     public GameObject camera;
     [FormerlySerializedAs("pistol")] public GameObject weapon;
     private bool _teamAddingSetupDone = false, _roundIsRestarting = false;
+    private static float _remainingTime = 120;
     
     // private void Awake()
     // {
@@ -183,6 +185,7 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .GetHealthForUiClientRpc(PlayerHhandling.clientHealthMap[clientId], clientRpcParams);
         AcknowledgeTeamAddingSetupClientRpc();
+        StartCountdownTimerWithServerTimeClientRpc(_remainingTime, clientRpcParams);
     }
     
     [ClientRpc]
@@ -196,6 +199,23 @@ public class GameManager : NetworkBehaviour
         if (!IsOwner) return;
         _createdCamera = Camera.main.gameObject;
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
+    }
+    
+    private IEnumerator CountdownTimerStart(float time)
+    {
+        _remainingTime = time;
+        while (_remainingTime > 0)
+        {
+            uiControler.Instance.UpdateTimer(_remainingTime);
+            yield return new WaitForSeconds(1f);
+            _remainingTime -= 1f;
+        }
+    }
+
+    [ClientRpc]
+    private void StartCountdownTimerWithServerTimeClientRpc(float time, ClientRpcParams serverRpcParams = default)
+    {
+        StartCoroutine(CountdownTimerStart(time));
     }
     
     public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString,
