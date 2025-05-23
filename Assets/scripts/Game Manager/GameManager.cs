@@ -90,6 +90,7 @@ public class GameManager : NetworkBehaviour
     [FormerlySerializedAs("pistol")] public GameObject weapon;
     private bool _teamAddingSetupDone = false, _roundIsRestarting = false;
     private static float _remainingTime = 120;
+    private static Coroutine _timerCoroutine; 
     
     // private void Awake()
     // {
@@ -204,20 +205,32 @@ public class GameManager : NetworkBehaviour
     private IEnumerator CountdownTimerStart(float time)
     {
         _remainingTime = time;
-        while (_remainingTime > 0)
+        while (_remainingTime >= 0)
         {
+            
             uiControler.Instance.UpdateTimer(_remainingTime);
             yield return new WaitForSeconds(1f);
             _remainingTime -= 1f;
+        }
+        if (IsServer)
+        {
+            StartCoroutine(NextRoundCoroutine(2, 0, 10));
         }
     }
 
     [ClientRpc]
     private void StartCountdownTimerWithServerTimeClientRpc(float time, ClientRpcParams serverRpcParams = default)
     {
-        StartCoroutine(CountdownTimerStart(time));
+        //When called, it is being done on the first player game object.
+        //But _timerCoroutine and time are static, so it doesn't matter, I think
+        if (_timerCoroutine != null)
+        {
+            StopCoroutine(_timerCoroutine);
+        }
+        _timerCoroutine = StartCoroutine(CountdownTimerStart(time));
     }
     
+    // this is in ServerRpc
     public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString,
         DataToSendOverNetwork data)
     {
@@ -479,6 +492,13 @@ public class GameManager : NetworkBehaviour
             gameObject.GetComponent<PlayerHhandling>().PerformRagdollOnPlayer(playerGameObject.transform, hitBodyPartString, data);
         }
     }
+
+    
+    private void RestartTimer()
+    {
+        _remainingTime = 120;
+        StartCountdownTimerWithServerTimeClientRpc(_remainingTime);
+    }
     
     IEnumerator NextRoundCoroutine(float duration, ulong clientId, int teamIndexOverwrite)
     {
@@ -488,6 +508,7 @@ public class GameManager : NetworkBehaviour
         RestartPlayersAliveList();
         RestartPositions();
         RestartWeaponsMagazinesClientRpc();
+        RestartTimer();
         foreach (PlayerData playerData in AllPlayersData)
         {
             turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObject);
