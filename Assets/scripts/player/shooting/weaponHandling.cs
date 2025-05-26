@@ -24,7 +24,8 @@ public class weaponHandling : NetworkBehaviour
     {
         if (!IsOwner) return;
         
-        // float shotAngle = transform.rotation.eulerAngles.z;    
+        // float shotAngle = transform.rotation.eulerAngles.z;
+        if(shopUi.ShopUiOpen) return;
 
         if (bulletCounter >= BulletCount) return;
         

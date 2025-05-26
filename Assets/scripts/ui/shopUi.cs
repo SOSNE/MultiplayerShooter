@@ -12,6 +12,8 @@ public class shopUi : NetworkBehaviour
     public Transform trackingTransform;
     [SerializeField] private GameObject moneyOperationUtilsGameObject;
     private MoneyOperationUtils _moneyOperationUtils;
+    public static bool ShopUiOpen = false;
+    
     private void Start()
     {
         shopButtonsList[0].onClick.AddListener(BuyPistol);
@@ -24,9 +26,11 @@ public class shopUi : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.B))
         {
             shopPanel.SetActive(true);
+            ShopUiOpen = true;
         }
         if (Input.GetKeyUp(KeyCode.B))
         {
+            ShopUiOpen = false;
             shopPanel.SetActive(false);
         } 
         
