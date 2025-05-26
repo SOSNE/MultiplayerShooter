@@ -14,7 +14,9 @@ public class weaponHandling : NetworkBehaviour
     public static readonly float  BulletCount = 10;
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
     public LayerMask layerMask;
-    public bool canShoot = true;
+    public bool canShoot = true, burstMode = false
+
+        ;
 
     [FormerlySerializedAs("BulletCounter")] public float bulletCounter = 0;
     private float _currentTime = 0;
@@ -22,23 +24,23 @@ public class weaponHandling : NetworkBehaviour
     {
         if (!IsOwner) return;
         
-        float shotAngle = transform.rotation.eulerAngles.z;    
+        // float shotAngle = transform.rotation.eulerAngles.z;    
 
-        if (bulletCounter >= BulletCount)
-        {
-            return;
-        }
-
+        if (bulletCounter >= BulletCount) return;
         
         _currentTime += Time.deltaTime;
-        if (_currentTime < fierRateInSeconds)
-        {
-            return;
-        }
+        if (_currentTime < fierRateInSeconds) return;
         
-        if (Input.GetMouseButtonDown(0) && canShoot)
+        if (Input.GetMouseButtonDown(0) && canShoot && !burstMode)
         {
-            
+            Shoot();
+            GameObject.Find("Camera Control").
+                GetComponent<CameraControl>().CameraShake(0.2f,0.04f);
+            _currentTime = 0;
+        }
+        //For burst mode
+        else if (Input.GetMouseButton(0) && canShoot && burstMode)
+        {
             Shoot();
             GameObject.Find("Camera Control").
                 GetComponent<CameraControl>().CameraShake(0.2f,0.04f);

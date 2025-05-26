@@ -14,7 +14,7 @@ public class pistolMovment : NetworkBehaviour
     private Vector3 _currentWeaponRecoilPosition;
     public Transform[] playerTransforms;
     [SerializeField] private Transform rotationCenterPoint;
-    [SerializeField] private float recoilAngleMultiplicationRate;
+    [SerializeField] private float recoilAngleMultiplicationRate, recoilPowerValue = 0.16f;
     
     private void Start()
     {
@@ -61,7 +61,7 @@ public class pistolMovment : NetworkBehaviour
         if (normalizedParam > 0.3f)
         {
             //this function ensures that recoil is smaller when weapon is closer to a body part.
-            recoilScaleValue = Mathf.Lerp(0f, 0.06f, (normalizedParam - 0.3f) / (1 - 0.3f));
+            recoilScaleValue = Mathf.Lerp(0f, recoilPowerValue, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
         StartCoroutine(WeaponRecoil(0.2f,0.1f, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
     }
