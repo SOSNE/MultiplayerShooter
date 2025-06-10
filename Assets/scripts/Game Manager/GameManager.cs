@@ -53,6 +53,7 @@ public struct PlayerData
     public string[] PlayerLoadout;
     public string PlayerName;
     public int MoneyAmount;
+    public Color PlayerColor;
     
     public PlayerData(int loadoutSize)
     {
@@ -63,6 +64,7 @@ public struct PlayerData
         PlayerLoadout = new string[loadoutSize]; // Initialize the array with a specific size
         PlayerName = "player";
         MoneyAmount = 60;
+        PlayerColor = Color.green;
     }
 
 }
@@ -395,8 +397,18 @@ public class GameManager : NetworkBehaviour
         newUser.Alive = true;
         newUser.PlayerLoadout[0] = "pistol";
         newUser.PlayerName = "player: " + _playerNameCount;
+        if (floatIndex % 2 == 0)
+        {
+            newUser.PlayerColor = new Color(0.2706f, 0.3098f, 0.1333f, 1f);
+        }
+        else
+        {
+            newUser.PlayerColor = new Color(0.1333f, 0.1608f, 0.3098f, 1f);
+        }
+        
         AllPlayersData.Add(newUser);
         _playersAlive[floatIndex % 2] += 1;
+        
         // teamsDictionary.Add(clientId, floatIndex%2);
 
         _playerNameCount++;
@@ -430,6 +442,8 @@ public class GameManager : NetworkBehaviour
                 
                 //Change name of new player on host and each client. 
                 ChangeClientsNameClientRpc(playerNetworkObject, AllPlayersData[i].PlayerName);
+                //Change name of new player on host and each client. 
+                ChangeClientsColorClientRpc(playerNetworkObject, AllPlayersData[i].PlayerColor);
             }
         }
         
@@ -442,6 +456,15 @@ public class GameManager : NetworkBehaviour
         if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
             playerNetworkObject.name = playerName;
+        }
+    }
+    
+    [ClientRpc]
+    private void ChangeClientsColorClientRpc(NetworkObjectReference playerGameObject, Color color)
+    {
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            FindObjectInHierarchy("AmmoBox").GetComponent<SpriteRenderer>().color = color;
         }
     }
 
