@@ -446,8 +446,6 @@ public class GameManager : NetworkBehaviour
                 ChangeClientsColorClientRpc(playerNetworkObject, AllPlayersData[i].PlayerColor);
             }
         }
-        
-        
     }
     
     [ClientRpc]

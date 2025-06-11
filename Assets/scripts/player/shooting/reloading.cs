@@ -13,7 +13,7 @@ public class reloading : NetworkBehaviour
     public Transform[] waypoint;
     private bool _isCoroutineRunning = false, _isMagazineStickingOut = false;
     public GameObject magazinePrefab, existingMagazine;
-    
+    [SerializeField] private float durationMagDropOveride = 0.5f;
     
     
     
@@ -82,14 +82,17 @@ public class reloading : NetworkBehaviour
         {
             backDirection = -transform.up;
         }
+
+        float elapsed = 0f;
         
-        while (IsInside(transform, _magazine))
+        bool dropMag = false;
+        while (!dropMag)
         {
+            if (!IsInside(transform, _magazine) || elapsed >= durationMagDropOveride) dropMag = true;
             _magazine.Translate(backDirection * 1f * Time.deltaTime, Space.World);
-            
+            elapsed += Time.deltaTime;
             yield return null;
         }
-        
         _magazine.transform.SetParent(null);
         _magazine.GetComponent<Rigidbody2D>().simulated = true;
         _magazine.GetComponent<Rigidbody2D>().gravityScale = 2;
