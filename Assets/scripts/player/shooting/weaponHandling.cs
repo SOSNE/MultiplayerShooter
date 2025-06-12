@@ -12,13 +12,12 @@ public class weaponHandling : NetworkBehaviour
 {
     public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
-    public static readonly float  BulletCount = 10;
+    public float bulletCount = 10;
     [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds, tracerStartWidth = 0.04f, tracerEndWidth = 0.019f;
     public LayerMask layerMask;
     public bool canShoot = true, burstMode = false;
     [SerializeField] private Gradient tracerGradientColor;
-
-    [FormerlySerializedAs("BulletCounter")] public float bulletCounter = 0;
+    public float bulletCounter = 0;
     private float _currentTime = 0;
     void Update()
     {
@@ -27,7 +26,7 @@ public class weaponHandling : NetworkBehaviour
         // float shotAngle = transform.rotation.eulerAngles.z;
         if(shopUi.ShopUiOpen) return;
 
-        if (bulletCounter >= BulletCount) return;
+        if (bulletCounter >= bulletCount) return;
         
         _currentTime += Time.deltaTime;
         if (_currentTime < fierRateInSeconds) return;

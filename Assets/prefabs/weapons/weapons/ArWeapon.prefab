@@ -539,9 +539,10 @@ MonoBehaviour:
   bulletSpawn: {fileID: 2234739642675802830}
   bloodParticleSystem: {fileID: 5866105100215955707, guid: a4467d6e80c3e9d4da8eca9bf5402ea7, type: 3}
   shootParticleParticleSystem: {fileID: 5279721618452076697, guid: 4b430cf2206d22e4ea816e8d76d591c9, type: 3}
+  bulletCount: 30
   bulletSpeed: 86.5
   tracerLength: 0.42
-  fierRateInSeconds: 0.16
+  fierRateInSeconds: 0.09
   tracerStartWidth: 0.019
   tracerEndWidth: 0.013
   layerMask:

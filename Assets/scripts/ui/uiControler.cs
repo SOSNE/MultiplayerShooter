@@ -22,10 +22,10 @@ public class uiControler : NetworkBehaviour
         if (!GetChildWithTag(trackingTransform, "weapon")) return;
         
         Transform weapon = trackingTransform.GetComponent<GameManager>().weapon.transform;
-        float remainingBullets = weaponHandling.BulletCount -
-                             weapon.GetComponent<weaponHandling>()
-                                  .bulletCounter;
-        ammoCounter.text = $"Bullets: {weaponHandling.BulletCount} / {remainingBullets}";
+        float remainingBullets = weapon.GetComponent<weaponHandling>().bulletCount -
+                                 weapon.GetComponent<weaponHandling>()
+                                     .bulletCounter;
+        ammoCounter.text = $"Bullets: {weapon.GetComponent<weaponHandling>().bulletCount} / {remainingBullets}";
     }
     
     [ClientRpc]
