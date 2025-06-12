@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
 using UnityEngine.Serialization;
+using UnityEngine.TextCore.Text;
 
 
 public class weaponHandling : NetworkBehaviour
@@ -12,11 +13,10 @@ public class weaponHandling : NetworkBehaviour
     public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
     public static readonly float  BulletCount = 10;
-    [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds;
+    [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds, tracerStartWidth = 0.04f, tracerEndWidth = 0.019f;
     public LayerMask layerMask;
-    public bool canShoot = true, burstMode = false
-
-        ;
+    public bool canShoot = true, burstMode = false;
+    [SerializeField] private Gradient tracerGradientColor;
 
     [FormerlySerializedAs("BulletCounter")] public float bulletCounter = 0;
     private float _currentTime = 0;
@@ -172,7 +172,6 @@ public class weaponHandling : NetworkBehaviour
     private void ShootParticleClientRpc(float shotAngle, ClientRpcParams clientRpcParams = default)
     {
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,shotAngle));
-        // print("setting parent");
         // shootParticle.transform.SetParent(transform);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
@@ -189,18 +188,12 @@ public class weaponHandling : NetworkBehaviour
     
     IEnumerator DrawLine(GameObject lineObject ,Vector2 startPoint, Vector2 endPoint, float duration)
     {
-        
-                    
         LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
         lineObject.GetComponent<destroyOverTime>().destroyTime = duration;
+        lineRenderer.colorGradient = tracerGradientColor;
                     
-        lineRenderer.positionCount = 2;
-                    
-        lineRenderer.SetPosition(0, startPoint);
-        lineRenderer.SetPosition(1, endPoint); 
-                    
-        lineRenderer.startWidth = 0.02f; 
-        lineRenderer.endWidth = 0.009f; 
+        lineRenderer.startWidth = tracerStartWidth; 
+        lineRenderer.endWidth = tracerEndWidth; 
         lineRenderer.useWorldSpace = true; 
 
         lineRenderer.positionCount = 2;

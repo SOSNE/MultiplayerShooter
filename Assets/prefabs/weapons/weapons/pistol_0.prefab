@@ -539,7 +539,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   rotationCenterPoint: {fileID: 5306113966992115189}
-  recoilAngleMultiplicationRate: 0
+  recoilAngleMultiplicationRate: 0.09
+  recoilPowerValue: 0.16
   lastTime: 0
 --- !u!114 &1394759636731171174
 MonoBehaviour:
@@ -558,13 +559,46 @@ MonoBehaviour:
   bulletSpawn: {fileID: 3570027566895733854}
   bloodParticleSystem: {fileID: 5866105100215955707, guid: a4467d6e80c3e9d4da8eca9bf5402ea7, type: 3}
   shootParticleParticleSystem: {fileID: 5279721618452076697, guid: 4b430cf2206d22e4ea816e8d76d591c9, type: 3}
-  bulletSpeed: 68.64
+  bulletSpeed: 86.5
   tracerLength: 0.42
   fierRateInSeconds: 0.16
+  tracerStartWidth: 0.019
+  tracerEndWidth: 0.013
   layerMask:
     serializedVersion: 2
     m_Bits: 17408
   canShoot: 1
+  burstMode: 0
+  tracerGradientColor:
+    serializedVersion: 2
+    key0: {r: 1, g: 0.72638464, b: 0, a: 0}
+    key1: {r: 1, g: 0.9425386, b: 0.6839622, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 38165
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
   bulletCounter: 0
 --- !u!114 &3461347680528403587
 MonoBehaviour:
@@ -589,6 +623,7 @@ MonoBehaviour:
   - {fileID: 5909975487269419199}
   magazinePrefab: {fileID: 6521936320489191920, guid: 7170ef5110b5e654689af02e0f2ab3ec, type: 3}
   existingMagazine: {fileID: 0}
+  durationMagDropOveride: 0.5
 --- !u!114 &129204444920376228
 MonoBehaviour:
   m_ObjectHideFlags: 0
