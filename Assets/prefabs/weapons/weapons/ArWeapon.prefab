@@ -483,7 +483,7 @@ MonoBehaviour:
   positionFirstR: {fileID: 0}
   bulletSpawn: {fileID: 2234739642675802830}
   weaponEnd: {fileID: 8731306519630223270}
-  partOfTheWeaponWithMaxExtendedHands: 0.42
+  partOfTheWeaponWithMaxExtendedHands: 0.53
   maxExtension: 1.11931
   camera: {fileID: 0}
   playerTransforms:
@@ -496,7 +496,7 @@ MonoBehaviour:
   - {fileID: 0}
   rotationCenterPoint: {fileID: 8275883752307157157}
   recoilAngleMultiplicationRate: 0.35
-  recoilPowerValue: 0.1
+  recoilPowerValue: 0.07
   lastTime: 0
 --- !u!114 &7307294333883811969
 MonoBehaviour:
@@ -540,9 +540,9 @@ MonoBehaviour:
   bloodParticleSystem: {fileID: 5866105100215955707, guid: a4467d6e80c3e9d4da8eca9bf5402ea7, type: 3}
   shootParticleParticleSystem: {fileID: 5279721618452076697, guid: 4b430cf2206d22e4ea816e8d76d591c9, type: 3}
   bulletCount: 30
+  fierRateInSeconds: 0.09
   bulletSpeed: 86.5
   tracerLength: 0.42
-  fierRateInSeconds: 0.09
   tracerStartWidth: 0.019
   tracerEndWidth: 0.013
   layerMask:

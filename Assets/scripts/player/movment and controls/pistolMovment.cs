@@ -42,8 +42,11 @@ public class pistolMovment : NetworkBehaviour
     }
 
     public float  lastTime;
+    private Coroutine weaponRecoilCoroutine;
+
     public void PerformRecoil()
     {
+        float weaponFirerate = gameObject.GetComponent<weaponHandling>().fierRateInSeconds;
         float elapsedTime = Time.time - lastTime;
         //strengthen the value to better display it on a function.
         elapsedTime *= 7f;
@@ -63,7 +66,13 @@ public class pistolMovment : NetworkBehaviour
             //this function ensures that recoil is smaller when weapon is closer to a body part.
             recoilScaleValue = Mathf.Lerp(0f, recoilPowerValue, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
-        StartCoroutine(WeaponRecoil(0.2f,0.1f, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
+        
+        if (weaponRecoilCoroutine != null)
+        {
+            StopCoroutine(weaponRecoilCoroutine);
+            weaponRecoilCoroutine = null;
+        }
+        weaponRecoilCoroutine = StartCoroutine(WeaponRecoil(weaponFirerate,weaponFirerate*2, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
     }
     
     void Update()
@@ -137,7 +146,7 @@ public class pistolMovment : NetworkBehaviour
         }
     }
     
-    IEnumerator WeaponRecoil(float durationOfRagdoll, float durationOfRagdollRegression,float recoilAngleIncrease = 20, float recoilScale = 0.03f)
+    IEnumerator WeaponRecoil(float durationOfRecoil, float durationOfRecoilRegression,float recoilAngleIncrease = 20, float recoilScale = 0.03f)
     {
         List<Vector3> recoilBezierCurvesList = new List<Vector3>();
 
@@ -153,9 +162,9 @@ public class pistolMovment : NetworkBehaviour
         recoilBezierCurvesList.Add(bottomRight);
 
         float startTime = Time.time;
-        while (Time.time - startTime < durationOfRagdoll)
+        while (Time.time - startTime < durationOfRecoil)
         {
-            float t = (Time.time - startTime) / durationOfRagdoll;
+            float t = (Time.time - startTime) / durationOfRecoil;
 
             _currentWeaponRecoilPosition = Mathf.Pow((1 - t), 3) * recoilBezierCurvesList[0] +
                                            3 * Mathf.Pow((1 - t), 2) * t * recoilBezierCurvesList[1] +
@@ -169,9 +178,9 @@ public class pistolMovment : NetworkBehaviour
         Vector3 initialPosition = transform.localPosition;
 
         float startTime2 = Time.time;
-        while (Time.time - startTime2 < durationOfRagdollRegression)
+        while (Time.time - startTime2 < durationOfRecoilRegression)
         {
-            float t = (Time.time - startTime2) / durationOfRagdollRegression;
+            float t = (Time.time - startTime2) / durationOfRecoilRegression;
             
             _currentWeaponRecoilPosition = Vector3.Lerp(initialPosition, bottomLeft, t);
             

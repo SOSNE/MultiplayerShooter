@@ -12,8 +12,8 @@ public class weaponHandling : NetworkBehaviour
 {
     public GameObject bulletTracer;
     public Transform bulletSpawn, bloodParticleSystem, shootParticleParticleSystem;
-    public float bulletCount = 10;
-    [SerializeField] private float bulletSpeed, tracerLength, fierRateInSeconds, tracerStartWidth = 0.04f, tracerEndWidth = 0.019f;
+    public float bulletCount = 10, fierRateInSeconds;
+    [SerializeField] private float bulletSpeed, tracerLength, tracerStartWidth = 0.04f, tracerEndWidth = 0.019f;
     public LayerMask layerMask;
     public bool canShoot = true, burstMode = false;
     [SerializeField] private Gradient tracerGradientColor;
