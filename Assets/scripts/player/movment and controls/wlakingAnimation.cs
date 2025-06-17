@@ -14,16 +14,15 @@ public class wlakingAnimation : NetworkBehaviour
     
     void Update()
     {
-        if (!IsOwner) return;
         if (Mathf.Abs(GetComponent<Rigidbody2D>().linearVelocity.x) > 0.1)
         {
-            _walk = true;
+            gameObject.GetComponent<Animator>().SetBool("walking", true);
         }
         else
         {
-            _walk = false;
+            gameObject.GetComponent<Animator>().SetBool("walking", false);
         }
-        SetWalkServerRpc(_walk, gameObject);
+        // SetWalkServerRpc(_walk, gameObject);
     }
     
     [ServerRpc]
