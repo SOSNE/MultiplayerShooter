@@ -16,8 +16,8 @@ public class NetworkMenagerUi : MonoBehaviour
     
     public void OnInputIp(string ipAddress)
     {
-        UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        unityTransport.SetConnectionData(ipAddress, 7777);
+        // UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        // unityTransport.SetConnectionData(ipAddress, 7777);
         _ip = ipAddress;
     }
     
@@ -25,16 +25,16 @@ public class NetworkMenagerUi : MonoBehaviour
     {
         host.onClick.AddListener((() =>
         {
-            // StartHostWithRelay();
-            NetworkManager.Singleton.StartHost();
+            StartHostWithRelay();
+            // NetworkManager.Singleton.StartHost();
             // PlayerPrefs.SetString("ip", "HOSTDONOTPASSASSIP");
             // SceneManager.LoadScene("SampleScene");
         }));
         
         client.onClick.AddListener((() =>
         {
-            // StartClientWithRelay(_ip);
-            NetworkManager.Singleton.StartClient();
+            StartClientWithRelay(_ip);
+            // NetworkManager.Singleton.StartClient();
             // PlayerPrefs.SetString("ip", _ip);
             // SceneManager.LoadScene("SampleScene");
         }));
