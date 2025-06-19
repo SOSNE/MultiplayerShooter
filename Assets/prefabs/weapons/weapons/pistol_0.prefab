@@ -567,7 +567,7 @@ MonoBehaviour:
   tracerEndWidth: 0.013
   layerMask:
     serializedVersion: 2
-    m_Bits: 17408
+    m_Bits: 18176
   canShoot: 1
   burstMode: 0
   tracerGradientColor:

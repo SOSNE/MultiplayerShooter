@@ -62,62 +62,77 @@ public class weaponHandling : NetworkBehaviour
         
         ShootParticleServerRpc(shotAngle);
         GetComponent<pistolMovment>().PerformRecoil();    
-        RaycastHit2D hit2D = Physics2D.Raycast(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
-        if (!hit2D)
+        RaycastHit2D[] hits2D = Physics2D.RaycastAll(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
+        
+        foreach (RaycastHit2D hit2D in hits2D)
         {
-            ContactData data;
-            data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
-            ShootHandlingBulletTracerServerRpc(data);
-        }
-        else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
-        {
-            ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
-            switch (hit2D.collider.gameObject.name)
+            GameObject target = hit2D.collider.gameObject;
+            
+            //Prevent hitting teammates but allow to self hit. 
+            if (Utils.Instance.GetMasterParent(target.transform).layer == playerParent.gameObject.layer && Utils.Instance.GetMasterParent(target.transform) != playerParent.gameObject)
             {
-                case "headCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
-                case "bodyDownCollider" or "bodyUpCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
-                case "rightArmStartCollider" or "rightArmEndCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
-                case "leftArmStartCollider" or "leftArmEndCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
-                case "leftLegStartCollider" or "leftLegEndCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
-                case "rightLegStartCollider" or "rightLegEndCollider":
-                    transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, hit2D.collider.gameObject.name, shotDirection);
-                    break;
-                
+                continue;
             }
-            ContactData data;
-            data.Position = hit2D.point;
-            NetworkObjectReference netObject = new NetworkObjectReference (
-                GetRootParent(hit2D.transform).GetComponent<NetworkObject>());
-            if (transform.parent.localScale.x < 0 || transform.parent.localScale.y < 0 || transform.parent.localScale.z < 0)
+            
+            if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
             {
-                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+                ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
+                switch (hit2D.collider.gameObject.name)
+                {
+                    case "headCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                    case "bodyDownCollider" or "bodyUpCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                    case "rightArmStartCollider" or "rightArmEndCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                    case "leftArmStartCollider" or "leftArmEndCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                    case "leftLegStartCollider" or "leftLegEndCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                    case "rightLegStartCollider" or "rightLegEndCollider":
+                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                        break;
+                    
+                }
+                ContactData data;
+                data.Position = hit2D.point;
+                NetworkObjectReference netObject = new NetworkObjectReference (
+                    GetRootParent(hit2D.transform).GetComponent<NetworkObject>());
+                if (transform.parent.localScale.x < 0 || transform.parent.localScale.y < 0 || transform.parent.localScale.z < 0)
+                {
+                    ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
+                }
+                else
+                {
+                    ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
+                }
+                ShootHandlingBulletTracerServerRpc(data);
+                break;
             }
-            else
+            if (target.layer == LayerMask.NameToLayer("ground"))
             {
-                ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
+                ContactData data;
+                data.Position = hit2D.point;
+                ShootHandlingBulletTracerServerRpc(data);
+                break;
             }
-            ShootHandlingBulletTracerServerRpc(data);
-        }
-        else if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("ground"))
-        {
-            ContactData data;
-            data.Position = hit2D.point;
-            ShootHandlingBulletTracerServerRpc(data);
+            if (!hit2D)
+            {
+                ContactData data;
+                data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
+                ShootHandlingBulletTracerServerRpc(data);
+                break;
+            }
         }
     }
     

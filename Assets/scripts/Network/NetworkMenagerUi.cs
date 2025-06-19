@@ -14,7 +14,7 @@ public class NetworkMenagerUi : MonoBehaviour
     public Toggle conectionMod;
     public TextMeshProUGUI codeTextMeshPro;
     private NetworkManager networkManager;
-    private string _ip, _code;
+    private string _ip = "127.0.0.1", _code;
     private Action _startActionHost, _startActionClient;
     
     public void OnInputIp(string ipAddress)
@@ -49,7 +49,6 @@ public class NetworkMenagerUi : MonoBehaviour
                 {
                     UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
                     unityTransport.SetConnectionData("127.0.0.1", 7777);
-                    print("invoce");
                 };
                 _startActionHost += () => NetworkManager.Singleton.StartHost();
                 
