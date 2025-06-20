@@ -71,7 +71,7 @@ public class PlayerHhandling : NetworkBehaviour
         clientHealthMap[clientId] -= damageAmount;
         if (clientHealthMap[clientId]<=0)
         {
-            gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId, hitBodyPartString, data);
+            gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId, hitBodyPartString, data, serverRpcParams);
         }
         
         // update health ui

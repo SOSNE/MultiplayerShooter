@@ -77,32 +77,34 @@ public class weaponHandling : NetworkBehaviour
             if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
             {
                 ulong shooterNetworkId = hit2D.collider.transform.root.gameObject.GetComponent<NetworkObject>().OwnerClientId;
-                switch (hit2D.collider.gameObject.name)
+                if (playerParent.GetComponent<GameManager>().isAlive)
                 {
-                    case "headCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
-                    case "bodyDownCollider" or "bodyUpCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
-                    case "rightArmStartCollider" or "rightArmEndCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
-                    case "leftArmStartCollider" or "leftArmEndCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
-                    case "leftLegStartCollider" or "leftLegEndCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
-                    case "rightLegStartCollider" or "rightLegEndCollider":
-                        transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
-                        break;
-                    
+                    switch (hit2D.collider.gameObject.name)
+                    {
+                        case "headCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId, target.name, shotDirection);
+                            break;
+                        
+                        case "bodyDownCollider" or "bodyUpCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId, target.name, shotDirection);
+                            break;
+                        
+                        case "rightArmStartCollider" or "rightArmEndCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            break;
+                        
+                        case "leftArmStartCollider" or "leftArmEndCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            break;
+                        
+                        case "leftLegStartCollider" or "leftLegEndCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            break;
+                        
+                        case "rightLegStartCollider" or "rightLegEndCollider":
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            break;
+                    }
                 }
                 ContactData data;
                 data.Position = hit2D.point;

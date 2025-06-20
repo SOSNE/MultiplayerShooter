@@ -92,7 +92,8 @@ public class GameManager : NetworkBehaviour
     [FormerlySerializedAs("pistol")] public GameObject weapon;
     private bool _teamAddingSetupDone = false, _roundIsRestarting = false;
     private static float _remainingTime = 120;
-    private static Coroutine _timerCoroutine; 
+    private static Coroutine _timerCoroutine;
+    public bool isAlive = true;
     
     // private void Awake()
     // {
@@ -234,7 +235,7 @@ public class GameManager : NetworkBehaviour
     
     // this is in ServerRpc
     public void HandleGame(ulong currentClientId, ulong hitClientId, string hitBodyPartString,
-        DataToSendOverNetwork data)
+        DataToSendOverNetwork data, ServerRpcParams serverRpcParams = default)
     {
         int teamIndexOverwrite = 10;
         for (int i = 0; i < AllPlayersData.Count; i++)
@@ -259,6 +260,15 @@ public class GameManager : NetworkBehaviour
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 _playersAlive[AllPlayersData[i].Team] -= 1;
+                var clientRpcParams = new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new[] { hitClientId }
+                    }
+                };
+
+                SetPlayerIsAliveClientRpc(false, AllPlayersData[i].PlayerNetworkObject, clientRpcParams);
                 performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
             }
             
@@ -283,6 +293,25 @@ public class GameManager : NetworkBehaviour
         {
             _roundIsRestarting = true;
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
+        }
+    }
+
+    [ClientRpc]
+    private void SetPlayerIsAliveClientRpc(bool isAliveBool,NetworkObjectReference networkObjectReferenceTarget = default, ClientRpcParams clientRpcParams = default)
+    {
+        if (!networkObjectReferenceTarget.Equals(default) && networkObjectReferenceTarget.TryGet(out NetworkObject targetNetworkObject))
+        {
+            targetNetworkObject.GetComponent<GameManager>().isAlive = isAliveBool;
+        }
+        else
+        {
+            GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag("player");
+
+            foreach (GameObject obj in taggedObjects)
+            {
+                
+                obj.GetComponent<GameManager>().isAlive = isAliveBool;
+            }
         }
     }
 
@@ -527,6 +556,7 @@ public class GameManager : NetworkBehaviour
         yield return new WaitForSeconds(duration);
         ResetHealthMap();
         RestartPlayersAliveList();
+        SetPlayerIsAliveClientRpc(true);
         RestartPositions();
         RestartWeaponsMagazinesClientRpc();
         RestartTimer();

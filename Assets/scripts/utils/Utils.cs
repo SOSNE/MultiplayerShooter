@@ -7,6 +7,12 @@ public class Utils : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        
+        #if UNITY_EDITOR
+            Application.targetFrameRate = 30;
+            QualitySettings.vSyncCount = 1;
+        #endif
+
     }
     
     public GameObject GetMasterParent(Transform child)
