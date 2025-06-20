@@ -64,6 +64,20 @@ public class weaponHandling : NetworkBehaviour
         GetComponent<pistolMovment>().PerformRecoil();    
         RaycastHit2D[] hits2D = Physics2D.RaycastAll(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
         
+        if (hits2D.Length == 0)
+        {
+            ContactData data;
+            if (playerParent.localScale.x < 0 || playerParent.localScale.y < 0 || playerParent.localScale.z < 0)
+            {
+                data.Position = bulletSpawn.position + (bulletSpawn.right.normalized)*40;
+            }
+            else
+            {
+                data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
+
+            }
+            ShootHandlingBulletTracerServerRpc(data);
+        }
         foreach (RaycastHit2D hit2D in hits2D)
         {
             GameObject target = hit2D.collider.gameObject;
@@ -125,13 +139,6 @@ public class weaponHandling : NetworkBehaviour
             {
                 ContactData data;
                 data.Position = hit2D.point;
-                ShootHandlingBulletTracerServerRpc(data);
-                break;
-            }
-            if (!hit2D)
-            {
-                ContactData data;
-                data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
                 ShootHandlingBulletTracerServerRpc(data);
                 break;
             }
