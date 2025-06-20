@@ -9,7 +9,7 @@ public class Utils : MonoBehaviour
         Instance = this;
         
         #if UNITY_EDITOR
-            Application.targetFrameRate = 30;
+            Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 1;
         #endif
 

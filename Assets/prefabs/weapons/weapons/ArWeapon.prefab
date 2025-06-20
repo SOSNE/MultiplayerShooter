@@ -495,7 +495,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   rotationCenterPoint: {fileID: 8275883752307157157}
-  recoilAngleMultiplicationRate: 0.35
+  recoilAngleMultiplicationRate: 4.19
   recoilPowerValue: 0.07
   lastTime: 0
 --- !u!114 &7307294333883811969
