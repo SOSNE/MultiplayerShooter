@@ -260,6 +260,7 @@ public class GameManager : NetworkBehaviour
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 _playersAlive[AllPlayersData[i].Team] -= 1;
+                
                 var clientRpcParams = new ClientRpcParams
                 {
                     Send = new ClientRpcSendParams
@@ -287,7 +288,7 @@ public class GameManager : NetworkBehaviour
                 }
             }
         }
-
+        print("0: "+_playersAlive[0] + "    1: "+_playersAlive[1]);
         //restart game after all players are dead
         if ((_playersAlive[0] <= 0 || _playersAlive[1] <= 0) && !_roundIsRestarting)
         {

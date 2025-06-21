@@ -13,8 +13,6 @@ public class CameraControl : NetworkBehaviour
         // Calculate the scaling needed to adjust the viewport
         float scale = screenAspect /(16f / 9f);
         
-        print(scale + "scale");
-
         if (scale < 1.0f)
         {
             //when screen is higher then wider
