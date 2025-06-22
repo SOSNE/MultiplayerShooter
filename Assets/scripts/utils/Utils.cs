@@ -1,9 +1,12 @@
 using System.Runtime.InteropServices;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Utils : MonoBehaviour
+public class Utils : NetworkBehaviour
 {
     public static Utils Instance;
+    public NetworkVariable<bool> allowFriendlyFire = new NetworkVariable<bool>(false);
+
     [DllImport("__Internal")]
     private static extern void CopyWebGL(string str);
 

@@ -83,10 +83,12 @@ public class weaponHandling : NetworkBehaviour
             GameObject target = hit2D.collider.gameObject;
             
             //Prevent hitting teammates but allow to self hit. 
-            if (Utils.Instance.GetMasterParent(target.transform).layer == playerParent.gameObject.layer && Utils.Instance.GetMasterParent(target.transform) != playerParent.gameObject)
-            {
-                continue;
-            }
+            if (Utils.Instance.GetMasterParent(target.transform).layer == playerParent.gameObject.layer 
+                && Utils.Instance.GetMasterParent(target.transform) != playerParent.gameObject 
+                && !Utils.Instance.allowFriendlyFire.Value)
+                {
+                    continue;
+                }
             
             if (hit2D.collider.gameObject.layer == LayerMask.NameToLayer("player body"))
             {

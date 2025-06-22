@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 public class NetworkMenagerUi : MonoBehaviour
 {
     public Button host, client, copyCodeButton;
-    public Toggle conectionMod;
+    public Toggle conectionMod, allowFriendlyFireMod;
     public TextMeshProUGUI codeTextMeshPro;
     private NetworkManager networkManager;
     private string _ip = "127.0.0.1", _code;
@@ -66,6 +66,10 @@ public class NetworkMenagerUi : MonoBehaviour
                 _startActionClient = () => StartClientWithRelay(_ip);
             }
         });
+        allowFriendlyFireMod.onValueChanged.AddListener((bool isOn) =>
+        {
+            Utils.Instance.allowFriendlyFire.Value = isOn;
+        });
     }
     
     public async Task<string> StartHostWithRelay(int maxConnections = 4)
@@ -85,7 +89,7 @@ public class NetworkMenagerUi : MonoBehaviour
         codeTextMeshPro.gameObject.SetActive(true);
         Utils.Instance.CopyText(_code);
         copyCodeButton.gameObject.SetActive(true);
-        
+        allowFriendlyFireMod.gameObject.SetActive(true);
         return NetworkManager.Singleton.StartHost() ? _code : null;
     }
     
