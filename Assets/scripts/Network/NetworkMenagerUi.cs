@@ -38,7 +38,7 @@ public class NetworkMenagerUi : MonoBehaviour
         });
         copyCodeButton.onClick.AddListener(() =>
         {
-            GUIUtility.systemCopyBuffer = _code;
+            Utils.Instance.CopyText(_code);
         });
         
         conectionMod.onValueChanged.AddListener((bool isOn) =>
@@ -80,9 +80,10 @@ public class NetworkMenagerUi : MonoBehaviour
             .SetRelayServerData(new RelayServerData(allocation, "wss"));
 
         _code = await Unity.Services.Relay.RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+        print(_code);
         codeTextMeshPro.text = _code;
         codeTextMeshPro.gameObject.SetActive(true);
-        GUIUtility.systemCopyBuffer = _code;
+        Utils.Instance.CopyText(_code);
         copyCodeButton.gameObject.SetActive(true);
         
         return NetworkManager.Singleton.StartHost() ? _code : null;
@@ -95,7 +96,6 @@ public class NetworkMenagerUi : MonoBehaviour
         if (!Unity.Services.Authentication.AuthenticationService.Instance.IsSignedIn)
             await Unity.Services.Authentication.AuthenticationService.Instance.SignInAnonymouslyAsync();
 
-        print(joinCode);
         var allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
         NetworkManager.Singleton.GetComponent<UnityTransport>()
             .SetRelayServerData(new RelayServerData(allocation, "wss"));
