@@ -37,12 +37,7 @@ public class shopUi : NetworkBehaviour
         // For testing shop mechanics
         if (Input.GetKeyUp(KeyCode.M))
         {
-            StartCoroutine(_moneyOperationUtils.TryToBuyCoroutine("arWeapon", result =>
-            {
-                if (result) return;
-                
-                _moneyOperationUtils.UpdatePlayerMoneyAmountServerRpc(1000, NetworkManager.Singleton.LocalClientId);
-            }));
+            _moneyOperationUtils.UpdatePlayerMoneyAmountServerRpc(1000, NetworkManager.Singleton.LocalClientId);
         } 
     }
 

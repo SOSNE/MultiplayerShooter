@@ -318,15 +318,17 @@ public class GameManager : NetworkBehaviour
 
     private void RestartPlayersAliveList()
     {
+        _playersAlive[0] = 0;
+        _playersAlive[1] = 0;
         for (int i = 0; i < AllPlayersData.Count; i++)
         {
             var data = AllPlayersData[i];
-            if (data is { Team: 0, Alive: false })
+            if (data is { Team: 0 })
             {
                 _playersAlive[0] += 1;
             }
 
-            if (data is { Team: 1, Alive: false })
+            if (data is { Team: 1 })
             {
                 _playersAlive[1] += 1;
             }

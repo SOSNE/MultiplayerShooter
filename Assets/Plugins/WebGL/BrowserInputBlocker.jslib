@@ -2,13 +2,27 @@ mergeInto(LibraryManager.library, {
     BlockBrowserShortcuts: function () {
         if (typeof window !== 'undefined') {
             window.addEventListener("keydown", function (e) {
+                const code = e.code;
+                console.log(`Keydown detected: ${code}, ctrl=${e.ctrlKey}, meta=${e.metaKey}`);
+                if (
+                    code === 'KeyW' ||
+                    code === 'KeyA' ||
+                    code === 'KeyS' ||
+                    code === 'KeyD' ||
+                    code === 'Space'
+                ) {
+                    console.log(`Blocking key: ${code}`);
+                    e.preventDefault();
+                }
+                // extra: block dangerous Ctrl/Cmd combos:
                 if (e.ctrlKey || e.metaKey) {
-                    switch (e.code) {
+                    switch (code) {
                         case 'KeyW':
                         case 'KeyA':
                         case 'KeyS':
                         case 'KeyD':
-                        case 'Space':
+                        case 'KeyR':
+                            console.log(`Blocking Ctrl/Cmd+${code}`);
                             e.preventDefault();
                             break;
                     }
