@@ -19,14 +19,14 @@ public class crouchingAnimation : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             _crouch = true;
             // StartCoroutine(DrawLine(_weapon, 0.3f));
             SetWalkServerRpc(_crouch, gameObject);
             
         }
-        else if (Input.GetKeyUp(KeyCode.LeftControl))
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             _crouch = false;
             SetWalkServerRpc(_crouch, gameObject);

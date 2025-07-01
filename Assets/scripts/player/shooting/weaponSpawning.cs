@@ -183,10 +183,10 @@ public class weaponSpawning : NetworkBehaviour
             foreach (var data in GameManager.AllPlayersData)
             {
                 //Find weapon that is already created at clint.
-                if (!data.PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) return;
+                if (!data.PlayerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) return;
                 if (playerNetworkObjectForEachPlayer.gameObject == gameObject) return;
                 GameObject weaponOfThisPlayer = GetChildWithTag(playerNetworkObjectForEachPlayer.transform, "weapon").gameObject;
-                PerformWeaponSetupClientRpc(data.PlayerNetworkObject, weaponOfThisPlayer);
+                PerformWeaponSetupClientRpc(data.PlayerNetworkObjectReference, weaponOfThisPlayer);
             }
         }
     }

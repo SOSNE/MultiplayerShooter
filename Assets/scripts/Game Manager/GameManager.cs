@@ -48,7 +48,7 @@ public struct PlayerData
 {
     public ulong ClientId;
     public int Team;
-    public NetworkObjectReference PlayerNetworkObject;
+    public NetworkObjectReference PlayerNetworkObjectReference;
     public bool Alive;
     public string[] PlayerLoadout;
     public string PlayerName;
@@ -59,7 +59,7 @@ public struct PlayerData
     {
         ClientId = 0; 
         Team = 0; 
-        PlayerNetworkObject = default; 
+        PlayerNetworkObjectReference = default; 
         Alive = false; 
         PlayerLoadout = new string[loadoutSize]; // Initialize the array with a specific size
         PlayerName = "player";
@@ -160,7 +160,15 @@ public class GameManager : NetworkBehaviour
             GetComponent<CameraControl>().currentPlayer = transform;
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .UpdateMoneyAmountUiServerRpc(60);
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
+
         print("start");
+    }
+    
+    void OnDisable() {
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientConnected;
+
     }
     
     private void OnClientConnected(ulong clientId)
@@ -172,6 +180,39 @@ public class GameManager : NetworkBehaviour
             gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
         }
     }
+    
+    private void OnClientDisconect(ulong clientId)
+    {
+        if(!IsServer) return;
+        HandlePlayerDisconection(clientId);
+    }
+
+    private void HandlePlayerDisconection(ulong clientId)
+    {
+        for (int i = 0; i < AllPlayersData.Count; i++)
+        {
+            var data = AllPlayersData[i];
+            if (data.ClientId == clientId)
+            {
+                _playersAlive[data.Team] -= 1;
+            }
+
+            if (data.PlayerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
+            {
+                playerGameObject.Despawn(destroy: true);
+            }
+            AllPlayersData.RemoveAt(i);
+        }
+    }
+
+    // [ClientRpc]
+    // private void RemovePleyerGameObjectAfterDisconetion(NetworkObjectReference networkObjectReferencePlayer)
+    // {
+    //     if(!networkObjectReferencePlayer.TryGet(out NetworkObject playerGameObject)) return;
+    //
+    //     
+    // }
+
     
     [ServerRpc]
     private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
@@ -269,8 +310,8 @@ public class GameManager : NetworkBehaviour
                     }
                 };
 
-                SetPlayerIsAliveClientRpc(false, AllPlayersData[i].PlayerNetworkObject, clientRpcParams);
-                performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObject, hitBodyPartString, data);
+                SetPlayerIsAliveClientRpc(false, AllPlayersData[i].PlayerNetworkObjectReference, clientRpcParams);
+                performRagdollOnSelectedPlayerClientRpc(AllPlayersData[i].PlayerNetworkObjectReference, hitBodyPartString, data);
             }
             
             // Add money for player after kill
@@ -364,13 +405,13 @@ public class GameManager : NetworkBehaviour
             {
                 NetworkObjectReference netObject = new NetworkObjectReference(
                     _team0Spawn.transform.GetComponent<NetworkObject>());
-                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
+                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObjectReference, netObject);
             }
             else
             {
                 NetworkObjectReference netObject = new NetworkObjectReference(
                     _team1Spawn.transform.GetComponent<NetworkObject>());
-                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObject, netObject);
+                SpawnPlayerOnSpawnPointClientRpc(record.PlayerNetworkObjectReference, netObject);
             }
         }
     }
@@ -425,7 +466,7 @@ public class GameManager : NetworkBehaviour
         PlayerData newUser = new PlayerData(5);
         newUser.ClientId = clientId;
         newUser.Team = floatIndex % 2;
-        newUser.PlayerNetworkObject = playerGameObject;
+        newUser.PlayerNetworkObjectReference = playerGameObject;
         newUser.Alive = true;
         newUser.PlayerLoadout[0] = "pistol";
         newUser.PlayerName = "player: " + _playerNameCount;
@@ -461,7 +502,7 @@ public class GameManager : NetworkBehaviour
         for (int i =0; i<AllPlayersData.Count;i++)
         {
             //The following is done for every player that is connected.
-            if (AllPlayersData[i].PlayerNetworkObject.TryGet(out NetworkObject playerNetworkObject))
+            if (AllPlayersData[i].PlayerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
             {
                 if (AllPlayersData[i].Team == 0)
                 {
@@ -565,7 +606,7 @@ public class GameManager : NetworkBehaviour
         RestartTimer();
         foreach (PlayerData playerData in AllPlayersData)
         {
-            turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObject);
+            turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObjectReference);
         }
 
         _roundIsRestarting = false;
