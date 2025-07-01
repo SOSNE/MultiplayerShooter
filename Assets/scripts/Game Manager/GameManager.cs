@@ -189,30 +189,22 @@ public class GameManager : NetworkBehaviour
 
     private void HandlePlayerDisconection(ulong clientId)
     {
+        print($"Client {clientId} disconnected.");
         for (int i = 0; i < AllPlayersData.Count; i++)
         {
             var data = AllPlayersData[i];
             if (data.ClientId == clientId)
             {
                 _playersAlive[data.Team] -= 1;
+                if (data.PlayerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
+                {
+                    playerGameObject.Despawn(destroy: true);
+                }
+                AllPlayersData.RemoveAt(i);
+                break;
             }
-
-            if (data.PlayerNetworkObjectReference.TryGet(out NetworkObject playerGameObject))
-            {
-                playerGameObject.Despawn(destroy: true);
-            }
-            AllPlayersData.RemoveAt(i);
         }
     }
-
-    // [ClientRpc]
-    // private void RemovePleyerGameObjectAfterDisconetion(NetworkObjectReference networkObjectReferencePlayer)
-    // {
-    //     if(!networkObjectReferencePlayer.TryGet(out NetworkObject playerGameObject)) return;
-    //
-    //     
-    // }
-
     
     [ServerRpc]
     private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
