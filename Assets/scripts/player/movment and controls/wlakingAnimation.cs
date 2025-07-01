@@ -5,16 +5,19 @@ public class wlakingAnimation : NetworkBehaviour
 {
     private Animator _animator;
     private bool _walk;
+    private Vector3 lastPosition;
+
     void Start()
     {
         _animator = GetComponent<Animator>();
         _walk = false;
+        lastPosition = transform.position;
     }
     
     
     void Update()
     {
-        if (Mathf.Abs(GetComponent<Rigidbody2D>().linearVelocity.x) > 0.1)
+        if (Vector3.Distance(transform.position, lastPosition) > 0.01)
         {
             gameObject.GetComponent<Animator>().SetBool("walking", true);
         }
@@ -22,6 +25,7 @@ public class wlakingAnimation : NetworkBehaviour
         {
             gameObject.GetComponent<Animator>().SetBool("walking", false);
         }
+        lastPosition = transform.position;
         // SetWalkServerRpc(_walk, gameObject);
     }
     

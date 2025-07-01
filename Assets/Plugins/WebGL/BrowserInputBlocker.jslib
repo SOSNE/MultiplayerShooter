@@ -3,7 +3,6 @@ mergeInto(LibraryManager.library, {
         if (typeof window !== 'undefined') {
             window.addEventListener("keydown", function (e) {
                 const code = e.code;
-                console.log(`Keydown detected: ${code}, ctrl=${e.ctrlKey}, meta=${e.metaKey}`);
                 if (
                     code === 'KeyW' ||
                     code === 'KeyA' ||
@@ -11,7 +10,6 @@ mergeInto(LibraryManager.library, {
                     code === 'KeyD' ||
                     code === 'Space'
                 ) {
-                    console.log(`Blocking key: ${code}`);
                     e.preventDefault();
                 }
                 // extra: block dangerous Ctrl/Cmd combos:
@@ -22,7 +20,6 @@ mergeInto(LibraryManager.library, {
                         case 'KeyS':
                         case 'KeyD':
                         case 'KeyR':
-                            console.log(`Blocking Ctrl/Cmd+${code}`);
                             e.preventDefault();
                             break;
                     }
