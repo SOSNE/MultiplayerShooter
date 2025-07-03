@@ -86,7 +86,6 @@ public class GameManager : NetworkBehaviour
     private static List<int> _playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
     private static ObservableList<int> _pointScore = new ObservableList<int>();
-    private static int floatIndex;
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera;
     [FormerlySerializedAs("pistol")] public GameObject weapon;
@@ -453,6 +452,7 @@ public class GameManager : NetworkBehaviour
     private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId,
         ServerRpcParams serverRpcParams = default)
     {
+        int floatIndex = AllPlayersData.Count;
         _team0Spawn = GameObject.Find("Team0Spawn").transform;
         _team1Spawn = GameObject.Find("Team1Spawn").transform;
         PlayerData newUser = new PlayerData(5);
@@ -477,7 +477,6 @@ public class GameManager : NetworkBehaviour
         // teamsDictionary.Add(clientId, floatIndex%2);
 
         _playerNameCount++;
-        floatIndex++;
         if (AllPlayersData.FirstOrDefault(obj => obj.ClientId == clientId).Team == 0)
         {
             NetworkObjectReference netObject = new NetworkObjectReference(
