@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEngine.Serialization;
 
 public class pistolMovment : NetworkBehaviour
 {
+    public GameObject rotationCenterPointGameObject;
     public Transform positionFirstL, positionFirstR, bulletSpawn, weaponEnd;
     public double partOfTheWeaponWithMaxExtendedHands, maxExtension;
     private double _width;
@@ -42,8 +45,7 @@ public class pistolMovment : NetworkBehaviour
     }
 
     public float  lastTime;
-    private Coroutine weaponRecoilCoroutine;
-
+    
     public void PerformRecoil()
     {
         float weaponFirerate = gameObject.GetComponent<weaponHandling>().fierRateInSeconds;
@@ -67,14 +69,20 @@ public class pistolMovment : NetworkBehaviour
             recoilScaleValue = Mathf.Lerp(0f, recoilPowerValue, (normalizedParam - 0.3f) / (1 - 0.3f));
         }
         
-        if (weaponRecoilCoroutine != null)
+        if (_weaponRecoilCoroutine != null)
         {
-            StopCoroutine(weaponRecoilCoroutine);
-            weaponRecoilCoroutine = null;
+            StopCoroutine(_weaponRecoilCoroutine);
+            _weaponRecoilCoroutine = null;
         }
-        weaponRecoilCoroutine = StartCoroutine(WeaponRecoil(weaponFirerate,weaponFirerate*2, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
+        _weaponRecoilCoroutine = StartCoroutine(WeaponRecoil(weaponFirerate,weaponFirerate*2, recoilScale:  recoilScaleValue, recoilAngleIncrease: recoilAngleIncreaseValue));
     }
     
+    private Vector3 _pozitionForCalculatingWeaponRotation;
+    bool _wasHolding= false;
+    private Coroutine _weaponRecoilCoroutine;
+    private GameObject _rotationCenterPointSpawned = null;
+
+
     void Update()
     {
         if (!IsOwner) return;
@@ -86,11 +94,38 @@ public class pistolMovment : NetworkBehaviour
         double rightArmExtenstion = Vector2.Distance(positionFirstR.position, mouseWorldPosition);
         double leftArmExtenstionToWeapon = Vector2.Distance(positionFirstL.position, transform.position);
         double rightArmExtenstionToWeapon =  Vector2.Distance(positionFirstL.position, transform.position);
+
         
-        float angleTarget = Mathf.Atan2(mouseWorldPosition.y - bulletSpawn.position.y, mouseWorldPosition.x - bulletSpawn.position.x);
+        //For rotating weapon when clicing the second mouse button.
+        bool isHolding = Input.GetMouseButton(1);
+        
+        if (isHolding)
+        {
+            if (!_wasHolding)
+            {
+                _pozitionForCalculatingWeaponRotation = mouseWorldPosition; 
+                _rotationCenterPointSpawned =Instantiate(rotationCenterPointGameObject, _pozitionForCalculatingWeaponRotation,
+                    rotationCenterPointGameObject.transform.rotation);
+                _wasHolding = true;
+            }
+        }
+        else
+        {
+            if (_rotationCenterPointSpawned != null)
+            {
+                Destroy(_rotationCenterPointSpawned);
+                _rotationCenterPointSpawned = null;
+            }
+            _pozitionForCalculatingWeaponRotation = bulletSpawn.position;
+        }
+
+        _wasHolding = isHolding;
+        
+        float angleTarget = Mathf.Atan2(mouseWorldPosition.y - _pozitionForCalculatingWeaponRotation.y, mouseWorldPosition.x - _pozitionForCalculatingWeaponRotation.x);
         angleTarget *= Mathf.Rad2Deg;
         Transform playerParent = transform.parent;
         float angle = angleTarget;
+
         if (playerParent.localScale.x < 0 || playerParent.localScale.y < 0 || playerParent.localScale.z < 0)
         {
             // If the object is mirrored, invert the target rotation to compensate for flipping

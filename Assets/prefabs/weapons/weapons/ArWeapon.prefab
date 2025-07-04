@@ -479,6 +479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  rotationCenterPointGameObject: {fileID: 1481472921212902055, guid: 832cdc1b6bb3e4062bfa2d81608ae05c, type: 3}
   positionFirstL: {fileID: 0}
   positionFirstR: {fileID: 0}
   bulletSpawn: {fileID: 2234739642675802830}
