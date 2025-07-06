@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
 using UnityEngine.Serialization;
 using UnityEngine.TextCore.Text;
-using UnityEngine.WSA;
-
 
 public class weaponHandling : NetworkBehaviour
 {
