@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
 using UnityEngine.Serialization;
 using UnityEngine.TextCore.Text;
+using UnityEngine.WSA;
 
 
 public class weaponHandling : NetworkBehaviour
@@ -19,6 +20,8 @@ public class weaponHandling : NetworkBehaviour
     [SerializeField] private Gradient tracerGradientColor;
     public float bulletCounter = 0;
     private float _currentTime = 0;
+    public int weaponType;
+    
     void Update()
     {
         if (!IsOwner) return;
@@ -60,7 +63,7 @@ public class weaponHandling : NetworkBehaviour
             shotAngle -= 180;
         }
         
-        ShootParticleServerRpc(shotAngle);
+        WeaponShotArtSystemServerRpc(shotAngle, gameObject);
         GetComponent<pistolMovment>().PerformRecoil();    
         RaycastHit2D[] hits2D = Physics2D.RaycastAll(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
         
@@ -178,13 +181,13 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ServerRpc]
-    private void ShootParticleServerRpc(float shotAngle ,ServerRpcParams serverRpcParams = default)
+    private void WeaponShotArtSystemServerRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ServerRpcParams serverRpcParams = default)
     {
         // Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
         // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
-        ShootParticleClientRpc(shotAngle);
+        WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference);
     }
     
     [ClientRpc]
@@ -194,12 +197,16 @@ public class weaponHandling : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void ShootParticleClientRpc(float shotAngle, ClientRpcParams clientRpcParams = default)
+    private void WeaponShotArtSystemClientRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ClientRpcParams clientRpcParams = default)
     {
         Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,shotAngle));
         // shootParticle.transform.SetParent(transform);
         Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        
+        if (!weaponTargetReference.TryGet(out NetworkObject weaponGameObject)) return;
+        Utils.Instance.PlaySound(weaponType,1f, weaponGameObject.transform);
+
     }
     
     struct ContactData : INetworkSerializable

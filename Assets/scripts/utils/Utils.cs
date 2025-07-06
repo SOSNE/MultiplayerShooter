@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
 
 public class Utils : NetworkBehaviour
 {
     public static Utils Instance;
+    public List<AudioClip> soundsList = new List<AudioClip>();
     public NetworkVariable<bool> allowFriendlyFire = new NetworkVariable<bool>(false);
 
     [DllImport("__Internal")]
@@ -37,4 +40,21 @@ public class Utils : NetworkBehaviour
         #endif
     }
 
+    public void PlaySound(int soundListIndex, float volume, Transform soundTransform)
+    {
+        GameObject go = new GameObject("TempAudio");
+        go.transform.position = soundTransform.position;
+
+        AudioSource src = go.AddComponent<AudioSource>();
+        src.volume = volume;
+        src.pitch = 1f;
+        src.spatialBlend = 1f;
+        src.minDistance = 15f;
+        src.maxDistance = 100f;
+        src.rolloffMode = AudioRolloffMode.Linear;
+
+        src.PlayOneShot(soundsList[soundListIndex]);
+        Destroy(go, soundsList[soundListIndex].length / src.pitch);
+
+    }
 }

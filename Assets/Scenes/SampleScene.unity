@@ -10532,6 +10532,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  soundsList:
+  - {fileID: 8300000, guid: 5855bb4a6d87f4d379ce1937baefbab9, type: 3}
+  - {fileID: 8300000, guid: 3926bde2a91954f04b16c899aac14621, type: 3}
   allowFriendlyFire:
     m_InternalValue: 0
 --- !u!4 &1468101120
