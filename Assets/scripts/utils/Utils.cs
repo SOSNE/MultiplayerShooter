@@ -3,13 +3,15 @@ using System.Runtime.InteropServices;
 using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Utils : NetworkBehaviour
 {
     public static Utils Instance;
     public List<AudioClip> soundsList = new List<AudioClip>();
     public NetworkVariable<bool> allowFriendlyFire = new NetworkVariable<bool>(false);
-
+    public AudioMixer mixer;
+    
     [DllImport("__Internal")]
     private static extern void CopyWebGL(string str);
 
@@ -46,6 +48,8 @@ public class Utils : NetworkBehaviour
         go.transform.position = soundTransform.position;
 
         AudioSource src = go.AddComponent<AudioSource>();
+        src.outputAudioMixerGroup = mixer.FindMatchingGroups("SFX")[0];
+
         src.volume = volume;
         src.pitch = 1f;
         src.spatialBlend = 1f;

@@ -2,10 +2,14 @@ using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class uiControler : NetworkBehaviour
 {
-    
+
+    public AudioMixer mixer;
+    public Scrollbar volumeScrollbar;
     public TextMeshProUGUI ammoCounter;
     [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter, timer;
     public Transform trackingTransform;
@@ -14,6 +18,13 @@ public class uiControler : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+        volumeScrollbar.onValueChanged.AddListener(OnScrollbarValueChanged);
+    }
+
+    private void OnScrollbarValueChanged(float value)
+    {
+        float dB = Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 15f;
+        mixer.SetFloat("MyExposedParamMaster", dB);
     }
 
     void Update()
