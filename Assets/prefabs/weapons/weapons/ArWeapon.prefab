@@ -582,6 +582,7 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   bulletCounter: 0
+  weaponDamageMultiplier: 0.67
   weaponType: 1
 --- !u!1001 &8340375679196526087
 PrefabInstance:

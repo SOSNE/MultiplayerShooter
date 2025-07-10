@@ -602,6 +602,8 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   bulletCounter: 0
+  weaponDamageMultiplier: 0.45
+  weaponType: 0
 --- !u!114 &3461347680528403587
 MonoBehaviour:
   m_ObjectHideFlags: 0

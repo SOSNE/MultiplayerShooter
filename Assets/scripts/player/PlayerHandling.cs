@@ -82,8 +82,16 @@ public class PlayerHhandling : NetworkBehaviour
                 TargetClientIds = new ulong[]{clientId}
             }
         };
-        GameObject.Find("UiControler").GetComponent<uiControler>()
-            .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
+        if (clientHealthMap[clientId] < 0)
+        {
+            GameObject.Find("UiControler").GetComponent<uiControler>()
+                .GetHealthForUiClientRpc(0, clientRpcParams);
+        }
+        else
+        {
+            GameObject.Find("UiControler").GetComponent<uiControler>()
+                .GetHealthForUiClientRpc(clientHealthMap[clientId], clientRpcParams);
+        }
     }
 
     public void PerformRagdollOnPlayer(Transform playerTarget, string hitBodyPartString , DataToSendOverNetwork data)

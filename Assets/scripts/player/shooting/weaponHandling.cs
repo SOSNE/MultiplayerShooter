@@ -16,9 +16,10 @@ public class weaponHandling : NetworkBehaviour
     public LayerMask layerMask;
     public bool canShoot = true, burstMode = false;
     [SerializeField] private Gradient tracerGradientColor;
-    public float bulletCounter = 0;
+    public float bulletCounter = 0, weaponDamageMultiplier;
     private float _currentTime = 0;
     public int weaponType;
+    
     
     void Update()
     {
@@ -99,27 +100,27 @@ public class weaponHandling : NetworkBehaviour
                     switch (hit2D.collider.gameObject.name)
                     {
                         case "headCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(100, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(180*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                         
                         case "bodyDownCollider" or "bodyUpCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(50, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(50*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                         
                         case "rightArmStartCollider" or "rightArmEndCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(20*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                         
                         case "leftArmStartCollider" or "leftArmEndCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(20*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                         
                         case "leftLegStartCollider" or "leftLegEndCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(20*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                         
                         case "rightLegStartCollider" or "rightLegEndCollider":
-                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit(20, shooterNetworkId, target.name, shotDirection);
+                            transform.root.gameObject.GetComponent<PlayerHhandling>().PlayerHit((int)(20*weaponDamageMultiplier), shooterNetworkId, target.name, shotDirection);
                             break;
                     }
                 }
