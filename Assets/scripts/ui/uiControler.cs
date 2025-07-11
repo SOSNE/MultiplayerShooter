@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using Unity.Netcode;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -14,13 +15,22 @@ public class uiControler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter, timer;
     public Transform trackingTransform;
     public static uiControler Instance;
+    public GameObject canvasWorldSpace, playerNameTextMechProPrephab;
+    public string playerSelectedName = "";
+    public TMP_InputField playerNameSelectionInputField;
     
     private void Awake()
     {
         Instance = this;
         volumeScrollbar.onValueChanged.AddListener(OnScrollbarValueChanged);
+        playerNameSelectionInputField.onValueChanged.AddListener(OnplayerNameSelectionInputFieldValueChange);
     }
 
+    private void OnplayerNameSelectionInputFieldValueChange(string value)
+    {
+        playerSelectedName = value;
+    }
+    
     private void OnScrollbarValueChanged(float value)
     {
         float dB = Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 15f;
@@ -60,10 +70,35 @@ public class uiControler : NetworkBehaviour
         moneyCounter.text = "Golden Shekels: " + moneyAmount;
     }
     
-    
     public void UpdateTimer(float time)
     {
         timer.text = "Time left: " + time;
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void AddNameTagsForEachPlayerServerRpc()
+    {
+        print("NameTag ");
+        //Posible bandwith improvment:
+        //Instade of sending ClientRpc for every player we can send one ClientRpc with list of evry player.
+        foreach (var data in GameManager.AllPlayersData)
+        {
+            print("adding for " + data.PlayerName);
+            AddNameTagsForEachPlayerClientRpc(data.PlayerNetworkObjectReference, data.PlayerName);
+        }
+    }
+    
+    [ClientRpc]
+    public void AddNameTagsForEachPlayerClientRpc(NetworkObjectReference targetPlayer, string name)
+    {
+        //SetActive = false for player name input field.
+        if (playerNameSelectionInputField.gameObject.activeSelf) playerNameSelectionInputField.gameObject.SetActive(false);
+        
+        if(!targetPlayer.TryGet(out NetworkObject targetPlayerNetworkObject)) return;
+        GameObject newplayerNameTextMechProGameObject = Instantiate(playerNameTextMechProPrephab, canvasWorldSpace.transform);
+        newplayerNameTextMechProGameObject.GetComponent<TextMeshProUGUI>().text = name;
+        newplayerNameTextMechProGameObject.GetComponent<TextMeshProUGUI>().text = name;
+        newplayerNameTextMechProGameObject.GetComponent<PlayerNameTagControl>().target = targetPlayerNetworkObject.gameObject;
     }
     
     Transform GetChildWithTag(Transform parent, string tag)

@@ -160,6 +160,8 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .UpdateMoneyAmountUiServerRpc(60);
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
+        
+        uiControler.Instance.AddNameTagsForEachPlayerServerRpc();
 
         print("start");
     }
@@ -167,16 +169,16 @@ public class GameManager : NetworkBehaviour
     void OnDisable() {
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientConnected;
-
     }
     
     private void OnClientConnected(ulong clientId)
     {
         if (!IsOwner) return;
+        if (!IsClient) return;
+        
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            NewClientConnectionServerRpc(clientId);
-            gameObject.GetComponent<GameManager>().AddClientToTeam(clientId);
+            gameObject.GetComponent<GameManager>().NewClientSetupServerRpc(gameObject, clientId, uiControler.Instance.playerSelectedName);
         }
     }
     
@@ -205,8 +207,7 @@ public class GameManager : NetworkBehaviour
         }
     }
     
-    [ServerRpc]
-    private void NewClientConnectionServerRpc(ulong clientId ,ServerRpcParams serverRpcParams = default)
+    private void NewClientHealthSetup(ulong clientId ,ServerRpcParams serverRpcParams = default)
     {
         PlayerHhandling.clientHealthMap.Add(clientId, 100);
         
@@ -221,7 +222,7 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .GetHealthForUiClientRpc(PlayerHhandling.clientHealthMap[clientId], clientRpcParams);
         AcknowledgeTeamAddingSetupClientRpc();
-        StartCountdownTimerWithServerTimeClientRpc(_remainingTime, clientRpcParams);
+
     }
     
     [ClientRpc]
@@ -441,15 +442,15 @@ public class GameManager : NetworkBehaviour
         teamTwoWinCounter.text = $"{team1}";
     }
 
-    public void AddClientToTeam(ulong clientId)
-    {
-        if (!IsClient) return;
-        AddClientToTeamServerRpc(gameObject, clientId);
-    }
+    // public void AddClientToTeam(ulong clientId)
+    // {
+    //     if (!IsClient) return;
+    //     AddClientToTeamServerRpc(gameObject, clientId);
+    // }
 
     //Possible change for name of this function to ClientSetupServerRpc
     [ServerRpc]
-    private void AddClientToTeamServerRpc(NetworkObjectReference playerGameObject, ulong clientId,
+    private void NewClientSetupServerRpc(NetworkObjectReference playerGameObject, ulong clientId, string playerName,
         ServerRpcParams serverRpcParams = default)
     {
         int floatIndex = AllPlayersData.Count;
@@ -461,7 +462,15 @@ public class GameManager : NetworkBehaviour
         newUser.PlayerNetworkObjectReference = playerGameObject;
         newUser.Alive = true;
         newUser.PlayerLoadout[0] = "pistol";
-        newUser.PlayerName = "player: " + _playerNameCount;
+        if (playerName != "")
+        {
+            newUser.PlayerName = playerName;
+        }
+        else
+        {
+            newUser.PlayerName = "player: " + _playerNameCount;
+        }
+        
         if (floatIndex % 2 == 0)
         {
             newUser.PlayerColor = new Color(0.2706f, 0.3098f, 0.1333f, 1f);
@@ -510,6 +519,16 @@ public class GameManager : NetworkBehaviour
                 ChangeClientsColorClientRpc(playerNetworkObject, AllPlayersData[i].PlayerColor);
             }
         }
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[]{clientId}
+            }
+        };
+        StartCountdownTimerWithServerTimeClientRpc(_remainingTime, clientRpcParams);
+        NewClientHealthSetup(clientId);
+
     }
     
     [ClientRpc]

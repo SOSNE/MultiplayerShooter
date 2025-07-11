@@ -49,6 +49,7 @@ public class NetworkMenagerUi : MonoBehaviour
                 {
                     UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
                     unityTransport.SetConnectionData("127.0.0.1", 7777);
+                    allowFriendlyFireMod.gameObject.SetActive(true);
                 };
                 _startActionHost += () => NetworkManager.Singleton.StartHost();
                 
