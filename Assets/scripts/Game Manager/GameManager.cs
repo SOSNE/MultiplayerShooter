@@ -54,6 +54,7 @@ public struct PlayerData
     public string PlayerName;
     public int MoneyAmount;
     public Color PlayerColor;
+    public int[] Kda;
     
     public PlayerData(int loadoutSize)
     {
@@ -65,6 +66,7 @@ public struct PlayerData
         PlayerName = "player";
         MoneyAmount = 60;
         PlayerColor = Color.green;
+        Kda = new int[3];
     }
 
 }
@@ -275,6 +277,7 @@ public class GameManager : NetworkBehaviour
         {
             if (AllPlayersData[i].ClientId == hitClientId)
             {
+                PlayerData myStruct = AllPlayersData[i];
                 //calculate teamIndexOverwrite for self killing.
                 //if shoot himself
                 if (currentClientId == hitClientId)
@@ -288,8 +291,13 @@ public class GameManager : NetworkBehaviour
                         teamIndexOverwrite = 0;
                     }
                 }
+                else
+                {
+                    // Add death when killed by someone instead of by himself.
+                    myStruct.Kda[1] = + 1;
+                }
 
-                PlayerData myStruct = AllPlayersData[i];
+                
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 _playersAlive[AllPlayersData[i].Team] -= 1;
@@ -316,6 +324,9 @@ public class GameManager : NetworkBehaviour
                         if (currentClientId != hitClientId && AllPlayersData[i].Team != AllPlayersData[j].Team)
                         {
                             MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, currentClientId);
+                            PlayerData myStruct = AllPlayersData[i];
+                            myStruct.Kda[0] = + 1;
+                            AllPlayersData[i] = myStruct;
                         }
                     }
                 }
@@ -328,6 +339,7 @@ public class GameManager : NetworkBehaviour
             _roundIsRestarting = true;
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
+        print(AllPlayersData[0].Kda[1]);
     }
 
     [ClientRpc]
@@ -479,6 +491,10 @@ public class GameManager : NetworkBehaviour
         {
             newUser.PlayerColor = new Color(0.1333f, 0.1608f, 0.3098f, 1f);
         }
+        newUser.Kda[0] = 0;
+        newUser.Kda[1] = 0;
+        newUser.Kda[2] = 0;
+
         
         AllPlayersData.Add(newUser);
         _playersAlive[floatIndex % 2] += 1;
