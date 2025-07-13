@@ -14,7 +14,7 @@ public class uiControler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter, timer;
     public Transform trackingTransform;
     public static uiControler Instance;
-    public GameObject canvasWorldSpace, playerNameTextMechProPrephab;
+    public GameObject canvasWorldSpace, playerNameTextMechProPrephab, tabStatisticsMenu, playerInfoTextPrephab;
     public string playerSelectedName = "";
     public TMP_InputField playerNameSelectionInputField;
     
@@ -46,8 +46,58 @@ public class uiControler : NetworkBehaviour
                                  weapon.GetComponent<weaponHandling>()
                                      .bulletCounter;
         ammoCounter.text = $"Bullets: {weapon.GetComponent<weaponHandling>().bulletCount} / {remainingBullets}";
+        
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            OpenTabStatisticsMenuServerRpc();
+            // ShopUiOpen = true;
+        }
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            // ShopUiOpen = false;
+            tabStatisticsMenu.SetActive(false);
+            foreach (Transform child in tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"))
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+            foreach (Transform child in tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"))
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+        } 
     }
     
+    [ServerRpc(RequireOwnership = false)]
+    public void OpenTabStatisticsMenuServerRpc(ServerRpcParams rpcParams = default)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
+        };
+        foreach (var data in GameManager.AllPlayersData)
+        {
+            OpenTabStatisticsMenuClientRpc(data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], clientRpcParams);
+        }
+    }
+
+    [ClientRpc]
+    private void OpenTabStatisticsMenuClientRpc(int team, string playerName, int kills, int deaths, int asitsts, ClientRpcParams clientRpcParams)
+    {
+        if (team == 0)
+        {
+           GameObject createdPlayerTextInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
+           createdPlayerTextInfo.GetComponent<TextMeshProUGUI>().text = $"{playerName} | Kills: {kills}  Deaths: {deaths}";
+
+        }else if (team == 1)
+        {
+            GameObject createdPlayerTextInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"));
+            createdPlayerTextInfo.GetComponent<TextMeshProUGUI>().text = $"{playerName} | Kills: {kills}  Deaths: {deaths}";
+        }
+        if(!tabStatisticsMenu.activeSelf) tabStatisticsMenu.SetActive(true);
+        
+    }
+
     [ClientRpc]
     public void GetHealthForUiClientRpc(int currentHealth, ClientRpcParams clientRpcParams)
     {
@@ -77,12 +127,10 @@ public class uiControler : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void AddNameTagsForEachPlayerServerRpc()
     {
-        print("NameTag ");
         //Posible bandwith improvment:
         //Instade of sending ClientRpc for every player we can send one ClientRpc with list of evry player.
         foreach (var data in GameManager.AllPlayersData)
         {
-            print("adding for " + data.PlayerName);
             AddNameTagsForEachPlayerClientRpc(data.PlayerNetworkObjectReference, data.PlayerName);
         }
     }
