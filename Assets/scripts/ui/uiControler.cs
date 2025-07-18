@@ -77,22 +77,24 @@ public class uiControler : NetworkBehaviour
         };
         foreach (var data in GameManager.AllPlayersData)
         {
-            OpenTabStatisticsMenuClientRpc(data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], clientRpcParams);
+            OpenTabStatisticsMenuClientRpc(data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], data.MoneyAmount, data.Alive, clientRpcParams);
         }
     }
 
     [ClientRpc]
-    private void OpenTabStatisticsMenuClientRpc(int team, string playerName, int kills, int deaths, int asitsts, ClientRpcParams clientRpcParams)
+    private void OpenTabStatisticsMenuClientRpc(int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams)
     {
         if (team == 0)
         {
-           GameObject createdPlayerTextInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
-           createdPlayerTextInfo.GetComponent<TextMeshProUGUI>().text = $"{playerName} | Kills: {kills}  Deaths: {deaths}";
+           GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
+           createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $"{playerName} {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+           if (!isAlive) createdPlayerPanelInfo.GetComponent<Image>().color = Color.red;
+           
 
         }else if (team == 1)
         {
             GameObject createdPlayerTextInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"));
-            createdPlayerTextInfo.GetComponent<TextMeshProUGUI>().text = $"{playerName} | Kills: {kills}  Deaths: {deaths}";
+            createdPlayerTextInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $"{playerName} {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
         }
         if(!tabStatisticsMenu.activeSelf) tabStatisticsMenu.SetActive(true);
         
