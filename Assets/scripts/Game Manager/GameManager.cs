@@ -294,7 +294,7 @@ public class GameManager : NetworkBehaviour
                 else
                 {
                     // Add death when killed by someone instead of by himself.
-                    myStruct.Kda[1] = + 1;
+                    myStruct.Kda[1] += 1;
                 }
 
                 
@@ -319,16 +319,18 @@ public class GameManager : NetworkBehaviour
             {
                 for (int j = 0; j < AllPlayersData.Count; j++)
                 {
-                    if (AllPlayersData[j].ClientId == hitClientId)
-                    {
+                    // Potencial fix to the Kda bug
+                    // if (AllPlayersData[j].ClientId == hitClientId)
+                    // {
                         if (currentClientId != hitClientId && AllPlayersData[i].Team != AllPlayersData[j].Team)
                         {
+                            print("adding Kils");
                             MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, currentClientId);
                             PlayerData myStruct = AllPlayersData[i];
-                            myStruct.Kda[0] = + 1;
+                            myStruct.Kda[0] += 1;
                             AllPlayersData[i] = myStruct;
                         }
-                    }
+                    // }
                 }
             }
         }
@@ -339,7 +341,8 @@ public class GameManager : NetworkBehaviour
             _roundIsRestarting = true;
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
-        print(AllPlayersData[0].Kda[1]);
+        print(AllPlayersData[1].Kda[0]);
+        
     }
 
     [ClientRpc]
