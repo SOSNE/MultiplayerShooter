@@ -87,14 +87,16 @@ public class uiControler : NetworkBehaviour
         if (team == 0)
         {
            GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
-           createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $"{playerName} {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+           createdPlayerPanelInfo.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
+           createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
            if (!isAlive) createdPlayerPanelInfo.GetComponent<Image>().color = Color.red;
            
 
         }else if (team == 1)
         {
-            GameObject createdPlayerTextInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"));
-            createdPlayerTextInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $"{playerName} {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"));
+            createdPlayerPanelInfo.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
+            createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
         }
         if(!tabStatisticsMenu.activeSelf) tabStatisticsMenu.SetActive(true);
         

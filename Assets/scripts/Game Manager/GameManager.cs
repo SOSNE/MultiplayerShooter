@@ -324,7 +324,6 @@ public class GameManager : NetworkBehaviour
                     // {
                         if (currentClientId != hitClientId && AllPlayersData[i].Team != AllPlayersData[j].Team)
                         {
-                            print("adding Kils");
                             MoneyOperationUtils.Instance.UpdatePlayerMoneyAmountServerRpc(300, currentClientId);
                             PlayerData myStruct = AllPlayersData[i];
                             myStruct.Kda[0] += 1;
@@ -341,8 +340,6 @@ public class GameManager : NetworkBehaviour
             _roundIsRestarting = true;
             StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
         }
-        print(AllPlayersData[1].Kda[0]);
-        
     }
 
     [ClientRpc]
