@@ -517,6 +517,7 @@ public class GameManager : NetworkBehaviour
 
         for (int i = 0; i<AllPlayersData.Count;i++)
         {
+            //TODO meyby some of this can be done only for conected game ojbect on evry client. 
             //The following is done for every player that is connected.
             if (AllPlayersData[i].PlayerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
             {
