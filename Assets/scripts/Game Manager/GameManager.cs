@@ -483,7 +483,7 @@ public class GameManager : NetworkBehaviour
             newUser.PlayerName = "player: " + _playerNameCount;
         }
         
-        if (floatIndex % 2 == 0)
+        if (newUser.Team == 0)
         {
             newUser.PlayerColor = new Color(0.2706f, 0.3098f, 0.1333f, 1f);
         }
@@ -515,7 +515,7 @@ public class GameManager : NetworkBehaviour
             SpawnPlayerOnSpawnPointClientRpc(playerGameObject, netObject);
         }
 
-        for (int i =0; i<AllPlayersData.Count;i++)
+        for (int i = 0; i<AllPlayersData.Count;i++)
         {
             //The following is done for every player that is connected.
             if (AllPlayersData[i].PlayerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
