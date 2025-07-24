@@ -59,6 +59,5 @@ public class Utils : NetworkBehaviour
 
         src.PlayOneShot(soundsList[soundListIndex]);
         Destroy(go, soundsList[soundListIndex].length / src.pitch);
-
     }
 }

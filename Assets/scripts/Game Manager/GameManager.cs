@@ -562,7 +562,7 @@ public class GameManager : NetworkBehaviour
     {
         if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
-            FindObjectInHierarchy("AmmoBox").GetComponent<SpriteRenderer>().color = color;
+            playerNetworkObject.transform.Find("bodyDown").Find("AmmoBox").GetComponent<SpriteRenderer>().color = color;
         }
     }
 
