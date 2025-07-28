@@ -3,6 +3,7 @@ using Unity.Netcode;
 using Vector3 = System.Numerics.Vector3;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics.Geometry;
 using UnityEngine.Serialization;
 using UnityEngine.TextCore.Text;
@@ -61,7 +62,7 @@ public class weaponHandling : NetworkBehaviour
             shotDirection= bulletSpawn.right.normalized;
             shotAngle -= 180;
         }
-        
+        WeaponShotArtSystem(shotAngle, gameObject);
         WeaponShotArtSystemServerRpc(shotAngle, gameObject);
         GetComponent<pistolMovment>().PerformRecoil();    
         RaycastHit2D[] hits2D = Physics2D.RaycastAll(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
@@ -78,6 +79,7 @@ public class weaponHandling : NetworkBehaviour
                 data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
 
             }
+            ShootHandlingBulletTracer(data);
             ShootHandlingBulletTracerServerRpc(data);
         }
         foreach (RaycastHit2D hit2D in hits2D)
@@ -136,6 +138,7 @@ public class weaponHandling : NetworkBehaviour
                 {
                     ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
                 }
+                ShootHandlingBulletTracer(data);
                 ShootHandlingBulletTracerServerRpc(data);
                 break;
             }
@@ -143,6 +146,7 @@ public class weaponHandling : NetworkBehaviour
             {
                 ContactData data;
                 data.Position = hit2D.point;
+                ShootHandlingBulletTracer(data);
                 ShootHandlingBulletTracerServerRpc(data);
                 break;
             }
@@ -151,20 +155,31 @@ public class weaponHandling : NetworkBehaviour
     
     [ClientRpc]
     private void ShootHandlingRpcClientRpc(ContactData contactData, ClientRpcParams clientRpcParams = default)
+    { 
+        ShootHandlingBulletTracer(contactData);
+    }
+
+    private void ShootHandlingBulletTracer(ContactData contactData)
     {
-        if (IsHost) return;
-        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
         GameObject lineObject = Instantiate(bulletTracer);
+        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
         StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
     }
     
     [ServerRpc]
-    private void ShootHandlingBulletTracerServerRpc(ContactData contactData,ServerRpcParams serverRpcParams = default)
+    private void ShootHandlingBulletTracerServerRpc(ContactData contactData, ServerRpcParams serverRpcParams = default)
     {
-        GameObject lineObject = Instantiate(bulletTracer);
-        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
-        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
-        ShootHandlingRpcClientRpc(contactData);
+        // Exclude the sender from the ClientRpc
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+                    .Where(id => id != serverRpcParams.Receive.SenderClientId)
+                    .ToList()
+            }
+        };
+        ShootHandlingRpcClientRpc(contactData, clientRpcParams);
     }
     
     [ServerRpc]
@@ -182,11 +197,18 @@ public class weaponHandling : NetworkBehaviour
     [ServerRpc]
     private void WeaponShotArtSystemServerRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ServerRpcParams serverRpcParams = default)
     {
-        // Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
-        // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
-        // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        // Exclude the sender from the ClientRpc
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+                    .Where(id => id != serverRpcParams.Receive.SenderClientId)
+                    .ToList()
+            }
+        };
         ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
-        WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference);
+        WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference, clientRpcParams);
     }
     
     [ClientRpc]
@@ -195,6 +217,15 @@ public class weaponHandling : NetworkBehaviour
         bulletCounter++;
     }
     
+    private void WeaponShotArtSystem(float shotAngle, GameObject weaponGameObject)
+    {
+        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,shotAngle));
+        Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
+        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        
+        Utils.Instance.PlaySound(weaponType,1f, weaponGameObject.transform);
+    }
+
     [ClientRpc]
     private void WeaponShotArtSystemClientRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ClientRpcParams clientRpcParams = default)
     {
@@ -205,7 +236,6 @@ public class weaponHandling : NetworkBehaviour
         
         if (!weaponTargetReference.TryGet(out NetworkObject weaponGameObject)) return;
         Utils.Instance.PlaySound(weaponType,1f, weaponGameObject.transform);
-
     }
     
     struct ContactData : INetworkSerializable
