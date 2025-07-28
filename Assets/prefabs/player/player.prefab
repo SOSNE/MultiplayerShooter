@@ -2470,7 +2470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 168810998
+  GlobalObjectIdHash: 4042147263
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2516,6 +2516,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   camera: {fileID: 1062943222018729907, guid: b9dee91aa6224e446b1be6661f1fd139, type: 3}
   weapon: {fileID: 0}
+  isAlive: 1
   positionsDistance: fdfffffffeffffffffffffff00000000010000000200000003000000
 --- !u!114 &9072768927191672002
 MonoBehaviour:
@@ -3065,7 +3066,7 @@ HingeJoint2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7142451505783588245}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   m_EnableCollision: 0
   m_ConnectedRigidBody: {fileID: 4783747034548855946}

@@ -102,10 +102,10 @@ public class PlayerHhandling : NetworkBehaviour
         // StartCoroutine(PerformPlayerMovementStop(playerTarget));
         // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         // playerTarget.GetComponent<Animator>().Update(1f);
+        StartCoroutine(PerformAnimationStop(playerTarget));
         playerTarget.GetComponent<wlakingAnimation>().enabled = false;
         playerTarget.GetComponent<crouchingAnimation>().enabled = false;
         // EditorApplication.isPaused = true;
-        StartCoroutine(PerformAnimationStop(playerTarget));
         // playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
         playerTarget.GetComponent<Rigidbody2D>().simulated = false;
