@@ -2759,7 +2759,7 @@ MonoBehaviour:
   playerNameTextMechProPrephab: {fileID: 3359497495572045665, guid: da3a0dd18e34e4332a7b883d4583fd56, type: 3}
   tabStatisticsMenu: {fileID: 1089606188}
   playerInfoTextPrephab: {fileID: 4933330846595171338, guid: 5d28fd38df5cf42e6a6b8d1d2dd2f192, type: 3}
-  mainMenu: {fileID: 0}
+  mainMenu: {fileID: 1475118590}
   playerSelectedName: 
   playerNameSelectionInputField: {fileID: 2110249593}
 --- !u!4 &358094115

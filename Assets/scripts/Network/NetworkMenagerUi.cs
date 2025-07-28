@@ -53,7 +53,11 @@ public class NetworkMenagerUi : MonoBehaviour
                     allowFriendlyFireMod.gameObject.SetActive(true);
                 };
                 _startActionHost += () => NetworkManager.Singleton.StartHost();
-                _startActionHost += () => { mainMenu.SetActive(false); };
+                _startActionHost += () =>
+                {
+                    mainMenu.SetActive(false);
+                    uiControler.masterMainMenuOpen = false;
+                };
                 
                 _startActionClient = () =>
                 {
@@ -61,7 +65,11 @@ public class NetworkMenagerUi : MonoBehaviour
                     unityTransport.SetConnectionData(_ip, 7777);
                 };
                 _startActionClient += () => NetworkManager.Singleton.StartClient();
-                _startActionClient += () => { mainMenu.SetActive(false); };
+                _startActionClient += () =>
+                {
+                    mainMenu.SetActive(false);
+                    uiControler.masterMainMenuOpen = false;
+                };
                 
             }
             else
@@ -95,6 +103,7 @@ public class NetworkMenagerUi : MonoBehaviour
         copyCodeButton.gameObject.SetActive(true);
         allowFriendlyFireMod.gameObject.SetActive(true);
         mainMenu.SetActive(false);
+        uiControler.masterMainMenuOpen = false;
         return NetworkManager.Singleton.StartHost() ? _code : null;
     }
     
@@ -109,6 +118,7 @@ public class NetworkMenagerUi : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>()
             .SetRelayServerData(new RelayServerData(allocation, "wss"));
         mainMenu.SetActive(false);
+        uiControler.masterMainMenuOpen = false;
         return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
     }
 }

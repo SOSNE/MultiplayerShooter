@@ -66,11 +66,11 @@ public class uiControler : NetworkBehaviour
                 GameObject.Destroy(child.gameObject);
             }
         } 
-        if (masterMainMenuOpen && Input.GetKeyDown(KeyCode.Escape))
+        if (!masterMainMenuOpen && Input.GetKeyDown(KeyCode.Escape))
         {
             mainMenu.SetActive(true);
         } 
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (!masterMainMenuOpen && Input.GetKeyUp(KeyCode.Escape))
         {
             mainMenu.SetActive(false);
         } 
