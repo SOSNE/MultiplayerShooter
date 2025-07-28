@@ -42,5 +42,4 @@ public class wlakingAnimation : NetworkBehaviour
             playerNetworkObject.GetComponent<Animator>().SetBool("walking", value);
         }
     }
-
 }
