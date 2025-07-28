@@ -15,7 +15,8 @@ public class wlakingAnimation : NetworkBehaviour
     }
     
     
-    void Update()
+    //Temp fix because it wont work if someone will have different fps except of 60. (:
+    void FixedUpdate()
     {
         if (Vector3.Distance(transform.position, lastPosition) > 0.01)
         {
