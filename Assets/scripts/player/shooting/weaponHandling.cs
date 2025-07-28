@@ -62,7 +62,7 @@ public class weaponHandling : NetworkBehaviour
             shotDirection= bulletSpawn.right.normalized;
             shotAngle -= 180;
         }
-        
+        WeaponShotArtSystem(shotAngle, gameObject);
         WeaponShotArtSystemServerRpc(shotAngle, gameObject);
         GetComponent<pistolMovment>().PerformRecoil();    
         RaycastHit2D[] hits2D = Physics2D.RaycastAll(bulletSpawn.position, shotDirection, Mathf.Infinity, layerMask);
@@ -197,12 +197,18 @@ public class weaponHandling : NetworkBehaviour
     [ServerRpc]
     private void WeaponShotArtSystemServerRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ServerRpcParams serverRpcParams = default)
     {
-        // Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,bulletSpawn.eulerAngles.z));
-        // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
-        // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        // Exclude the sender from the ClientRpc
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+                    .Where(id => id != serverRpcParams.Receive.SenderClientId)
+                    .ToList()
+            }
+        };
         ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
-        WeaponShotArtSystem(shotAngle, weaponTargetReference);
-        WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference);
+        WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference, clientRpcParams);
     }
     
     [ClientRpc]
