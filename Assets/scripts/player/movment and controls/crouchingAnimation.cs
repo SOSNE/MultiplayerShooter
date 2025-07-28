@@ -22,6 +22,7 @@ public class crouchingAnimation : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             _crouch = true;
+            ToggleCrouchingMode(_crouch, gameObject);
             // StartCoroutine(DrawLine(_weapon, 0.3f));
             SetWalkServerRpc(_crouch, gameObject);
             
@@ -29,6 +30,7 @@ public class crouchingAnimation : NetworkBehaviour
         else if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             _crouch = false;
+            ToggleCrouchingMode(_crouch, gameObject);
             SetWalkServerRpc(_crouch, gameObject);
         }
         
