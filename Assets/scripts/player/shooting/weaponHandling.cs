@@ -79,6 +79,7 @@ public class weaponHandling : NetworkBehaviour
                 data.Position = bulletSpawn.position + (-bulletSpawn.right.normalized)*40;
 
             }
+            ShootHandlingBulletTracer(data);
             ShootHandlingBulletTracerServerRpc(data);
         }
         foreach (RaycastHit2D hit2D in hits2D)
@@ -137,6 +138,7 @@ public class weaponHandling : NetworkBehaviour
                 {
                     ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
                 }
+                ShootHandlingBulletTracer(data);
                 ShootHandlingBulletTracerServerRpc(data);
                 break;
             }
@@ -144,6 +146,7 @@ public class weaponHandling : NetworkBehaviour
             {
                 ContactData data;
                 data.Position = hit2D.point;
+                ShootHandlingBulletTracer(data);
                 ShootHandlingBulletTracerServerRpc(data);
                 break;
             }
@@ -206,7 +209,7 @@ public class weaponHandling : NetworkBehaviour
     {
         bulletCounter++;
     }
-    
+
     [ClientRpc]
     private void WeaponShotArtSystemClientRpc(float shotAngle, NetworkObjectReference weaponTargetReference, ClientRpcParams clientRpcParams = default)
     {
