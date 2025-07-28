@@ -201,6 +201,7 @@ public class weaponHandling : NetworkBehaviour
         // Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         // shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
         ClientRpcNotifyClientClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new [] { serverRpcParams.Receive.SenderClientId } } });
+        WeaponShotArtSystem(shotAngle, weaponTargetReference);
         WeaponShotArtSystemClientRpc(shotAngle, weaponTargetReference);
     }
     
@@ -208,6 +209,15 @@ public class weaponHandling : NetworkBehaviour
     private void ClientRpcNotifyClientClientRpc(ClientRpcParams clientRpcParams = default)
     {
         bulletCounter++;
+    }
+    
+    private void WeaponShotArtSystem(float shotAngle, GameObject weaponGameObject)
+    {
+        Transform shootParticle = Instantiate(shootParticleParticleSystem, bulletSpawn.position, Quaternion.Euler(0f,0f,shotAngle));
+        Vector2 velocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
+        shootParticle.GetComponent<Rigidbody2D>().linearVelocity = velocity*4;
+        
+        Utils.Instance.PlaySound(weaponType,1f, weaponGameObject.transform);
     }
 
     [ClientRpc]
@@ -220,7 +230,6 @@ public class weaponHandling : NetworkBehaviour
         
         if (!weaponTargetReference.TryGet(out NetworkObject weaponGameObject)) return;
         Utils.Instance.PlaySound(weaponType,1f, weaponGameObject.transform);
-
     }
     
     struct ContactData : INetworkSerializable
