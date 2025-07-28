@@ -3,6 +3,7 @@ using Unity.Netcode;
 using Vector3 = System.Numerics.Vector3;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics.Geometry;
 using UnityEngine.Serialization;
 using UnityEngine.TextCore.Text;
@@ -151,20 +152,31 @@ public class weaponHandling : NetworkBehaviour
     
     [ClientRpc]
     private void ShootHandlingRpcClientRpc(ContactData contactData, ClientRpcParams clientRpcParams = default)
+    { 
+        ShootHandlingBulletTracer(contactData);
+    }
+
+    private void ShootHandlingBulletTracer(ContactData contactData)
     {
-        if (IsHost) return;
-        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
         GameObject lineObject = Instantiate(bulletTracer);
+        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
         StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
     }
     
     [ServerRpc]
-    private void ShootHandlingBulletTracerServerRpc(ContactData contactData,ServerRpcParams serverRpcParams = default)
+    private void ShootHandlingBulletTracerServerRpc(ContactData contactData, ServerRpcParams serverRpcParams = default)
     {
-        GameObject lineObject = Instantiate(bulletTracer);
-        float speed = Vector2.Distance(bulletSpawn.position, contactData.Position) / bulletSpeed;
-        StartCoroutine(DrawLine(lineObject,bulletSpawn.position, contactData.Position, speed));
-        ShootHandlingRpcClientRpc(contactData);
+        // Exclude the sender from the ClientRpc
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+                    .Where(id => id != serverRpcParams.Receive.SenderClientId)
+                    .ToList()
+            }
+        };
+        ShootHandlingRpcClientRpc(contactData, clientRpcParams);
     }
     
     [ServerRpc]
