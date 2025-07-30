@@ -16,6 +16,7 @@ public class NetworkMenagerUi : MonoBehaviour
     private NetworkManager networkManager;
     private string _ip = "127.0.0.1", _code;
     private Action _startActionHost, _startActionClient;
+    public GameObject mainMenu; 
     
     public void OnInputIp(string ipAddress)
     {
@@ -52,6 +53,11 @@ public class NetworkMenagerUi : MonoBehaviour
                     allowFriendlyFireMod.gameObject.SetActive(true);
                 };
                 _startActionHost += () => NetworkManager.Singleton.StartHost();
+                _startActionHost += () =>
+                {
+                    mainMenu.SetActive(false);
+                    uiControler.masterMainMenuOpen = false;
+                };
                 
                 _startActionClient = () =>
                 {
@@ -59,6 +65,11 @@ public class NetworkMenagerUi : MonoBehaviour
                     unityTransport.SetConnectionData(_ip, 7777);
                 };
                 _startActionClient += () => NetworkManager.Singleton.StartClient();
+                _startActionClient += () =>
+                {
+                    mainMenu.SetActive(false);
+                    uiControler.masterMainMenuOpen = false;
+                };
                 
             }
             else
@@ -91,6 +102,8 @@ public class NetworkMenagerUi : MonoBehaviour
         Utils.Instance.CopyText(_code);
         copyCodeButton.gameObject.SetActive(true);
         allowFriendlyFireMod.gameObject.SetActive(true);
+        mainMenu.SetActive(false);
+        uiControler.masterMainMenuOpen = false;
         return NetworkManager.Singleton.StartHost() ? _code : null;
     }
     
@@ -104,7 +117,8 @@ public class NetworkMenagerUi : MonoBehaviour
         var allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
         NetworkManager.Singleton.GetComponent<UnityTransport>()
             .SetRelayServerData(new RelayServerData(allocation, "wss"));
-
+        mainMenu.SetActive(false);
+        uiControler.masterMainMenuOpen = false;
         return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
     }
 }

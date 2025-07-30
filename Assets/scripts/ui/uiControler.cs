@@ -14,9 +14,10 @@ public class uiControler : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI hpCounter, moneyCounter, timer;
     public Transform trackingTransform;
     public static uiControler Instance;
-    public GameObject canvasWorldSpace, playerNameTextMechProPrephab, tabStatisticsMenu, playerInfoTextPrephab;
+    public GameObject canvasWorldSpace, playerNameTextMechProPrephab, tabStatisticsMenu, playerInfoTextPrephab, mainMenu;
     public string playerSelectedName = "";
     public TMP_InputField playerNameSelectionInputField;
+    public static bool masterMainMenuOpen = true;
     
     private void Awake()
     {
@@ -64,7 +65,14 @@ public class uiControler : NetworkBehaviour
             {
                 GameObject.Destroy(child.gameObject);
             }
-
+        } 
+        if (!masterMainMenuOpen && Input.GetKeyDown(KeyCode.Escape))
+        {
+            mainMenu.SetActive(true);
+        } 
+        if (!masterMainMenuOpen && Input.GetKeyUp(KeyCode.Escape))
+        {
+            mainMenu.SetActive(false);
         } 
     }
     
