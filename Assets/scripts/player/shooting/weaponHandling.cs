@@ -132,10 +132,12 @@ public class weaponHandling : NetworkBehaviour
                     GetRootParent(hit2D.transform).GetComponent<NetworkObject>());
                 if (transform.parent.localScale.x < 0 || transform.parent.localScale.y < 0 || transform.parent.localScale.z < 0)
                 {
+                    ShootHandlingBlood(gameObject, data, transform.localRotation.eulerAngles.z);
                     ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z);
                 }
                 else
                 {
+                    ShootHandlingBlood(gameObject, data, transform.localRotation.eulerAngles.z - 180);
                     ShootHandlingBloodServerRpc(netObject, data, transform.localRotation.eulerAngles.z - 180);
                 }
                 ShootHandlingBulletTracer(data);
@@ -185,13 +187,33 @@ public class weaponHandling : NetworkBehaviour
     [ServerRpc]
     private void ShootHandlingBloodServerRpc(NetworkObjectReference playerGameObject,ContactData contactData, float transformEulerAnglesZ, ServerRpcParams serverRpcParams = default)
     {
+        // Exclude the sender from the ClientRpc
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+                    .Where(id => id != serverRpcParams.Receive.SenderClientId)
+                    .ToList()
+            }
+        };
+        ShootHandlingBloodClientRpc(playerGameObject, contactData, transformEulerAnglesZ, clientRpcParams);
+    }
+    
+    [ClientRpc]
+    private void ShootHandlingBloodClientRpc(NetworkObjectReference playerGameObject,ContactData contactData, float transformEulerAnglesZ, ClientRpcParams serverRpcParams = default)
+    {
         if (playerGameObject.TryGet(out NetworkObject networkObject))
         {
-            Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transformEulerAnglesZ)).transform;
-            blood.GetComponent<NetworkObject>().Spawn(true);
-            blood.rotation = Quaternion.Euler(0f, 0f, transformEulerAnglesZ);
-            blood.SetParent(networkObject.transform);
+            ShootHandlingBlood(networkObject.gameObject, contactData, transformEulerAnglesZ);
         }
+    }
+
+    private void ShootHandlingBlood(GameObject playerGameObject, ContactData contactData, float transformEulerAnglesZ)
+    {
+        Transform blood = Instantiate(bloodParticleSystem, contactData.Position, Quaternion.Euler(0f,0f,transformEulerAnglesZ)).transform;
+        blood.rotation = Quaternion.Euler(0f, 0f, transformEulerAnglesZ);
+        blood.SetParent(playerGameObject.transform);
     }
     
     [ServerRpc]
