@@ -87,6 +87,7 @@ public class pistolMovment : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (!camera) return;
+        if (uiControler.anyMenuIsOpen) return;
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
         

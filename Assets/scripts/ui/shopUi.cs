@@ -27,10 +27,12 @@ public class shopUi : NetworkBehaviour
         {
             shopPanel.SetActive(true);
             ShopUiOpen = true;
+            uiControler.anyMenuIsOpen = true;
         }
         if (Input.GetKeyUp(KeyCode.B))
         {
             ShopUiOpen = false;
+            uiControler.anyMenuIsOpen = false;
             shopPanel.SetActive(false);
         } 
         

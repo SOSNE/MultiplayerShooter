@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class uiControler : NetworkBehaviour
 {
-
     public AudioMixer mixer;
     public Scrollbar volumeScrollbar;
     public TextMeshProUGUI ammoCounter;
@@ -17,7 +16,7 @@ public class uiControler : NetworkBehaviour
     public GameObject canvasWorldSpace, playerNameTextMechProPrephab, tabStatisticsMenu, playerInfoTextPrephab, mainMenu;
     public string playerSelectedName = "";
     public TMP_InputField playerNameSelectionInputField;
-    public static bool masterMainMenuOpen = true;
+    public static bool masterMainMenuOpen = true, anyMenuIsOpen = true;
     
     private void Awake()
     {
@@ -69,10 +68,12 @@ public class uiControler : NetworkBehaviour
         if (!masterMainMenuOpen && Input.GetKeyDown(KeyCode.Escape))
         {
             mainMenu.SetActive(true);
+            anyMenuIsOpen = true;
         } 
         if (!masterMainMenuOpen && Input.GetKeyUp(KeyCode.Escape))
         {
             mainMenu.SetActive(false);
+            anyMenuIsOpen = false;
         } 
     }
     
@@ -106,8 +107,11 @@ public class uiControler : NetworkBehaviour
             createdPlayerPanelInfo.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
             createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
         }
-        if(!tabStatisticsMenu.activeSelf) tabStatisticsMenu.SetActive(true);
-        
+
+        if (!tabStatisticsMenu.activeSelf)
+        {
+            tabStatisticsMenu.SetActive(true);
+        }
     }
 
     [ClientRpc]

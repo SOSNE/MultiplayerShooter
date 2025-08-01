@@ -20,6 +20,7 @@ public class crouchingAnimation : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
+        if (uiControler.anyMenuIsOpen) return;
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             _crouch = true;

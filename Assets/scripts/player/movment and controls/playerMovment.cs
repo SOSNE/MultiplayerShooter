@@ -14,23 +14,20 @@ public class playerMovment : NetworkBehaviour
     public Vector3 _weaponStartScale;
 
     void Start()
-    { 
+    {
         // _camera = Camera.main;
-        
     }
     
     private Quaternion _targetRotation;
     private float _timer;
     bool _rotateFlag = true;
     
-    
-    
     void Update()
     {
         if (!IsOwner) return;
         if (!camera) return;
+        if (uiControler.anyMenuIsOpen) return;
         if (weapon && _weaponStartScale == Vector3.zero)  _weaponStartScale = weapon.localScale;
-        
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
@@ -64,7 +61,6 @@ public class playerMovment : NetworkBehaviour
         {
             _rb.linearVelocity = new Vector2(0, jumpHeight);
         }
-        
         
         if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space)) && _goUp )
         { 

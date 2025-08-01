@@ -57,6 +57,7 @@ public class NetworkMenagerUi : MonoBehaviour
                 {
                     mainMenu.SetActive(false);
                     uiControler.masterMainMenuOpen = false;
+                    uiControler.anyMenuIsOpen = false;
                 };
                 
                 _startActionClient = () =>
@@ -69,6 +70,8 @@ public class NetworkMenagerUi : MonoBehaviour
                 {
                     mainMenu.SetActive(false);
                     uiControler.masterMainMenuOpen = false;
+                    uiControler.anyMenuIsOpen = false;
+
                 };
                 
             }
@@ -104,6 +107,8 @@ public class NetworkMenagerUi : MonoBehaviour
         allowFriendlyFireMod.gameObject.SetActive(true);
         mainMenu.SetActive(false);
         uiControler.masterMainMenuOpen = false;
+        uiControler.anyMenuIsOpen = false;
+
         return NetworkManager.Singleton.StartHost() ? _code : null;
     }
     
@@ -119,6 +124,7 @@ public class NetworkMenagerUi : MonoBehaviour
             .SetRelayServerData(new RelayServerData(allocation, "wss"));
         mainMenu.SetActive(false);
         uiControler.masterMainMenuOpen = false;
+        uiControler.anyMenuIsOpen = false;
         return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
     }
 }

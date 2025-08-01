@@ -25,6 +25,7 @@ public class weaponHandling : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
+        if (uiControler.anyMenuIsOpen) return;
         
         // float shotAngle = transform.rotation.eulerAngles.z;
         if(shopUi.ShopUiOpen) return;

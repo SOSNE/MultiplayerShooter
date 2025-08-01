@@ -31,6 +31,7 @@ public class reloading : NetworkBehaviour
     void Update()
     {
         if(!IsOwner) return;
+        if (uiControler.anyMenuIsOpen) return;
         float currentMagazineCount = GetComponent<weaponHandling>().bulletCounter;
         if (Input.GetKeyDown(KeyCode.R) && !_isCoroutineRunning && currentMagazineCount != 0)
         {
