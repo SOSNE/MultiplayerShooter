@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class bloodParticleSystem : MonoBehaviour
@@ -15,8 +16,8 @@ public class bloodParticleSystem : MonoBehaviour
         time += Time.deltaTime;
         if (time > 0.3f)
         {
-            //This canot be destroyed becouse it is spawned over network.
             system.Stop();
+            Destroy(gameObject);
         }
     }
 }

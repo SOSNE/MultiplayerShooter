@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8501120525867535624}
   - component: {fileID: 4925957428363467062}
   - component: {fileID: 968839859977911187}
-  - component: {fileID: 4258232709318382541}
   m_Layer: 0
   m_Name: Blood
   m_TagString: Untagged
@@ -4906,24 +4905,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b698e18ad585d4bf9a807bf956e2f16b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4258232709318382541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4859937811184405544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 454493986
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
