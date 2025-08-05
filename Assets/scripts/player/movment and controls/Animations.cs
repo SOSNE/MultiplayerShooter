@@ -22,7 +22,7 @@ public class Animations : NetworkBehaviour
     {
         lastPosition = transform.position;
     }
-    private string _animationState;
+    private string _animationTrigger;
     void Update()
     {
         if (!IsOwner) return;
@@ -63,6 +63,7 @@ public class Animations : NetworkBehaviour
         }
         else if(Input.GetKey(KeyCode.LeftShift))
         { 
+            //"crouch"
             ToggleCrouchingMode(true, gameObject);
             SetCrouchServerRpc(true, gameObject);
         }
@@ -76,8 +77,20 @@ public class Animations : NetworkBehaviour
             ToggleAnimationMode("idle", gameObject);
             ToggleAnimationModeServerRpc("idle", gameObject);
         }
-        GetComponent<Animator>().Play(_animationState);
 
+        ResetAllAnimationTriggers(_animationTrigger);
+        GetComponent<Animator>().SetTrigger(_animationTrigger);
+    }
+
+    private void ResetAllAnimationTriggers(string resetException)
+    {
+        foreach (AnimatorControllerParameter param in GetComponent<Animator>().parameters)
+        {
+            if (param.type == AnimatorControllerParameterType.Trigger && resetException != param.name)
+            {
+                GetComponent<Animator>().ResetTrigger(param.name);
+            }
+        }
     }
     
     // Temp fix bessscause it wont work if someone will have different fps except of 60. (:
@@ -122,7 +135,7 @@ public class Animations : NetworkBehaviour
     
      private void ToggleCrouchingMode(bool value, GameObject target)
      {
-         _animationState = "crouch";
+         _animationTrigger = "crouch";
          if (value)
          {
              target.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.02604413f, 0.1193484f);
@@ -150,35 +163,35 @@ public class Animations : NetworkBehaviour
      }
     
     
-     [ServerRpc]
-     void ToggleJumpingModeServerRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverRpcParams = default) {
-         
-         // Exclude the sender from the ClientRpc
-         ClientRpcParams clientRpcParams = new ClientRpcParams
-         {
-             Send = new ClientRpcSendParams
-             {
-                 TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
-                     .Where(id => id != serverRpcParams.Receive.SenderClientId)
-                     .ToList()
-             }
-         };
-         
-         ToggleJumpingModeClientRpc(value, playerNetworkObjectReference, clientRpcParams);
-     }
-    
-     [ClientRpc]
-     void ToggleJumpingModeClientRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ClientRpcParams clientRpcParams = default) {
-         if(playerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
-         {
-             ToggleJumpingMode(value, playerNetworkObject.gameObject);
-         }
-     }
-    
-     private void ToggleJumpingMode(bool value, GameObject target)
-     {
-         _animationState = "jump";
-     }
+     // [ServerRpc]
+     // void ToggleJumpingModeServerRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverRpcParams = default) {
+     //     
+     //     // Exclude the sender from the ClientRpc
+     //     ClientRpcParams clientRpcParams = new ClientRpcParams
+     //     {
+     //         Send = new ClientRpcSendParams
+     //         {
+     //             TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
+     //                 .Where(id => id != serverRpcParams.Receive.SenderClientId)
+     //                 .ToList()
+     //         }
+     //     };
+     //     
+     //     ToggleJumpingModeClientRpc(value, playerNetworkObjectReference, clientRpcParams);
+     // }
+     //
+     // [ClientRpc]
+     // void ToggleJumpingModeClientRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ClientRpcParams clientRpcParams = default) {
+     //     if(playerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
+     //     {
+     //         ToggleJumpingMode(value, playerNetworkObject.gameObject);
+     //     }
+     // }
+     //
+     // private void ToggleJumpingMode(bool value, GameObject target)
+     // {
+     //     _animationTrigger = "jump";
+     // }
      
      [ServerRpc]
      void ToggleAnimationModeServerRpc(string value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverRpcParams = default) {
@@ -206,6 +219,6 @@ public class Animations : NetworkBehaviour
     
      private void ToggleAnimationMode(string value, GameObject target)
      {
-         _animationState = value;
+         _animationTrigger = value;
      }
 }
