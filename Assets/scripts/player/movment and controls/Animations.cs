@@ -22,11 +22,11 @@ public class Animations : NetworkBehaviour
     {
         lastPosition = transform.position;
     }
-    private string _animationTrigger;
+
     void Update()
     {
         if (!IsOwner) return;
-        if (uiControler.anyMenuIsOpen) return;
+        // if (uiControler.anyMenuIsOpen) return;
         
         if (!GetComponent<playerMovment>().grounded)
         {
@@ -49,9 +49,6 @@ public class Animations : NetworkBehaviour
             ToggleAnimationMode("idle", gameObject);
             ToggleAnimationModeServerRpc("idle", gameObject);
         }
-
-        ResetAllAnimationTriggers(_animationTrigger);
-        GetComponent<Animator>().SetTrigger(_animationTrigger);
     }
 
     private void ResetAllAnimationTriggers(string resetException)
@@ -92,7 +89,8 @@ public class Animations : NetworkBehaviour
     
      private void ToggleCrouchingMode(bool value, GameObject target)
      {
-         _animationTrigger = "crouch";
+         ResetAllAnimationTriggers("crouch");
+         GetComponent<Animator>().SetTrigger("crouch");
          if (value)
          {
              target.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.02604413f, 0.1193484f);
@@ -145,6 +143,7 @@ public class Animations : NetworkBehaviour
     
      private void ToggleAnimationMode(string value, GameObject target)
      {
-         _animationTrigger = value;
+         ResetAllAnimationTriggers(value);
+         GetComponent<Animator>().SetTrigger(value);
      }
 }
