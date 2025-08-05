@@ -2045,9 +2045,6 @@ PrefabInstance:
       addedObject: {fileID: 5991272012275825472}
     - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3447894650520491094}
-    - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1541486162962915160}
     - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
@@ -2057,7 +2054,7 @@ PrefabInstance:
       addedObject: {fileID: 8373251539412687381}
     - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4900007992998673341}
+      addedObject: {fileID: 2849855882673767198}
     - targetCorrespondingSourceObject: {fileID: 386791141387813222, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4783747034548855946}
@@ -2538,6 +2535,9 @@ MonoBehaviour:
   weapon: {fileID: 0}
   camera: {fileID: 0}
   _weaponStartScale: {x: 0, y: 0, z: 0}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!50 &1799989168919453944
 Rigidbody2D:
   serializedVersion: 5
@@ -2670,19 +2670,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.2991296, y: 1}
   m_EdgeRadius: 0
---- !u!114 &3447894650520491094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3477146210293715247}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 517b74e59da26d848a8a089ee400d5fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &1541486162962915160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2760,7 +2747,7 @@ MonoBehaviour:
   - {fileID: 5531579935365831119}
   - {fileID: 8191098557831887270}
   - {fileID: 4187609698820619193}
---- !u!114 &4900007992998673341
+--- !u!114 &2849855882673767198
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2769,11 +2756,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3477146210293715247}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85df67215d331fa43a48f4e28f8fdeb5, type: 3}
+  m_Script: {fileID: 11500000, guid: fd03865220f2849ea9177511a2b94752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  _weapon: {fileID: 0}
   turnToIdleInstantlyDone: 0
 --- !u!1 &3672872067797742068 stripped
 GameObject:

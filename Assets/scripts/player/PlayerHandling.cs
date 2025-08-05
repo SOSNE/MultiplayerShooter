@@ -102,9 +102,9 @@ public class PlayerHhandling : NetworkBehaviour
         // StartCoroutine(PerformPlayerMovementStop(playerTarget));
         // playerTarget.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         // playerTarget.GetComponent<Animator>().Update(1f);
+        //TODO set it to only check crouching.
         StartCoroutine(PerformAnimationStop(playerTarget));
-        playerTarget.GetComponent<wlakingAnimation>().enabled = false;
-        playerTarget.GetComponent<crouchingAnimation>().enabled = false;
+        playerTarget.GetComponent<Animations>().enabled = false;
         // EditorApplication.isPaused = true;
         // playerTarget.GetComponent<Animator>().enabled = false;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = false;
@@ -125,11 +125,11 @@ public class PlayerHhandling : NetworkBehaviour
 
     IEnumerator PerformAnimationStop(Transform playerTarget)
     {
-        yield return new WaitUntil(() => playerTarget.GetComponent<crouchingAnimation>().turnToIdleInstantlyDone);
+        yield return new WaitUntil(() => playerTarget.GetComponent<Animations>().turnToIdleInstantlyDone);
         yield return new WaitForEndOfFrame(); 
         
         playerTarget.GetComponent<Animator>().enabled = false;
-        playerTarget.GetComponent<crouchingAnimation>().turnToIdleInstantlyDone = false;
+        playerTarget.GetComponent<Animations>().turnToIdleInstantlyDone = false;
     }
     IEnumerator PerformPlayerMovementStop(Transform playerTarget)
     {
@@ -159,8 +159,7 @@ public class PlayerHhandling : NetworkBehaviour
         // var velocityToPass = playerTarget.GetComponent<Rigidbody2D>().linearVelocity;
         playerTarget.GetComponent<Rigidbody2D>().simulated = true;
         playerTarget.GetComponent<CapsuleCollider2D>().enabled = true;
-        playerTarget.GetComponent<wlakingAnimation>().enabled = true;
-        playerTarget.GetComponent<crouchingAnimation>().enabled = true;
+        playerTarget.GetComponent<Animations>().enabled = true;
         SetLayerRecursively(bodyDown.gameObject, 10);
         bodyDown.GetComponent<Rigidbody2D>().simulated = false;
         

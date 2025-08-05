@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 
 public class playerMovment : NetworkBehaviour
 {
@@ -9,9 +12,11 @@ public class playerMovment : NetworkBehaviour
     [SerializeField] private float ladderSpeed;
     public Transform centerOfPlayer, weapon;
     private Rigidbody2D _rb;
-    private bool _grounded, _goUp;
+    public bool grounded, goUp;
     public Camera camera;
     public Vector3 _weaponStartScale;
+    public LayerMask groundMask;
+
 
     void Start()
     {
@@ -28,6 +33,12 @@ public class playerMovment : NetworkBehaviour
         if (!camera) return;
         if (uiControler.anyMenuIsOpen) return;
         if (weapon && _weaponStartScale == Vector3.zero)  _weaponStartScale = weapon.localScale;
+        
+        // check grounded
+        float height = GetComponent<Collider2D>().bounds.size.y;
+        Vector2 raycastTransformPosition = new Vector2(transform.position.x, transform.position.y - height / 2f); 
+        grounded = Physics2D.Raycast(raycastTransformPosition, Vector2.down, 0.01f, groundMask).collider;
+        
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         Vector3 mouseWorldPosition = camera.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, camera.nearClipPlane));
@@ -57,23 +68,23 @@ public class playerMovment : NetworkBehaviour
         
         _rb = GetComponent<Rigidbody2D>();
         
-        if (Input.GetKeyDown(KeyCode.Space) && _grounded )
+        if (Input.GetKeyDown(KeyCode.Space) && grounded )
         {
             _rb.linearVelocity = new Vector2(0, jumpHeight);
         }
         
-        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space)) && _goUp )
+        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.Space)) && goUp )
         { 
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
             _rb.linearVelocity = new Vector2(0, ladderSpeed);
             _rb.linearDamping = 18;
         }
-        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.LeftControl)) && _goUp && !_grounded)
+        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.LeftControl)) && goUp && !grounded)
         {
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
             _rb.linearVelocity = new Vector2(0, -ladderSpeed/4);
         }
-        else if(_goUp)
+        else if(goUp)
         {
             _rb.constraints |= RigidbodyConstraints2D.FreezePositionY;
             _rb.linearDamping = 18;
@@ -83,7 +94,7 @@ public class playerMovment : NetworkBehaviour
             _rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
         }
         
-        if (!_grounded && !_goUp)
+        if (!grounded && !goUp)
         {
             _rb.linearDamping = 0;
         }
@@ -97,12 +108,14 @@ public class playerMovment : NetworkBehaviour
             _rb.linearVelocity = new Vector2(-movementSpeed, GetComponent<Rigidbody2D>().linearVelocity.y);
         }
     }
+    
+    
 
     private void FixedUpdate()
     {
         _rb = GetComponent<Rigidbody2D>();
         
-        if (!_grounded && !_goUp)
+        if (!grounded && !goUp)
         {
             _rb.linearDamping = 0;
         }
@@ -112,26 +125,28 @@ public class playerMovment : NetworkBehaviour
         }
     }
 
-    private void OnCollisionStay2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("ground"))
-        {
-            _grounded = true;
-        }
-    }
+    // private void OnCollisionStay2D(Collision2D other)
+    // {
+    //     if (other.gameObject.CompareTag("ground"))
+    //     {
+    //         Grounded = true;
+    //         ToggleJumpingMode(false, gameObject);
+    //         ToggleJumpingModeServerRpc(false, gameObject);
+    //     }
+    // }
     
-    private void OnCollisionExit2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("ground"))
-        {
-            _grounded = false;
-        }
-    }
+    // private void OnCollisionExit2D(Collision2D other)
+    // {
+    //     if (other.gameObject.CompareTag("ground"))
+    //     {
+    //         Grounded = false;
+    //     }
+    // }
     private void OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("ladder"))
         {
-            _goUp = true;
+            goUp = true;
         }
     }
     
@@ -139,7 +154,7 @@ public class playerMovment : NetworkBehaviour
     {
         if (other.gameObject.CompareTag("ladder"))
         {
-            _goUp = false;
+            goUp = false;
         }
     }
     
