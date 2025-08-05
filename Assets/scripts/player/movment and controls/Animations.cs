@@ -67,7 +67,7 @@ public class Animations : NetworkBehaviour
             ToggleCrouchingMode(true, gameObject);
             SetCrouchServerRpc(true, gameObject);
         }
-        else if (GetComponent<Rigidbody2D>().linearVelocity.sqrMagnitude > 0.01f)
+        else if (Mathf.Abs(GetComponent<Rigidbody2D>().linearVelocity.x) > 0.01f)
         {
             ToggleAnimationMode("walk", gameObject);
             ToggleAnimationModeServerRpc("walk", gameObject);
