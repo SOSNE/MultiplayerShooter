@@ -27,35 +27,7 @@ public class Animations : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (uiControler.anyMenuIsOpen) return;
-        // if (Input.GetKeyDown(KeyCode.LeftShift))
-        // {
-        //     _crouch = true;
-        //     ToggleCrouchingMode(_crouch, gameObject);
-        //     // StartCoroutine(DrawLine(_weapon, 0.3f));
-        //     SetCrouchServerRpc(_crouch, gameObject);
-        //     
-        // }
-        // else if (Input.GetKeyUp(KeyCode.LeftShift))
-        // {
-        //     _crouch = false;
-        //     ToggleCrouchingMode(_crouch, gameObject);
-        //     SetCrouchServerRpc(_crouch, gameObject);
-        // }
-        //
-        //
-        // if (!GetComponent<playerMovment>().grounded)
-        // {
-        //     ToggleJumpingMode(true, gameObject);
-        //     ToggleJumpingModeServerRpc(true, gameObject);
-        // }
-        // else if (GetComponent<playerMovment>().grounded)
-        // {
-        //     ToggleJumpingMode(false, gameObject);
-        //     ToggleJumpingModeServerRpc(false, gameObject);
-        // }
         
-        
-
         if (!GetComponent<playerMovment>().grounded)
         {
             ToggleAnimationMode("jump", gameObject);
@@ -92,21 +64,6 @@ public class Animations : NetworkBehaviour
             }
         }
     }
-    
-    // Temp fix bessscause it wont work if someone will have different fps except of 60. (:
-     // void FixedUpdate()
-     // {
-     //     if (!Input.GetKey(KeyCode.Space)&& GetComponent<playerMovment>().grounded && Vector3.Distance(transform.position, lastPosition) > 0.01)
-     //     {
-     //         gameObject.GetComponent<Animator>().SetBool("walking", true);
-     //     }
-     //     else
-     //     {
-     //         gameObject.GetComponent<Animator>().SetBool("walking", false);
-     //     }
-     //     lastPosition = transform.position;
-     //     // SetWalkServerRpc(_walk, gameObject);
-     // }
     
      [ServerRpc]
      void SetCrouchServerRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverrpcParams = default) {
@@ -161,37 +118,6 @@ public class Animations : NetworkBehaviour
              playerNetworkObject.GetComponent<Animations>().turnToIdleInstantlyDone = true;
          }
      }
-    
-    
-     // [ServerRpc]
-     // void ToggleJumpingModeServerRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverRpcParams = default) {
-     //     
-     //     // Exclude the sender from the ClientRpc
-     //     ClientRpcParams clientRpcParams = new ClientRpcParams
-     //     {
-     //         Send = new ClientRpcSendParams
-     //         {
-     //             TargetClientIds = NetworkManager.Singleton.ConnectedClientsIds
-     //                 .Where(id => id != serverRpcParams.Receive.SenderClientId)
-     //                 .ToList()
-     //         }
-     //     };
-     //     
-     //     ToggleJumpingModeClientRpc(value, playerNetworkObjectReference, clientRpcParams);
-     // }
-     //
-     // [ClientRpc]
-     // void ToggleJumpingModeClientRpc(bool value, NetworkObjectReference playerNetworkObjectReference, ClientRpcParams clientRpcParams = default) {
-     //     if(playerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
-     //     {
-     //         ToggleJumpingMode(value, playerNetworkObject.gameObject);
-     //     }
-     // }
-     //
-     // private void ToggleJumpingMode(bool value, GameObject target)
-     // {
-     //     _animationTrigger = "jump";
-     // }
      
      [ServerRpc]
      void ToggleAnimationModeServerRpc(string value, NetworkObjectReference playerNetworkObjectReference, ServerRpcParams serverRpcParams = default) {
