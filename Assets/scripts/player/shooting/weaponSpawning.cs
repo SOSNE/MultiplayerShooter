@@ -84,7 +84,7 @@ public class weaponSpawning : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void PerformWeaponSetupClientRpc(NetworkObjectReference targetPlayer, NetworkObjectReference weaponNetworkObjectReference)
+    private void PerformWeaponSetupClientRpc(NetworkObjectReference targetPlayer, NetworkObjectReference weaponNetworkObjectReference, int weaponIndex)
     {
         
         if (targetPlayer.TryGet(out NetworkObject playerNetworkObject))
@@ -109,8 +109,13 @@ public class weaponSpawning : NetworkBehaviour
                 
                 if (targetTransform.localScale.x < 0 || targetTransform.localScale.y < 0 || targetTransform.localScale.z < 0)
                 {
-                    createdWeapon.localScale = new Vector3(-createdWeapon.localScale.x, createdWeapon.localScale.y,
-                        createdWeapon.localScale.z);
+                    createdWeapon.localScale = new Vector3(-weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
+                        weapons[weaponIndex].localScale.z);
+                }
+                else
+                {
+                    createdWeapon.localScale = new Vector3(weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
+                        weapons[weaponIndex].localScale.z);
                 }
                 
                 targetTransform.GetComponent<GameManager>().weapon = createdWeapon.gameObject;
@@ -173,20 +178,20 @@ public class weaponSpawning : NetworkBehaviour
             Transform targetTransform = playerNetworkObject.transform;
             Transform weapon = weapons[weaponToSpawnIndex];
             Transform createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
-            
+
             NetworkObject networkObject = createdWeapon.GetComponent<NetworkObject>();
             NetworkObject parentNetworkObject = targetTransform.GetComponent<NetworkObject>();
         
             networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
             createdWeapon.transform.SetParent(targetTransform);
-            PerformWeaponSetupClientRpc(targetPlayer, createdWeapon.gameObject);
+            PerformWeaponSetupClientRpc(targetPlayer, createdWeapon.gameObject, weaponToSpawnIndex);
             foreach (var data in GameManager.AllPlayersData)
             {
                 //Find weapon that is already created at clint.
                 if (!data.PlayerNetworkObjectReference.TryGet(out NetworkObject playerNetworkObjectForEachPlayer)) return;
                 if (playerNetworkObjectForEachPlayer.gameObject == gameObject) return;
                 GameObject weaponOfThisPlayer = GetChildWithTag(playerNetworkObjectForEachPlayer.transform, "weapon").gameObject;
-                PerformWeaponSetupClientRpc(data.PlayerNetworkObjectReference, weaponOfThisPlayer);
+                PerformWeaponSetupClientRpc(data.PlayerNetworkObjectReference, weaponOfThisPlayer, weaponToSpawnIndex);
             }
         }
     }
