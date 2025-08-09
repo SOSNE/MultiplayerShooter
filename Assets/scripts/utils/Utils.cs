@@ -60,4 +60,18 @@ public class Utils : NetworkBehaviour
         src.PlayOneShot(soundsList[soundListIndex]);
         Destroy(go, soundsList[soundListIndex].length / src.pitch);
     }
+
+    public PlayerData GetPlayerDataObjectFromClientIdReadOnly(ulong clientId)
+    {
+        //Call it only inside ServerRpc .
+        foreach (var data in GameManager.AllPlayersData)
+        {
+            if (data.ClientId == clientId)
+            {
+                return data;
+            }
+        }
+        return default;
+    }
+    
 }

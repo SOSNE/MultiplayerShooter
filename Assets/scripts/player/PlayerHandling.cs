@@ -69,7 +69,7 @@ public class PlayerHhandling : NetworkBehaviour
     private void PlayerHitServerRpc(int damageAmount,ulong clientId , ulong currentClientId, string hitBodyPartString , DataToSendOverNetwork data, ServerRpcParams serverRpcParams = default)
     {
         clientHealthMap[clientId] -= damageAmount;
-        if (clientHealthMap[clientId]<=0)
+        if (clientHealthMap[clientId]<=0 && Utils.Instance.GetPlayerDataObjectFromClientIdReadOnly(clientId).Alive)
         {
             gameObject.GetComponent<GameManager>().HandleGame(currentClientId, clientId, hitBodyPartString, data, serverRpcParams);
         }
