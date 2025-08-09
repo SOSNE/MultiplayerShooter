@@ -568,6 +568,37 @@ CapsuleCollider2D:
   m_Offset: {x: 0.26275536, y: 0.011537078}
   m_Size: {x: 0.65981746, y: 0.1952243}
   m_Direction: 1
+--- !u!1 &5096905319260258893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442586788311633447}
+  m_Layer: 7
+  m_Name: weaponSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442586788311633447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5096905319260258893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.803, y: 1.236, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2344501678799866188}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5662026099860757240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1973,6 +2004,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8893469407128632794}
+    - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: 70cc0974af755a744b2901b42220476e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1442586788311633447}
     - targetCorrespondingSourceObject: {fileID: 4257508509235537429, guid: 70cc0974af755a744b2901b42220476e, type: 3}
       insertIndex: 0
       addedObject: {fileID: 4165756586646925511}
@@ -2498,6 +2532,7 @@ MonoBehaviour:
   - {fileID: 2089097055469182062, guid: 164524b8d02a7440b9075bc4ae305b9a, type: 3}
   isWeaponSpawned: 0
   _weaponSeatUpDone: 0
+  weaponSpawnPoint: {fileID: 5096905319260258893}
 --- !u!114 &4996798501281288926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2533,6 +2568,8 @@ MonoBehaviour:
   ladderSpeed: 9.77
   centerOfPlayer: {fileID: 4121016224152418615}
   weapon: {fileID: 0}
+  grounded: 0
+  goUp: 0
   camera: {fileID: 0}
   _weaponStartScale: {x: 0, y: 0, z: 0}
   groundMask:

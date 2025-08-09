@@ -106,17 +106,17 @@ public class weaponSpawning : NetworkBehaviour
                 // networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
                 //
                 // _createdWeapon.transform.SetParent(targetTransform);
-                
-                if (targetTransform.localScale.x < 0 || targetTransform.localScale.y < 0 || targetTransform.localScale.z < 0)
-                {
-                    createdWeapon.localScale = new Vector3(-weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
-                        weapons[weaponIndex].localScale.z);
-                }
-                else
-                {
-                    createdWeapon.localScale = new Vector3(weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
-                        weapons[weaponIndex].localScale.z);
-                }
+                print(targetTransform.localScale.x + "scale while spawingi");
+                // if (targetTransform.localScale.x < 0 || targetTransform.localScale.y < 0 || targetTransform.localScale.z < 0)
+                // {
+                createdWeapon.localScale = new Vector3(weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
+                    weapons[weaponIndex].localScale.z);
+                // }
+                // else
+                // {
+                    // createdWeapon.localScale = new Vector3(weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,
+                    //     weapons[weaponIndex].localScale.z);
+                // }
                 
                 targetTransform.GetComponent<GameManager>().weapon = createdWeapon.gameObject;
                 targetTransform.GetComponent<playerMovment>().weapon = createdWeapon;
@@ -177,7 +177,7 @@ public class weaponSpawning : NetworkBehaviour
         {
             Transform targetTransform = playerNetworkObject.transform;
             Transform weapon = weapons[weaponToSpawnIndex];
-            Transform createdWeapon = Instantiate(weapon, targetTransform.position, weapon.rotation);
+            Transform createdWeapon = Instantiate(weapon, targetTransform.Find("weaponSpawnPoint").position, weapon.rotation);
 
             NetworkObject networkObject = createdWeapon.GetComponent<NetworkObject>();
             NetworkObject parentNetworkObject = targetTransform.GetComponent<NetworkObject>();
