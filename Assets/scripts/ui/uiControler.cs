@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -49,21 +50,25 @@ public class uiControler : NetworkBehaviour
         
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            OpenTabStatisticsMenuServerRpc();
+            // OpenTabStatisticsMenuServerRpc();
+            if (!tabStatisticsMenu.activeSelf)
+            {
+                tabStatisticsMenu.SetActive(true);
+            }
             // ShopUiOpen = true;
         }
         if (Input.GetKeyUp(KeyCode.Tab))
         {
             // ShopUiOpen = false;
             tabStatisticsMenu.SetActive(false);
-            foreach (Transform child in tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"))
-            {
-                GameObject.Destroy(child.gameObject);
-            }
-            foreach (Transform child in tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"))
-            {
-                GameObject.Destroy(child.gameObject);
-            }
+            // foreach (Transform child in tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"))
+            // {
+            //     GameObject.Destroy(child.gameObject);
+            // }
+            // foreach (Transform child in tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"))
+            // {
+            //     GameObject.Destroy(child.gameObject);
+            // }
         } 
         if (!masterMainMenuOpen && Input.GetKeyDown(KeyCode.Escape))
         {
@@ -84,33 +89,75 @@ public class uiControler : NetworkBehaviour
         {
             Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId } }
         };
+
         foreach (var data in GameManager.AllPlayersData)
         {
-            OpenTabStatisticsMenuClientRpc(data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], data.MoneyAmount, data.Alive, clientRpcParams);
+            if (data.ClientId == rpcParams.Receive.SenderClientId)
+            {
+                OpenTabStatisticsMenuClientRpc(data.ClientId, data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], data.MoneyAmount, data.Alive, clientRpcParams);
+            }
         }
     }
 
     [ClientRpc]
-    private void OpenTabStatisticsMenuClientRpc(int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams)
+    public void OpenTabStatisticsMenuClientRpc(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams = default)
     {
-        if (team == 0)
-        {
-           GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
-           createdPlayerPanelInfo.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
-           createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
-           if (!isAlive) createdPlayerPanelInfo.GetComponent<Image>().color = Color.red;
-           
+        //Identyfi by uid
+        print("testo" + clientId);
+        UpdateTabMenuStatistics(clientId, team, playerName, kills, deaths, asitsts, moneyAmout, isAlive);
 
-        }else if (team == 1)
+        // if (!tabStatisticsMenu.activeSelf)
+        // {
+        //     tabStatisticsMenu.SetActive(true);
+        // }
+    }
+    
+    private void UpdateTabMenuStatistics(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive)
+    {
+        bool masterBrake = true;
+        Transform viewPort = tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport");
+        foreach (Transform playerStatsInstance in viewPort)
         {
-            GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport"));
-            createdPlayerPanelInfo.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
-            createdPlayerPanelInfo.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            if (playerStatsInstance.name == clientId.ToString())
+            {
+                masterBrake = false;
+                break;
+            }
         }
 
-        if (!tabStatisticsMenu.activeSelf)
+        if (masterBrake)
         {
-            tabStatisticsMenu.SetActive(true);
+            GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
+            createdPlayerPanelInfo.name = clientId.ToString();
+        }
+
+        GameObject targetStatBar = viewPort.Find(clientId.ToString()).gameObject;
+        
+        if (team == 0)
+        {
+            targetStatBar.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
+            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            if (!isAlive)
+            {
+                targetStatBar.GetComponent<Image>().color = Color.red;
+            }
+            else
+            {
+                targetStatBar.GetComponent<Image>().color = Color.grey;
+            }
+            
+        }else if (team == 1)
+        {
+            targetStatBar.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
+            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            if (!isAlive)
+            {
+                targetStatBar.GetComponent<Image>().color = Color.red;
+            }
+            else
+            {
+                targetStatBar.GetComponent<Image>().color = Color.grey;
+            }
         }
     }
 
