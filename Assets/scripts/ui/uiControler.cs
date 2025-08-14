@@ -102,8 +102,7 @@ public class uiControler : NetworkBehaviour
     [ClientRpc]
     public void OpenTabStatisticsMenuClientRpc(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams = default)
     {
-        //Identyfi by uid
-        print("testo" + clientId);
+        //Identify by uid
         UpdateTabMenuStatistics(clientId, team, playerName, kills, deaths, asitsts, moneyAmout, isAlive);
 
         // if (!tabStatisticsMenu.activeSelf)
@@ -112,31 +111,32 @@ public class uiControler : NetworkBehaviour
         // }
     }
     
-    private void UpdateTabMenuStatistics(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive)
+    private void UpdateTabMenuStatistics(ulong clientId, int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive)
     {
         bool masterBrake = true;
-        Transform viewPort = tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport");
-        foreach (Transform playerStatsInstance in viewPort)
-        {
-            if (playerStatsInstance.name == clientId.ToString())
-            {
-                masterBrake = false;
-                break;
-            }
-        }
-
-        if (masterBrake)
-        {
-            GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport"));
-            createdPlayerPanelInfo.name = clientId.ToString();
-        }
-
-        GameObject targetStatBar = viewPort.Find(clientId.ToString()).gameObject;
         
         if (team == 0)
         {
+            Transform viewPort = tabStatisticsMenu.transform.Find("Team0TabKDA").Find("Viewport");
+            foreach (Transform playerStatsInstance in viewPort)
+            {
+                if (playerStatsInstance.name == clientId.ToString())
+                {
+                    masterBrake = false;
+                    break;
+                }
+            }
+
+            if (masterBrake)
+            {
+                GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, viewPort);
+                createdPlayerPanelInfo.name = clientId.ToString();
+            }
+
+            GameObject targetStatBar = viewPort.Find(clientId.ToString()).gameObject;
+            
             targetStatBar.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
-            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
             if (!isAlive)
             {
                 targetStatBar.GetComponent<Image>().color = Color.red;
@@ -148,8 +148,27 @@ public class uiControler : NetworkBehaviour
             
         }else if (team == 1)
         {
+            Transform viewPort = tabStatisticsMenu.transform.Find("Team1TabKDA").Find("Viewport");
+            foreach (Transform playerStatsInstance in viewPort)
+            {
+                if (playerStatsInstance.name == clientId.ToString())
+                {
+                    masterBrake = false;
+                    break;
+                }
+            }
+
+            if (masterBrake)
+            {
+                GameObject createdPlayerPanelInfo = Instantiate(playerInfoTextPrephab, viewPort);
+                createdPlayerPanelInfo.name = clientId.ToString();
+            }
+
+            GameObject targetStatBar = viewPort.Find(clientId.ToString()).gameObject;
+            
+            
             targetStatBar.transform.Find("PlayerNameText").GetComponent<TextMeshProUGUI>().text = $"{playerName}";
-            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" {(isAlive ? "•`_\u00b4•" : "x_x")} | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
+            targetStatBar.transform.Find("PlayerInfoText").GetComponent<TextMeshProUGUI>().text = $" | Kills: {kills}  Deaths: {deaths}  ${moneyAmout}";
             if (!isAlive)
             {
                 targetStatBar.GetComponent<Image>().color = Color.red;
