@@ -50,7 +50,7 @@ public class uiControler : NetworkBehaviour
         
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            // OpenTabStatisticsMenuServerRpc();
+            // UpdateTabStatisticsMenuServerRpc();
             if (!tabStatisticsMenu.activeSelf)
             {
                 tabStatisticsMenu.SetActive(true);
@@ -83,7 +83,7 @@ public class uiControler : NetworkBehaviour
     }
     
     [ServerRpc(RequireOwnership = false)]
-    public void OpenTabStatisticsMenuServerRpc(ServerRpcParams rpcParams = default)
+    public void UpdateTabStatisticsMenuServerRpc(ServerRpcParams rpcParams = default)
     {
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -94,13 +94,13 @@ public class uiControler : NetworkBehaviour
         {
             if (data.ClientId == rpcParams.Receive.SenderClientId)
             {
-                OpenTabStatisticsMenuClientRpc(data.ClientId, data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], data.MoneyAmount, data.Alive, clientRpcParams);
+                UpdateTabStatisticsMenuClientRpc(data.ClientId, data.Team, data.PlayerName, data.Kda[0],data.Kda[1],data.Kda[2], data.MoneyAmount, data.Alive, clientRpcParams);
             }
         }
     }
 
     [ClientRpc]
-    public void OpenTabStatisticsMenuClientRpc(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams = default)
+    public void UpdateTabStatisticsMenuClientRpc(ulong clientId,int team, string playerName, int kills, int deaths, int asitsts, int moneyAmout, bool isAlive, ClientRpcParams clientRpcParams = default)
     {
         //Identify by uid
         UpdateTabMenuStatistics(clientId, team, playerName, kills, deaths, asitsts, moneyAmout, isAlive);

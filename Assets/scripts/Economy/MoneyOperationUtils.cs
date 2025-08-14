@@ -79,7 +79,6 @@ public class MoneyOperationUtils : NetworkBehaviour
     {
         for (int i = 0; i < GameManager.AllPlayersData.Count; i++)
         {
-            
             if (GameManager.AllPlayersData[i].ClientId == clientId)
             {
                 ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -95,8 +94,10 @@ public class MoneyOperationUtils : NetworkBehaviour
                 GameManager.AllPlayersData[i] = data;
                 GameObject.Find("UiControler").GetComponent<uiControler>()
                     .UpdateMoneyAmountUiClientRpc(data.MoneyAmount, clientRpcParams);
+                uiControler.Instance.UpdateTabStatisticsMenuClientRpc(clientId, GameManager.AllPlayersData[i].Team, GameManager.AllPlayersData[i].PlayerName, GameManager.AllPlayersData[i].Kda[0], GameManager.AllPlayersData[i].Kda[1],GameManager.AllPlayersData[i].Kda[2],GameManager.AllPlayersData[i].MoneyAmount, GameManager.AllPlayersData[i].Alive);
                 break;
             }
+            
         }
     }
 }

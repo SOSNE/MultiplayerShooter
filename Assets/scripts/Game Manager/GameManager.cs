@@ -301,7 +301,7 @@ public class GameManager : NetworkBehaviour
                 myStruct.Alive = false;
                 AllPlayersData[i] = myStruct;
                 _playersAlive[AllPlayersData[i].Team] -= 1;
-                uiControler.Instance.OpenTabStatisticsMenuClientRpc(currentClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1], AllPlayersData[i].Kda[2], AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
+                uiControler.Instance.UpdateTabStatisticsMenuClientRpc(currentClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1], AllPlayersData[i].Kda[2], AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
 
                 var clientRpcParams = new ClientRpcParams
                 {
@@ -329,7 +329,7 @@ public class GameManager : NetworkBehaviour
                             PlayerData myStruct = AllPlayersData[i];
                             myStruct.Kda[0] += 1;
                             AllPlayersData[i] = myStruct;
-                            uiControler.Instance.OpenTabStatisticsMenuClientRpc(hitClientId,AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
+                            uiControler.Instance.UpdateTabStatisticsMenuClientRpc(hitClientId,AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
                         }
                     // }
                 }
@@ -382,7 +382,7 @@ public class GameManager : NetworkBehaviour
 
             data.Alive = true;
             AllPlayersData[i] = data;
-            uiControler.Instance.OpenTabStatisticsMenuClientRpc(AllPlayersData[i].ClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
+            uiControler.Instance.UpdateTabStatisticsMenuClientRpc(AllPlayersData[i].ClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
         }
 
         GameObject.Find("UiControler").GetComponent<uiControler>()
@@ -533,7 +533,7 @@ public class GameManager : NetworkBehaviour
                     AddTagToNewPlayerClientRpc(playerNetworkObject, "playerColliderTeam1");
                 }
                 //Add stats bar for every client for new player.
-                uiControler.Instance.OpenTabStatisticsMenuClientRpc(AllPlayersData[i].ClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
+                uiControler.Instance.UpdateTabStatisticsMenuClientRpc(AllPlayersData[i].ClientId, AllPlayersData[i].Team, AllPlayersData[i].PlayerName, AllPlayersData[i].Kda[0], AllPlayersData[i].Kda[1],AllPlayersData[i].Kda[2],AllPlayersData[i].MoneyAmount, AllPlayersData[i].Alive);
                 //Change name of new player on host and each client. 
                 ChangeClientsNameClientRpc(playerNetworkObject, AllPlayersData[i].PlayerName);
                 //Change name of new player on host and each client. 

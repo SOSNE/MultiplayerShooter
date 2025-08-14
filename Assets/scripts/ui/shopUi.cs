@@ -40,9 +40,7 @@ public class shopUi : NetworkBehaviour
         if (Input.GetKeyUp(KeyCode.M))
         {
             _moneyOperationUtils.UpdatePlayerMoneyAmountServerRpc(1000, NetworkManager.Singleton.LocalClientId);
-            
-            uiControler.Instance.OpenTabStatisticsMenuServerRpc();
-        } 
+        }
     }
 
     void BuyPistol()
