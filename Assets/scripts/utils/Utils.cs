@@ -74,4 +74,9 @@ public class Utils : NetworkBehaviour
         return default;
     }
     
+    public static Vector3 AngleToVector3(float angleDegrees)
+    {
+        float radians = angleDegrees * Mathf.Deg2Rad;
+        return new Vector3(Mathf.Cos(radians), Mathf.Sin(radians));
+    }
 }
