@@ -112,6 +112,8 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return;  
+        
         FieldOfView.targetFovPositionOrigin = transform.position;
     }
 
@@ -164,9 +166,16 @@ public class GameManager : NetworkBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
         
         uiControler.Instance.AddNameTagsForEachPlayerServerRpc();
-
+        
+        //following is done for eatery connected client.
+        //nice pattern for this inside this function.
+        print("setup");
+        // if (!AllPlayersData[i].PlayerNetworkObjectReference.TryGet(out NetworkObject targetNetworkObject));
+        AddLayerToBodyPartsForFovServerRpc("behindMask");
+         // AddLayerToBodyPartsForFovClientRpc(AllPlayersData[i].PlayerNetworkObjectReference, "behindMask");
         print("start");
     }
+
     
     void OnDisable() {
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
@@ -538,6 +547,7 @@ public class GameManager : NetworkBehaviour
                 ChangeClientsNameClientRpc(playerNetworkObject, AllPlayersData[i].PlayerName);
                 //Change name of new player on host and each client. 
                 ChangeClientsColorClientRpc(playerNetworkObject, AllPlayersData[i].PlayerColor);
+                
             }
         }
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -579,6 +589,36 @@ public class GameManager : NetworkBehaviour
             {
                 playerNetworkObject.gameObject.layer = LayerMask.NameToLayer(playerLayerName);
             }
+        }
+    }
+    [ServerRpc]
+    private void AddLayerToBodyPartsForFovServerRpc(string playerLayerName)
+    {
+        for (int i = 0; i < AllPlayersData.Count; i++)
+        {
+            AddLayerToBodyPartsForFovClientRpc(AllPlayersData[i].PlayerNetworkObjectReference, playerLayerName);
+
+        }
+    }
+    
+    [ClientRpc]
+    private void AddLayerToBodyPartsForFovClientRpc(NetworkObjectReference playerGameObject, string playerLayerName)
+    {
+        print("Nice it fires");
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            print(playerNetworkObject.gameObject.name);
+
+            if (playerNetworkObject.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+                return;
+
+            Utils.DoForAllChildren(playerNetworkObject.gameObject, (child) =>
+            {
+                if (child.GetComponent<SpriteRenderer>())
+                {
+                    child.gameObject.layer = LayerMask.NameToLayer(playerLayerName);
+                }
+            } );
         }
     }
     public List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };

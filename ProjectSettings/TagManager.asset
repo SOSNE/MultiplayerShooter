@@ -10,6 +10,8 @@ TagManager:
   - playerColliderDetection
   - bodyPart
   - weapon
+  - fovRender
+  - FovRender
   layers:
   - Default
   - TransparentFX
@@ -34,7 +36,7 @@ TagManager:
   - 
   - mask
   - 
-  - bechindMask
+  - behindMask
   - 
   - black
   - 

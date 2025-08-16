@@ -212,11 +212,9 @@ public class PlayerHhandling : NetworkBehaviour
         }
     }
     
-    
-    
     void SetLayerRecursively(GameObject obj, int layer)
     {
-        obj.layer = layer;
+        if(obj.name != "AmmoBox") obj.layer = layer;
 
         foreach (Transform child in obj.transform)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
@@ -78,5 +79,18 @@ public class Utils : NetworkBehaviour
     {
         float radians = angleDegrees * Mathf.Deg2Rad;
         return new Vector3(Mathf.Cos(radians), Mathf.Sin(radians));
+    }
+    
+    public static void DoForAllChildren(GameObject parent, Action<GameObject> action)
+    {
+        if (parent == null || action == null) return;
+
+        foreach (Transform child in parent.transform)
+        {
+            // Apply the action to this child
+            action(child.gameObject);
+
+            DoForAllChildren(child.gameObject, action);
+        }
     }
 }
