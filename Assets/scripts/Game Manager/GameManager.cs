@@ -112,7 +112,7 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        
+        FieldOfView.targetFovPositionOrigin = transform.position;
     }
 
     private GameObject _createdCamera;

@@ -1,21 +1,23 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class FieldOfView : MonoBehaviour
 {
     private Mesh _mesh;
     
-    private static float fov = 90f;
-    private static int reyCount = 50;
-    private float angleOfIncrease = fov / reyCount;
-    private float viewDistance = 10f;
+    private static float _fov = 90f;
+    private static int _reyCount = 400;
+    private float _angleOfIncrease = _fov / _reyCount;
+    private float _viewDistance = 10f;
     
 
-    private Vector3[] vertices = new Vector3[reyCount + 2];
-    private Vector2[] uv = new Vector2[reyCount + 2];
-    private int[] triangles = new int[reyCount * 3];
+    private Vector3[] _vertices = new Vector3[_reyCount + 2];
+    private Vector2[] _uv = new Vector2[_reyCount + 2];
+    private int[] _triangles = new int[_reyCount * 3];
 
     public LayerMask fovLayerMask;
+    public static Vector3 targetFovPositionOrigin;
 
     private void Start()
     {
@@ -24,6 +26,7 @@ public class FieldOfView : MonoBehaviour
 
     private void Update()
     {
+        transform.position = targetFovPositionOrigin;
         float angle = 90;
 
         // Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
@@ -37,53 +40,52 @@ public class FieldOfView : MonoBehaviour
         
         if (transform.localScale.x >= 0)
         {
-            angle = angleTarget + fov / 2;
+            angle = angleTarget + _fov / 2;
         }
         else
         {
-            angle = angleTarget - fov / 2;
+            angle = angleTarget - _fov / 2;
         }
         
-        vertices[0] = Vector3.zero;
+        _vertices[0] = Vector3.zero;
 
         int triangleIndex = 0;
-        for (int i = 0; i <= reyCount; i++)
+        for (int i = 0; i <= _reyCount; i++)
         {
             //For future. There was a lot of errors here because of different world spaces.
-            RaycastHit2D hit2D = Physics2D.Raycast(transform.position, Utils.AngleToVector3(angle), viewDistance, fovLayerMask);
+            RaycastHit2D hit2D = Physics2D.Raycast(transform.position, Utils.AngleToVector3(angle), _viewDistance, fovLayerMask);
 
             if (hit2D.collider != null)
             {
-                vertices[i + 1] = transform.InverseTransformPoint(hit2D.point);
+                _vertices[i + 1] = transform.InverseTransformPoint(hit2D.point);
    
             }
             else
             {
-                vertices[i + 1] = transform.InverseTransformPoint(transform.position + Utils.AngleToVector3(angle) * viewDistance);
+                _vertices[i + 1] = transform.InverseTransformPoint(transform.position + Utils.AngleToVector3(angle) * _viewDistance);
             }
 
             if (i > 0)
             {
-                triangles[triangleIndex] = 0;
-                triangles[triangleIndex + 1] = i;
-                triangles[triangleIndex + 2] = i + 1;
+                _triangles[triangleIndex] = 0;
+                _triangles[triangleIndex + 1] = i;
+                _triangles[triangleIndex + 2] = i + 1;
                 triangleIndex += 3;
             }
             
             if (transform.localScale.x >= 0)
             {
-                angle -= angleOfIncrease;
+                angle -= _angleOfIncrease;
             }
             else
             {
-                angle += angleOfIncrease;
+                angle += _angleOfIncrease;
             }
         }
-
-
-        _mesh.vertices = vertices;
-        _mesh.uv = uv;
-        _mesh.triangles = triangles;
+        
+        _mesh.vertices = _vertices;
+        _mesh.uv = _uv;
+        _mesh.triangles = _triangles;
             
         GetComponent<MeshFilter>().mesh = _mesh;
     }
