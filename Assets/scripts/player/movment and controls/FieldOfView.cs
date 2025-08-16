@@ -27,10 +27,7 @@ public class FieldOfView : MonoBehaviour
     private void Update()
     {
         transform.position = targetFovPositionOrigin;
-        float angle = 90;
-
-        // Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        // float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        float angle;
         
         Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3 dir = mouseWorldPosition - transform.position;
@@ -58,7 +55,6 @@ public class FieldOfView : MonoBehaviour
             if (hit2D.collider != null)
             {
                 _vertices[i + 1] = transform.InverseTransformPoint(hit2D.point);
-   
             }
             else
             {

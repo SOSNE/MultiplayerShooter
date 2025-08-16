@@ -22,32 +22,47 @@ public class Animations : NetworkBehaviour
     {
         lastPosition = transform.position;
     }
+    
+    private string _currentAnim = "";
 
     void Update()
     {
         if (!IsOwner) return;
-        // if (uiControler.anyMenuIsOpen) return;
         
+        string newAnim = "";
+
         if (!GetComponent<playerMovment>().grounded)
         {
-            ToggleAnimationMode("jump", gameObject);
-            ToggleAnimationModeServerRpc("jump", gameObject);
+            newAnim = "jump";
         }
-        else if(Input.GetKey(KeyCode.LeftShift))
-        { 
-            //"crouch"
-            ToggleCrouchingMode(true, gameObject);
-            SetCrouchServerRpc(true, gameObject);
+        else if (Input.GetKey(KeyCode.LeftShift))
+        {
+            newAnim = "crouch";
         }
         else if (Mathf.Abs(GetComponent<Rigidbody2D>().linearVelocity.x) > 0.01f)
         {
-            ToggleAnimationMode("walk", gameObject);
-            ToggleAnimationModeServerRpc("walk", gameObject);
+            newAnim = "walk";
         }
         else
         {
-            ToggleAnimationMode("idle", gameObject);
-            ToggleAnimationModeServerRpc("idle", gameObject);
+            newAnim = "idle";
+        }
+
+        if (newAnim != _currentAnim)
+        {
+            _currentAnim = newAnim;
+
+            if (newAnim == "crouch")
+            {
+                ToggleCrouchingMode(true, gameObject);
+                SetCrouchServerRpc(true, gameObject);
+            }
+            else
+            {
+                print("fire "+ newAnim);
+                ToggleAnimationMode(newAnim, gameObject);
+                ToggleAnimationModeServerRpc(newAnim, gameObject);
+            }
         }
     }
 
