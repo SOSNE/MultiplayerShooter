@@ -7,9 +7,9 @@ public class FieldOfView : MonoBehaviour
     private Mesh _mesh;
     
     private static float _fov = 90f;
-    private static int _reyCount = 400;
+    private static int _reyCount = 100;
     private float _angleOfIncrease = _fov / _reyCount;
-    private float _viewDistance = 10f;
+    private float _viewDistance = 20f;
     
 
     private Vector3[] _vertices = new Vector3[_reyCount + 2];
@@ -24,13 +24,13 @@ public class FieldOfView : MonoBehaviour
         _mesh = new Mesh();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         transform.position = targetFovPositionOrigin;
         float angle;
         
         Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 dir = mouseWorldPosition - transform.position;
+        Vector3 dir = mouseWorldPosition - targetFovPositionOrigin;
 
         float angleTarget = Mathf.Atan2(dir.y, dir.x);
         angleTarget *= Mathf.Rad2Deg;
@@ -50,7 +50,7 @@ public class FieldOfView : MonoBehaviour
         for (int i = 0; i <= _reyCount; i++)
         {
             //For future. There was a lot of errors here because of different world spaces.
-            RaycastHit2D hit2D = Physics2D.Raycast(transform.position, Utils.AngleToVector3(angle), _viewDistance, fovLayerMask);
+            RaycastHit2D hit2D = Physics2D.Raycast(targetFovPositionOrigin, Utils.AngleToVector3(angle), _viewDistance, fovLayerMask);
 
             if (hit2D.collider != null)
             {
@@ -58,7 +58,7 @@ public class FieldOfView : MonoBehaviour
             }
             else
             {
-                _vertices[i + 1] = transform.InverseTransformPoint(transform.position + Utils.AngleToVector3(angle) * _viewDistance);
+                _vertices[i + 1] = transform.InverseTransformPoint(targetFovPositionOrigin + Utils.AngleToVector3(angle) * _viewDistance);
             }
 
             if (i > 0)
