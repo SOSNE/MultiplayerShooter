@@ -93,4 +93,13 @@ public class Utils : NetworkBehaviour
             DoForAllChildren(child.gameObject, action);
         }
     }
+    
+    public static float GetMiddleAngle(float a, float b)
+    {
+        a = (a % 360 + 360) % 360;
+        b = (b % 360 + 360) % 360;
+
+        float diff = Mathf.DeltaAngle(a, b);
+        return a + diff / 2f;               
+    }
 }
