@@ -73,13 +73,11 @@ public class weaponSpawning : NetworkBehaviour
     [ClientRpc]
     private void AcknowledgeChangeWeaponClientRpc(ClientRpcParams clientRpcParams)
     {
-        Debug.Log("Acknowledgment received: Server processed your request!");
         _acknowledgmentFlag = true;
     }
 
     public void SpawnWeapon()
     {
-        print("spawn weapon for: " + gameObject.name);
         SpawnWeaponServerRpc(gameObject, 0);
     }
     
@@ -106,7 +104,6 @@ public class weaponSpawning : NetworkBehaviour
                 // networkObject.SpawnWithOwnership(parentNetworkObject.OwnerClientId);
                 //
                 // _createdWeapon.transform.SetParent(targetTransform);
-                print(targetTransform.localScale.x + "scale while spawingi");
                 // if (targetTransform.localScale.x < 0 || targetTransform.localScale.y < 0 || targetTransform.localScale.z < 0)
                 // {
                 createdWeapon.localScale = new Vector3(weapons[weaponIndex].localScale.x, weapons[weaponIndex].localScale.y,

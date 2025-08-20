@@ -59,7 +59,6 @@ public class Animations : NetworkBehaviour
             }
             else
             {
-                print("fire "+ newAnim);
                 ToggleAnimationMode(newAnim, gameObject);
                 ToggleAnimationModeServerRpc(newAnim, gameObject);
             }

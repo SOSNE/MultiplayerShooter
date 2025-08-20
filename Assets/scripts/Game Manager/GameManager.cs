@@ -169,7 +169,6 @@ public class GameManager : NetworkBehaviour
         
         //following is done for eatery connected client.
         //nice pattern for this inside this function.
-        print("setup");
         // if (!AllPlayersData[i].PlayerNetworkObjectReference.TryGet(out NetworkObject targetNetworkObject));
         AddLayerToBodyPartsForFovServerRpc("behindMask");
          // AddLayerToBodyPartsForFovClientRpc(AllPlayersData[i].PlayerNetworkObjectReference, "behindMask");
@@ -344,7 +343,6 @@ public class GameManager : NetworkBehaviour
                 }
             }
         }
-        print("0: "+_playersAlive[0] + "    1: "+_playersAlive[1]);
         //restart game after all players are dead
         if ((_playersAlive[0] <= 0 || _playersAlive[1] <= 0) && !_roundIsRestarting)
         {
@@ -604,10 +602,8 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void AddLayerToBodyPartsForFovClientRpc(NetworkObjectReference playerGameObject, string playerLayerName)
     {
-        print("Nice it fires");
         if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
-            print(playerNetworkObject.gameObject.name);
 
             if (playerNetworkObject.OwnerClientId == NetworkManager.Singleton.LocalClientId)
                 return;
