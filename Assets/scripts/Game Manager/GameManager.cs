@@ -114,7 +114,7 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsOwner) return;  
         
-        FieldOfView.targetFovPositionOrigin = transform.position;
+        FieldOfView.targetFovPositionOrigin = Utils.GetSpecificChild(gameObject, "head").transform.position;
     }
 
     private GameObject _createdCamera;

@@ -21,6 +21,8 @@ public class FieldOfView : MonoBehaviour
 
     public LayerMask fovLayerMask;
     public static Vector3 targetFovPositionOrigin;
+    [Range(-5f, 5f)]
+    public float upOffset = 0f;
 
     private void Start()
     {
@@ -31,6 +33,7 @@ public class FieldOfView : MonoBehaviour
 
     private void LateUpdate()
     {
+        targetFovPositionOrigin = targetFovPositionOrigin + new Vector3(0, upOffset);
         transform.position = targetFovPositionOrigin;
         _vertices.Clear();
         _triangles.Clear();

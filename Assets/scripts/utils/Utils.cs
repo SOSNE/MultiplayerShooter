@@ -102,4 +102,32 @@ public class Utils : NetworkBehaviour
         float diff = Mathf.DeltaAngle(a, b);
         return a + diff / 2f;               
     }
+    
+    public static void DoForSpecificChild(GameObject parent,string name, Action<GameObject> action)
+    {
+        if (parent == null || action == null || name == null) return;
+
+        foreach (Transform child in parent.transform)
+        {
+            if(child.name == name) action(child.gameObject);
+
+            DoForSpecificChild(child.gameObject, name, action);
+        }
+    }
+    
+    public static GameObject GetSpecificChild(GameObject parent,string name)
+    {
+        if (parent == null || name == null) return null;
+
+        foreach (Transform child in parent.transform)
+        {
+            if(child.name == name) return child.gameObject;
+            
+            GameObject found = GetSpecificChild(child.gameObject, name);
+            if (found != null)
+                return found;
+        }
+        
+        return null;
+    }
 }
