@@ -224,10 +224,11 @@ public class uiControler : NetworkBehaviour
         if (playerNameSelectionInputField.gameObject.activeSelf) playerNameSelectionInputField.gameObject.SetActive(false);
         
         if(!targetPlayer.TryGet(out NetworkObject targetPlayerNetworkObject)) return;
-        GameObject newplayerNameTextMechProGameObject = Instantiate(playerNameTextMechProPrephab, canvasWorldSpace.transform);
-        newplayerNameTextMechProGameObject.GetComponent<TextMeshProUGUI>().text = name;
-        newplayerNameTextMechProGameObject.GetComponent<TextMeshProUGUI>().text = name;
+        GameObject newplayerNameTextMechProGameObject = Instantiate(playerNameTextMechProPrephab);
+        newplayerNameTextMechProGameObject.GetComponent<TextMeshPro>().text = name;
         newplayerNameTextMechProGameObject.GetComponent<PlayerNameTagControl>().target = targetPlayerNetworkObject.gameObject;
+        targetPlayerNetworkObject.GetComponent<GameManager>().targetNameTag = newplayerNameTextMechProGameObject;
+
     }
     
     Transform GetChildWithTag(Transform parent, string tag)

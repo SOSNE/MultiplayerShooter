@@ -95,6 +95,8 @@ public class GameManager : NetworkBehaviour
     private static float _remainingTime = 120;
     private static Coroutine _timerCoroutine;
     public bool isAlive = true;
+    public GameObject targetNameTag;
+
     
     // private void Awake()
     // {
@@ -615,6 +617,8 @@ public class GameManager : NetworkBehaviour
                     child.gameObject.layer = LayerMask.NameToLayer(playerLayerName);
                 }
             } );
+            //Set behind mask to the name tag.
+            playerNetworkObject.GetComponent<GameManager>().targetNameTag.layer = LayerMask.NameToLayer(playerLayerName);
         }
     }
     public List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };
