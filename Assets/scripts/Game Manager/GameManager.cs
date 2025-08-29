@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Random = System.Random;
 
@@ -117,6 +118,11 @@ public class GameManager : NetworkBehaviour
         if (!IsOwner) return;  
         
         FieldOfView.targetFovPositionOrigin = Utils.GetSpecificChild(gameObject, "head").transform.position;
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene("That’sWhatSheSaid", LoadSceneMode.Single);
+        }
     }
 
     private GameObject _createdCamera;
