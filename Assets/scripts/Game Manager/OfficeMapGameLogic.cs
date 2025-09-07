@@ -1,16 +1,19 @@
+using System;
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class OfficeMapGameLogic : MonoBehaviour
+public class OfficeMapGameLogic : NetworkBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
+        // Debug.Log($"Client {clientId} finished loading {sceneName}");
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        List<ulong> playerIds = new List<ulong>{clientId};
+        PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         
+        GameObject spawnPoint = GameObject.Find($"Team{currentPlayerData.Team}Spawn");
+        Utils.Instance.SpawnPlayerOnSpawnPointClientRpc(currentPlayerData.PlayerNetworkObjectReference, spawnPoint);
     }
 }

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Audio;
+using Random = System.Random;
 
 public class Utils : NetworkBehaviour
 {
@@ -129,5 +130,45 @@ public class Utils : NetworkBehaviour
         }
         
         return null;
+    }
+
+    public static List<PlayerData> GetSelectedPlayersData(List<ulong> playerIds)
+    {
+        List<PlayerData> selectedPlayers = new List<PlayerData>(); 
+        foreach (var data in GameManager.AllPlayersData)
+        {
+            if (playerIds.Contains(data.ClientId))
+            {
+                selectedPlayers.Add(data);
+            }
+        }
+        return selectedPlayers;
+    }
+    
+    
+    [ClientRpc]
+    public void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
+    {
+        List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };
+
+        if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
+        {
+            if(spawnGameObject.TryGet(out NetworkObject spawnNetworkObject))
+            {
+                if (positionsDistance.Count != 0)
+                {
+                    Random random = new Random();
+                    int randomIndex = random.Next(positionsDistance.Count);
+                    var randomNumberDistance = positionsDistance[randomIndex];
+                    playerNetworkObject.transform.position = spawnNetworkObject.transform.position +
+                                                             new Vector3(randomNumberDistance, 0, 0);
+                    positionsDistance.RemoveAt(randomIndex);
+                }
+                else
+                {
+                    playerNetworkObject.transform.position = spawnNetworkObject.transform.position;
+                }
+            }
+        }
     }
 }

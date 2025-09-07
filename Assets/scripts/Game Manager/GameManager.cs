@@ -172,6 +172,8 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .UpdateMoneyAmountUiServerRpc(60);
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OfficeMapGameLogic.OnClientSceneLoaded;
+
         
         uiControler.Instance.AddNameTagsForEachPlayerServerRpc();
         
@@ -187,6 +189,8 @@ public class GameManager : NetworkBehaviour
     void OnDisable() {
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientConnected;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OfficeMapGameLogic.OnClientSceneLoaded;
+
     }
     
     private void OnClientConnected(ulong clientId)
@@ -632,6 +636,8 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
     {
+        List<int> positionsDistance = new List<int> { -3, -2, -1, 0, 1, 2, 3 };
+
         if(playerGameObject.TryGet(out NetworkObject playerNetworkObject))
         {
             if(spawnGameObject.TryGet(out NetworkObject spawnNetworkObject))
