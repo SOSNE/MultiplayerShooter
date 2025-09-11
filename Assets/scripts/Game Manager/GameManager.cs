@@ -172,8 +172,11 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .UpdateMoneyAmountUiServerRpc(60);
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OfficeMapGameLogic.OnClientSceneLoaded;
-
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OfficeMapGameLogic.Instance.OnClientSceneLoaded;
+        if (IsServer)
+        {
+            OfficeMapGameLogic.serverGameObjectReference = gameObject;
+        }
         
         uiControler.Instance.AddNameTagsForEachPlayerServerRpc();
         
@@ -189,7 +192,7 @@ public class GameManager : NetworkBehaviour
     void OnDisable() {
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientConnected;
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OfficeMapGameLogic.OnClientSceneLoaded;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OfficeMapGameLogic.Instance.OnClientSceneLoaded;
 
     }
     
@@ -277,7 +280,7 @@ public class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void StartCountdownTimerWithServerTimeClientRpc(float time, ClientRpcParams serverRpcParams = default)
+    public void StartCountdownTimerWithServerTimeClientRpc(float time, ClientRpcParams serverRpcParams = default)
     {
         //When called, it is being done on the first player game object.
         //But _timerCoroutine and time are static, so it doesn't matter, I think

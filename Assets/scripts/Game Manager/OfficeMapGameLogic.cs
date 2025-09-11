@@ -6,10 +6,23 @@ using UnityEngine.SceneManagement;
 
 public class OfficeMapGameLogic : NetworkBehaviour
 {
-    public static void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    public static OfficeMapGameLogic Instance;
+    public static GameObject serverGameObjectReference;
+    
+    private void Awake()
     {
-        // Debug.Log($"Client {clientId} finished loading {sceneName}");
-        
+        Instance = this;
+    }
+    
+    public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    {
+        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        TeleportPlayersToSpawn(clientId);
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
+    }
+
+    private void TeleportPlayersToSpawn(ulong clientId)
+    {
         List<ulong> playerIds = new List<ulong>{clientId};
         PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         
