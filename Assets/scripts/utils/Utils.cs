@@ -16,6 +16,8 @@ public class Utils : NetworkBehaviour
     public NetworkVariable<bool> allowFriendlyFire = new NetworkVariable<bool>(false);
     public AudioMixer mixer;
     public List<TextMeshProUGUI> textTypes = new List<TextMeshProUGUI>();
+    private List<TextMeshProUGUI> _textInstances = new List<TextMeshProUGUI>();
+    
     
     [DllImport("__Internal")]
     private static extern void CopyWebGL(string str);
@@ -28,7 +30,9 @@ public class Utils : NetworkBehaviour
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 1;
         #endif
-
+        
+        _textInstances.Add(null);
+        _textInstances.Add(null);
     }
     
     public GameObject GetMasterParent(Transform child)
@@ -177,8 +181,14 @@ public class Utils : NetworkBehaviour
     public void TextInformationSystem(string text, int typeOfTheText, float textAppearanceDelay, float textTimeToLive)
     {
         GameObject canvasParent = GameObject.Find("Canvas");
-        TextMeshProUGUI textMeshPro = Instantiate(textTypes[typeOfTheText], canvasParent.transform).GetComponent<TextMeshProUGUI>();
-        StartCoroutine(ShowText(textMeshPro, text, textAppearanceDelay, textTimeToLive));
+        if (_textInstances[typeOfTheText] != null)
+        {
+            //Potential bug when for example this object will start more coroutines.
+            StopAllCoroutines(); 
+            Destroy(_textInstances[typeOfTheText].gameObject);
+        }
+        _textInstances[typeOfTheText] = Instantiate(textTypes[typeOfTheText], canvasParent.transform).GetComponent<TextMeshProUGUI>();
+        StartCoroutine(ShowText(_textInstances[typeOfTheText], text, textAppearanceDelay, textTimeToLive));
     }
     
     IEnumerator ShowText(TextMeshProUGUI textMeshPro, string fullText, float textAppearanceDelay, float textTimeToLive)
@@ -190,7 +200,6 @@ public class Utils : NetworkBehaviour
             textMeshPro.text += c; 
             yield return new WaitForSeconds(textAppearanceDelay); 
         }
-
         yield return new WaitForSeconds(textTimeToLive);
         Destroy(textMeshPro.gameObject);
     }

@@ -126,6 +126,7 @@ public class GameManager : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.T))
         {
             Utils.Instance.TextInformationSystem("Test Message", 0, .3f, 5f);
+            Utils.Instance.TextInformationSystem("Test Message", 1, .1f, 5f);
         }
     }
 
