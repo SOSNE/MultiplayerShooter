@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -13,6 +15,7 @@ public class Utils : NetworkBehaviour
     public List<AudioClip> soundsList = new List<AudioClip>();
     public NetworkVariable<bool> allowFriendlyFire = new NetworkVariable<bool>(false);
     public AudioMixer mixer;
+    public List<TextMeshProUGUI> textTypes = new List<TextMeshProUGUI>();
     
     [DllImport("__Internal")]
     private static extern void CopyWebGL(string str);
@@ -145,7 +148,6 @@ public class Utils : NetworkBehaviour
         return selectedPlayers;
     }
     
-    
     [ClientRpc]
     public void SpawnPlayerOnSpawnPointClientRpc(NetworkObjectReference playerGameObject, NetworkObjectReference spawnGameObject)
     {
@@ -170,5 +172,26 @@ public class Utils : NetworkBehaviour
                 }
             }
         }
+    }
+
+    public void TextInformationSystem(string text, int typeOfTheText, float textAppearanceDelay, float textTimeToLive)
+    {
+        GameObject canvasParent = GameObject.Find("Canvas");
+        TextMeshProUGUI textMeshPro = Instantiate(textTypes[typeOfTheText], canvasParent.transform).GetComponent<TextMeshProUGUI>();
+        StartCoroutine(ShowText(textMeshPro, text, textAppearanceDelay, textTimeToLive));
+    }
+    
+    IEnumerator ShowText(TextMeshProUGUI textMeshPro, string fullText, float textAppearanceDelay, float textTimeToLive)
+    {
+        textMeshPro.text = ""; 
+        
+        foreach (char c in fullText)
+        {
+            textMeshPro.text += c; 
+            yield return new WaitForSeconds(textAppearanceDelay); 
+        }
+
+        yield return new WaitForSeconds(textTimeToLive);
+        Destroy(textMeshPro.gameObject);
     }
 }

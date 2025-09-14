@@ -123,6 +123,10 @@ public class GameManager : NetworkBehaviour
         {
             NetworkManager.Singleton.SceneManager.LoadScene("That’sWhatSheSaid", LoadSceneMode.Single);
         }
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Utils.Instance.TextInformationSystem("Test Message", 0, .3f, 5f);
+        }
     }
 
     private GameObject _createdCamera;
