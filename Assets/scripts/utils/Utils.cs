@@ -183,8 +183,6 @@ public class Utils : NetworkBehaviour
         GameObject canvasParent = GameObject.Find("Canvas");
         if (_textInstances[typeOfTheText] != null)
         {
-            //Potential bug when for example this object will start more coroutines.
-            StopAllCoroutines(); 
             Destroy(_textInstances[typeOfTheText].gameObject);
         }
         _textInstances[typeOfTheText] = Instantiate(textTypes[typeOfTheText], canvasParent.transform).GetComponent<TextMeshProUGUI>();
@@ -193,14 +191,22 @@ public class Utils : NetworkBehaviour
     
     IEnumerator ShowText(TextMeshProUGUI textMeshPro, string fullText, float textAppearanceDelay, float textTimeToLive)
     {
-        textMeshPro.text = ""; 
+        if (textMeshPro.gameObject != null)
+        {
+            textMeshPro.text = "";
+        }
         
         foreach (char c in fullText)
         {
+            if(textMeshPro.gameObject == null) yield break;
             textMeshPro.text += c; 
             yield return new WaitForSeconds(textAppearanceDelay); 
         }
-        yield return new WaitForSeconds(textTimeToLive);
-        Destroy(textMeshPro.gameObject);
+
+        if (textMeshPro.gameObject != null)
+        {
+            yield return new WaitForSeconds(textTimeToLive);
+            Destroy(textMeshPro.gameObject);
+        }
     }
 }
