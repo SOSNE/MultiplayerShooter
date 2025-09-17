@@ -8,16 +8,45 @@ public class OfficeMapGameLogic : NetworkBehaviour
 {
     public static OfficeMapGameLogic Instance;
     public static GameObject serverGameObjectReference;
+    public GameObject _clientGameObject, _gameObjective;
+    private bool _theMapIsOpen = false;
     
     private void Awake()
     {
         Instance = this;
+        
     }
     
+    private bool _isShowingTextFlag = false;
+
+    private void Update()
+    {
+        if(!_theMapIsOpen) return;
+        
+        if (Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
+        {
+            PerformGameObjectiveLogic();
+            _isShowingTextFlag = false;
+        }
+        else if (!_isShowingTextFlag)
+        {
+            Utils.Instance.StopTextInformationSystem(1);
+            _isShowingTextFlag = true;
+        }
+    }
+
+    private void PerformGameObjectiveLogic()
+    {
+        Utils.Instance.TextInformationSystem("Pres E to place the drill", 1, .06f, 2f);
+    }
+
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
         if (!IsServer) return;
         if (sceneName != "Office") return;
+        _theMapIsOpen = true;
+        _clientGameObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().gameObject;
+        _gameObjective = GameObject.Find("GameObjective");
         
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -33,8 +62,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
         PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
         
-        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
-        gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
+        // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        // gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
     }
 
     [ClientRpc]

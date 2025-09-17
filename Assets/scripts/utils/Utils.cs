@@ -17,6 +17,7 @@ public class Utils : NetworkBehaviour
     public AudioMixer mixer;
     public List<TextMeshProUGUI> textTypes = new List<TextMeshProUGUI>();
     private List<TextMeshProUGUI> _textInstances = new List<TextMeshProUGUI>();
+    private List<Coroutine> _runningCoroutines = new List<Coroutine>();
     
     
     [DllImport("__Internal")]
@@ -33,6 +34,8 @@ public class Utils : NetworkBehaviour
         
         _textInstances.Add(null);
         _textInstances.Add(null);
+        _runningCoroutines.Add(null);
+        _runningCoroutines.Add(null);
     }
     
     public GameObject GetMasterParent(Transform child)
@@ -181,13 +184,27 @@ public class Utils : NetworkBehaviour
     public void TextInformationSystem(string text, int typeOfTheText, float textAppearanceDelay, float textTimeToLive)
     {
         GameObject canvasParent = GameObject.Find("Canvas");
+        
         if (_textInstances[typeOfTheText] != null)
         {
-            Destroy(_textInstances[typeOfTheText].gameObject);
+            return;
         }
+
         _textInstances[typeOfTheText] = Instantiate(textTypes[typeOfTheText], canvasParent.transform).GetComponent<TextMeshProUGUI>();
-        StartCoroutine(ShowText(_textInstances[typeOfTheText], text, textAppearanceDelay, textTimeToLive));
+        _runningCoroutines[typeOfTheText] = StartCoroutine(ShowText(_textInstances[typeOfTheText], text, textAppearanceDelay, textTimeToLive));
+
     }
+    
+    public void StopTextInformationSystem(int typeOfTheText)
+    {
+        if (_textInstances[typeOfTheText] != null)
+        {
+            StopCoroutine(_runningCoroutines[typeOfTheText]);
+            Destroy(_textInstances[typeOfTheText].gameObject);
+            _textInstances[typeOfTheText] = null;
+        }
+    }
+
     
     IEnumerator ShowText(TextMeshProUGUI textMeshPro, string fullText, float textAppearanceDelay, float textTimeToLive)
     {
@@ -198,12 +215,10 @@ public class Utils : NetworkBehaviour
         
         foreach (char c in fullText)
         {
-            if(textMeshPro.gameObject == null) yield break;
             textMeshPro.text += c; 
             yield return new WaitForSeconds(textAppearanceDelay); 
         }
-
-        if (textMeshPro.gameObject != null)
+        if(textTimeToLive >= 0)
         {
             yield return new WaitForSeconds(textTimeToLive);
             Destroy(textMeshPro.gameObject);
