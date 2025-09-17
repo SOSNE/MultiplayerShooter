@@ -62,6 +62,9 @@ public class Animations : NetworkBehaviour
             {
                 ToggleAnimationMode(newAnim, gameObject);
                 ToggleAnimationModeServerRpc(newAnim, gameObject);
+                //Temp fix for crouch not setting collider to previous size.
+                ToggleCrouchingMode(false, gameObject);
+                SetCrouchServerRpc(false, gameObject);
             }
         }
     }
@@ -104,10 +107,10 @@ public class Animations : NetworkBehaviour
     
      private void ToggleCrouchingMode(bool value, GameObject target)
      {
-         ResetAllAnimationTriggers("crouch");
-         GetComponent<Animator>().SetTrigger("crouch");
          if (value)
          {
+             ResetAllAnimationTriggers("crouch");
+             GetComponent<Animator>().SetTrigger("crouch");
              target.GetComponent<CapsuleCollider2D>().offset = new Vector2(0.02604413f, 0.1193484f);
              target.GetComponent<CapsuleCollider2D>().size = new Vector2(0.5381981f, 2.677239f);
          }
