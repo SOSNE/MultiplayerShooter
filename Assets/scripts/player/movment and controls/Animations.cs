@@ -14,6 +14,7 @@ public class Animations : NetworkBehaviour
         if (!IsOwner) return;
         if(gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("crouching")) return;
         _crouch = false;
+        if(gameObject == null) return;
         SetCrouchServerRpc(_crouch, gameObject);
         TurnToIdleInstantlyServerRpc(gameObject);
     }

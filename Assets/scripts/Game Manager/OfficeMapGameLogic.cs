@@ -16,7 +16,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
     
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        if (!IsServer) return;
+        if (sceneName != "Office") return;
         
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -27,16 +28,19 @@ public class OfficeMapGameLogic : NetworkBehaviour
         };
         
         TeleportPlayersToSpawn(clientId);
-        PlayStartingTextMessageClientRpc(clientId, clientRpcParams);
+        
+        List<ulong> playerIds = new List<ulong>{clientId};
+        PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
+        PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
+        
+        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
         gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
     }
 
     [ClientRpc]
-    private void PlayStartingTextMessageClientRpc(ulong clientId, ClientRpcParams clientRpcParams)
+    private void PlayStartingTextMessageClientRpc(int currentPlayerDataTeam, ClientRpcParams clientRpcParams)
     {
-        List<ulong> playerIds = new List<ulong>{clientId};
-        PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
-        if (currentPlayerData.Team == 0)
+        if (currentPlayerDataTeam == 0)
         {
             Utils.Instance.TextInformationSystem("Objective: Steal the documents. If impossible — eliminate all agents.", 0, .1f, 5f);
         }
