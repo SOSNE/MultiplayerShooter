@@ -32,13 +32,14 @@ public class Animations : NetworkBehaviour
         
         string newAnim = "";
 
-        if (!GetComponent<playerMovment>().grounded)
-        {
-            newAnim = "jump";
-        }
-        else if (Input.GetKey(KeyCode.LeftShift))
+        
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             newAnim = "crouch";
+        }
+        else if (!GetComponent<playerMovment>().grounded)
+        {
+            newAnim = "jump";
         }
         else if (Mathf.Abs(GetComponent<Rigidbody2D>().linearVelocity.x) > 0.01f)
         {
