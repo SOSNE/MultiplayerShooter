@@ -8,7 +8,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
 {
     public static OfficeMapGameLogic Instance;
     public static GameObject serverGameObjectReference;
-    public GameObject _clientGameObject, _gameObjective;
+    private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
     
     private void Awake()
@@ -17,15 +17,19 @@ public class OfficeMapGameLogic : NetworkBehaviour
         
     }
     
-    private bool _isShowingTextFlag = false;
+    private bool _isShowingTextFlag = false, _objectiveStart = false;
 
     private void Update()
     {
         if(!_theMapIsOpen) return;
-        
-        if (Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
+        if (!_objectiveStart && Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
         {
-            PerformGameObjectiveLogic();
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                _objectiveStart = true;
+                PerformGameObjectiveLogicServerRpc();
+            }
+            Utils.Instance.TextInformationSystem("Pres E to place the drill", 1, .06f, 2f);
             _isShowingTextFlag = false;
         }
         else if (!_isShowingTextFlag)
@@ -34,19 +38,26 @@ public class OfficeMapGameLogic : NetworkBehaviour
             _isShowingTextFlag = true;
         }
     }
-
-    private void PerformGameObjectiveLogic()
+    
+    
+    [ServerRpc]
+    private void PerformGameObjectiveLogicServerRpc()
     {
-        Utils.Instance.TextInformationSystem("Pres E to place the drill", 1, .06f, 2f);
+        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(30f);
+        PerformGameObjectiveLogicClientRpc();
+    }
+    
+    [ClientRpc]
+    private void PerformGameObjectiveLogicClientRpc()
+    {
+        _gameObjective.transform.Find("Drill").gameObject.SetActive(true);
     }
 
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
         if (!IsServer) return;
         if (sceneName != "Office") return;
-        _theMapIsOpen = true;
-        _clientGameObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().gameObject;
-        _gameObjective = GameObject.Find("GameObjective");
         
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -61,9 +72,17 @@ public class OfficeMapGameLogic : NetworkBehaviour
         List<ulong> playerIds = new List<ulong>{clientId};
         PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
-        
+        StartingMapSetupClientRpc(clientRpcParams);
         // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
         // gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
+    }
+    
+    [ClientRpc]
+    private void StartingMapSetupClientRpc(ClientRpcParams clientRpcParams)
+    {
+        _clientGameObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().gameObject;
+        _gameObjective = GameObject.Find("GameObjective");
+        _theMapIsOpen = true;
     }
 
     [ClientRpc]
