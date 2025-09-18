@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -51,9 +53,22 @@ public class OfficeMapGameLogic : NetworkBehaviour
     [ClientRpc]
     private void PerformGameObjectiveLogicClientRpc()
     {
+        Utils.Instance.TextInformationSystem("Drill was planted", 0, .06f, 2f);
         _gameObjective.transform.Find("Drill").gameObject.SetActive(true);
+        StartCoroutine(StartDrillTimerFinishVisuals(30));
     }
+    
 
+    IEnumerator StartDrillTimerFinishVisuals(int durationTime)
+    {
+        int remainingTime = durationTime;
+        while (remainingTime >= 0)
+        {
+            yield return new WaitForSeconds(1f);
+            remainingTime -= 1;
+        }
+        Utils.Instance.TextInformationSystem("Raiders won", 0, .06f, 2f);
+    }
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
         if (!IsServer) return;
@@ -73,8 +88,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
         PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
         StartingMapSetupClientRpc(clientRpcParams);
-        // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
-        // gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
+        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
     }
     
     [ClientRpc]
