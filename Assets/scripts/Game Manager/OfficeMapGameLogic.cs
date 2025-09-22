@@ -10,6 +10,9 @@ public class OfficeMapGameLogic : NetworkBehaviour
 {
     public static OfficeMapGameLogic Instance;
     public static GameObject serverGameObjectReference;
+
+    public GameObject skillCheckMinGame;
+    
     private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
     
@@ -39,6 +42,23 @@ public class OfficeMapGameLogic : NetworkBehaviour
             Utils.Instance.StopTextInformationSystem(1);
             _isShowingTextFlag = true;
         }
+
+        
+        if (_objectiveStart && Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                _objectiveStart = true;
+                PerformDefuseAction();
+            }
+            Utils.Instance.TextInformationSystem("Pres E to Defuse the drill", 1, .06f, 2f);
+            _isShowingTextFlag = false;
+        }
+        else if (!_isShowingTextFlag)
+        {
+            Utils.Instance.StopTextInformationSystem(1);
+            _isShowingTextFlag = true;
+        }
     }
     
     
@@ -58,6 +78,24 @@ public class OfficeMapGameLogic : NetworkBehaviour
         StartCoroutine(StartDrillTimerFinishVisuals(30));
     }
     
+    private void PerformDefuseAction()
+    {
+        SkillCheckMInigameLogic.OnSucceedSkillCheckMiniGame += DefuseGameObjectiveLogicServerRpc;
+        skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StartSkillCheckMiniGame();
+    }
+    
+    [ServerRpc]
+    private void DefuseGameObjectiveLogicServerRpc()
+    {
+        
+        DefuseGameObjectiveLogicClientRpc();
+    }
+    
+    [ClientRpc]
+    private void DefuseGameObjectiveLogicClientRpc()
+    {
+        
+    }
 
     IEnumerator StartDrillTimerFinishVisuals(int durationTime)
     {
@@ -88,8 +126,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
         PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
         PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
         StartingMapSetupClientRpc(clientRpcParams);
-        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
-        gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
+        // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        // gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);
     }
     
     [ClientRpc]
