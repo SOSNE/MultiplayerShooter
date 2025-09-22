@@ -27,38 +27,58 @@ public class OfficeMapGameLogic : NetworkBehaviour
     private void Update()
     {
         if(!_theMapIsOpen) return;
-        if (!_objectiveStart && Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
+        float distance = Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position);
+
+        if (!_objectiveStart) // BEFORE placing drill
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (distance <= 2f)
             {
-                _objectiveStart = true;
-                PerformGameObjectiveLogicServerRpc();
+                if (!_isShowingTextFlag)
+                {
+                    Utils.Instance.TextInformationSystem("Press E to place the drill", 1, .06f, 2f);
+                    _isShowingTextFlag = true;
+                }
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    PerformGameObjectiveLogicServerRpc();
+                }
+
+                if (Input.GetKeyUp(KeyCode.E))
+                {
+                    _objectiveStart = true;
+                    Utils.Instance.StopTextInformationSystem(1); // clear old text
+                    _isShowingTextFlag = false;
+                }
             }
-            Utils.Instance.TextInformationSystem("Pres E to place the drill", 1, .06f, 2f);
-            _isShowingTextFlag = false;
+            else if (_isShowingTextFlag) // left range
+            {
+                Utils.Instance.StopTextInformationSystem(1);
+                _isShowingTextFlag = false;
+            }
         }
-        else if (!_isShowingTextFlag)
+        else // AFTER drill placed → defuse mode
         {
-            Utils.Instance.StopTextInformationSystem(1);
-            _isShowingTextFlag = true;
+            if (distance <= 2f)
+            {
+                if (!_isShowingTextFlag)
+                {
+                    Utils.Instance.TextInformationSystem("Press E to defuse the drill", 1, .06f, 2f);
+                    _isShowingTextFlag = true;
+                }
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    PerformDefuseAction();
+                }
+            }
+            else if (_isShowingTextFlag) // left range
+            {
+                Utils.Instance.StopTextInformationSystem(1);
+                _isShowingTextFlag = false;
+            }
         }
 
-        
-        if (_objectiveStart && Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position) <= 2f)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                _objectiveStart = true;
-                PerformDefuseAction();
-            }
-            Utils.Instance.TextInformationSystem("Pres E to Defuse the drill", 1, .06f, 2f);
-            _isShowingTextFlag = false;
-        }
-        else if (!_isShowingTextFlag)
-        {
-            Utils.Instance.StopTextInformationSystem(1);
-            _isShowingTextFlag = true;
-        }
     }
     
     
