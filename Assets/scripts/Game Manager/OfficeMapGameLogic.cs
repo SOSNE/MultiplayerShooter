@@ -5,9 +5,18 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class OfficeMapGameLogic : NetworkBehaviour
 {
+    //TODO when one tim kill whole other team then we have to stop objective coroutine.
+    //Handling of when player connect on the other map. current setup dont handle tact for example. OnClientSceneLoaded is
+    //called only when player first load the lobby.
+    
+    
+    
+    public NetworkVariable<bool> objectiveStart = new NetworkVariable<bool>(false);
+    
     public static OfficeMapGameLogic Instance;
     public static GameObject serverGameObjectReference;
 
@@ -15,7 +24,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
     
     private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
-    private Coroutine _objcetiveDrillCoroutine;
+    private Coroutine _objectiveDrillCoroutine;
+    
     
     private void Awake()
     {
@@ -23,14 +33,14 @@ public class OfficeMapGameLogic : NetworkBehaviour
         
     }
     
-    private bool _isShowingTextFlag = false, _objectiveStart = false;
+    private bool _isShowingTextFlag = false;
 
     private void Update()
     {
         if(!_theMapIsOpen) return;
         float distance = Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position);
 
-        if (!_objectiveStart) // BEFORE placing drill
+        if (!objectiveStart.Value) // BEFORE placing drill
         {
             if (distance <= 2f)
             {
@@ -47,7 +57,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
 
                 if (Input.GetKeyUp(KeyCode.E))
                 {
-                    _objectiveStart = true;
+                    SetValueToObjectiveStartServerRpc(true);
+                    // objectiveStart = true;
                     Utils.Instance.StopTextInformationSystem(1); // clear old text
                     _isShowingTextFlag = false;
                 }
@@ -82,43 +93,25 @@ public class OfficeMapGameLogic : NetworkBehaviour
 
     }
     
-    
-    [ServerRpc]
+    //Raiders
+    [ServerRpc(RequireOwnership = false)]
     private void PerformGameObjectiveLogicServerRpc()
     {
         GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
-        gameManager.StartCountdownTimerWithServerTimeClientRpc(30f);
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(30f, 1);
         PerformGameObjectiveLogicClientRpc();
     }
     
     [ClientRpc]
     private void PerformGameObjectiveLogicClientRpc()
     {
+        print("start rpc");
+
         Utils.Instance.TextInformationSystem("Drill has been planted", 0, .06f, 2f);
         _gameObjective.transform.Find("Drill").gameObject.SetActive(true);
-        _objcetiveDrillCoroutine = StartCoroutine(StartDrillTimerFinishVisuals(30));
+        _objectiveDrillCoroutine = StartCoroutine(StartDrillTimerFinishVisuals(30));
     }
     
-    private void PerformDefuseAction()
-    {
-        SkillCheckMInigameLogic.OnSucceedSkillCheckMiniGame += DefuseGameObjectiveLogicServerRpc;
-        skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StartSkillCheckMiniGame();
-    }
-    
-    [ServerRpc]
-    private void DefuseGameObjectiveLogicServerRpc()
-    {
-        RestartGameOfficeMap(3, 1);
-        DefuseGameObjectiveLogicClientRpc();
-    }
-    
-    [ClientRpc]
-    private void DefuseGameObjectiveLogicClientRpc()
-    {
-        StopCoroutine(_objcetiveDrillCoroutine);
-        Utils.Instance.TextInformationSystem("Drill has been disarmed", 0, .06f, 2f);
-    }
-
     IEnumerator StartDrillTimerFinishVisuals(int durationTime)
     {
         int remainingTime = durationTime;
@@ -130,9 +123,32 @@ public class OfficeMapGameLogic : NetworkBehaviour
         Utils.Instance.TextInformationSystem("Raiders won", 0, .06f, 2f);
         if (IsServer)
         {
-            RestartGameOfficeMap(3, 0);
+            RestartGameOfficeMapClientRpc();
         }
     }
+    
+    //Agents
+    private void PerformDefuseAction()
+    {
+        SkillCheckMInigameLogic.OnSucceedSkillCheckMiniGame += DefuseGameObjectiveLogicServerRpc;
+        skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StartSkillCheckMiniGame();
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    private void DefuseGameObjectiveLogicServerRpc()
+    {
+        RestartGameOfficeMap(3, 0);
+        DefuseGameObjectiveLogicClientRpc();
+    }
+    
+    [ClientRpc]
+    private void DefuseGameObjectiveLogicClientRpc()
+    {
+        StopCoroutine(_objectiveDrillCoroutine);
+        Utils.Instance.TextInformationSystem("Drill has been disarmed", 0, .06f, 2f);
+    }
+
+    
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
         if (!IsServer) return;
@@ -189,9 +205,25 @@ public class OfficeMapGameLogic : NetworkBehaviour
     private void RestartGameOfficeMap(float duration, int teamIndexOverwrite)
     {
         GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
-        gameManager.StartCountdownTimerWithServerTimeClientRpc(duration + 1);
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(duration + 1, 1);
         StartCoroutine(gameManager.NextRoundCoroutine(duration ,teamIndexOverwrite));
-        _objectiveStart = false;
+        RestartGameOfficeMapClientRpc();
+    }
+
+    [ClientRpc]
+    private void RestartGameOfficeMapClientRpc()
+    {
+        SetValueToObjectiveStartServerRpc(false);
+        // objectiveStart = false;
+        skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StopSkillCheckMiniGame();
         _gameObjective.transform.Find("Drill").gameObject.SetActive(false);
+    }
+    
+    
+    [ServerRpc(RequireOwnership = false)]
+
+    public void SetValueToObjectiveStartServerRpc(bool val)
+    {
+        objectiveStart.Value = val;
     }
 }

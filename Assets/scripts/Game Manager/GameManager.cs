@@ -268,7 +268,7 @@ public class GameManager : NetworkBehaviour
         gameObject.GetComponent<playerMovment>().camera = _createdCamera.GetComponent<Camera>();
     }
     
-    private IEnumerator CountdownTimerStart(float time)
+    private IEnumerator CountdownTimerStart(float time, int witchTeamGetsPoints)
     {
         _remainingTime = time;
         while (_remainingTime >= 0)
@@ -280,12 +280,12 @@ public class GameManager : NetworkBehaviour
         }
         if (IsServer)
         {
-            StartCoroutine(NextRoundCoroutine(2, 10, 0));
+            StartCoroutine(NextRoundCoroutine(2, witchTeamGetsPoints, 1));
         }
     }
 
     [ClientRpc]
-    public void StartCountdownTimerWithServerTimeClientRpc(float time, ClientRpcParams serverRpcParams = default)
+    public void StartCountdownTimerWithServerTimeClientRpc(float time, int witchTeamGetsPoints, ClientRpcParams serverRpcParams = default)
     {
         //When called, it is being done on the first player game object.
         //But _timerCoroutine and time are static, so it doesn't matter, I think
@@ -293,7 +293,7 @@ public class GameManager : NetworkBehaviour
         {
             StopCoroutine(_timerCoroutine);
         }
-        _timerCoroutine = StartCoroutine(CountdownTimerStart(time));
+        _timerCoroutine = StartCoroutine(CountdownTimerStart(time, witchTeamGetsPoints));
     }
     
     // this is in ServerRpc
@@ -575,7 +575,7 @@ public class GameManager : NetworkBehaviour
                 TargetClientIds = new ulong[]{clientId}
             }
         };
-        StartCountdownTimerWithServerTimeClientRpc(_remainingTime, clientRpcParams);
+        StartCountdownTimerWithServerTimeClientRpc(_remainingTime,1, clientRpcParams);
         NewClientHealthSetup(clientId);
     }
     
@@ -681,7 +681,7 @@ public class GameManager : NetworkBehaviour
     private void RestartTimer()
     {
         _remainingTime = 120;
-        StartCountdownTimerWithServerTimeClientRpc(_remainingTime);
+        StartCountdownTimerWithServerTimeClientRpc(_remainingTime, 1);
     }
     
     public IEnumerator NextRoundCoroutine(float duration, int teamIndexOverwrite, ulong clientId = default)

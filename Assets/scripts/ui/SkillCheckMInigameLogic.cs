@@ -17,6 +17,8 @@ public class SkillCheckMInigameLogic : NetworkBehaviour
 
     private float _t = 0f;
     private bool _goingUp = true;
+    private Coroutine _miniGameCoroutine;
+
 
     private void OnDisable()
     {
@@ -29,6 +31,13 @@ public class SkillCheckMInigameLogic : NetworkBehaviour
         skillCheckPoints = -500;
         gameObject.SetActive(true);
         StartCoroutine(SkillCheckCoroutine());
+    }
+    
+    public void StopSkillCheckMiniGame()
+    {
+        if (_miniGameCoroutine != null) StopCoroutine(_miniGameCoroutine);
+        _miniGameCoroutine = null;
+        gameObject.SetActive(false);
     }
 
     private IEnumerator SkillCheckCoroutine()
@@ -89,6 +98,7 @@ public class SkillCheckMInigameLogic : NetworkBehaviour
             if (skillCheckPoints >= 0)
             {
                 OnSucceedSkillCheckMiniGame?.Invoke();
+                _miniGameCoroutine = null;
                 gameObject.SetActive(false);
                 yield break; 
             }
