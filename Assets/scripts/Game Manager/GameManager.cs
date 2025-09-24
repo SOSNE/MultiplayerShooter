@@ -280,7 +280,7 @@ public class GameManager : NetworkBehaviour
         }
         if (IsServer)
         {
-            StartCoroutine(NextRoundCoroutine(2, 0, 10));
+            StartCoroutine(NextRoundCoroutine(2, 10, 0));
         }
     }
 
@@ -367,7 +367,7 @@ public class GameManager : NetworkBehaviour
         if ((_playersAlive[0] <= 0 || _playersAlive[1] <= 0) && !_roundIsRestarting)
         {
             _roundIsRestarting = true;
-            StartCoroutine(NextRoundCoroutine(2, currentClientId, teamIndexOverwrite));
+            StartCoroutine(NextRoundCoroutine(2, teamIndexOverwrite, currentClientId));
         }
     }
 
@@ -684,7 +684,7 @@ public class GameManager : NetworkBehaviour
         StartCountdownTimerWithServerTimeClientRpc(_remainingTime);
     }
     
-    IEnumerator NextRoundCoroutine(float duration, ulong clientId, int teamIndexOverwrite)
+    public IEnumerator NextRoundCoroutine(float duration, int teamIndexOverwrite, ulong clientId = default)
     {
         UpdatePointScoreDictionary(clientId, teamIndexOverwrite);
         yield return new WaitForSeconds(duration);

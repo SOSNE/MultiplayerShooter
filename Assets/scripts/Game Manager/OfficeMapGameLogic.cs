@@ -15,6 +15,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
     
     private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
+    private Coroutine _objcetiveDrillCoroutine;
     
     private void Awake()
     {
@@ -93,9 +94,9 @@ public class OfficeMapGameLogic : NetworkBehaviour
     [ClientRpc]
     private void PerformGameObjectiveLogicClientRpc()
     {
-        Utils.Instance.TextInformationSystem("Drill was planted", 0, .06f, 2f);
+        Utils.Instance.TextInformationSystem("Drill has been planted", 0, .06f, 2f);
         _gameObjective.transform.Find("Drill").gameObject.SetActive(true);
-        StartCoroutine(StartDrillTimerFinishVisuals(30));
+        _objcetiveDrillCoroutine = StartCoroutine(StartDrillTimerFinishVisuals(30));
     }
     
     private void PerformDefuseAction()
@@ -107,14 +108,15 @@ public class OfficeMapGameLogic : NetworkBehaviour
     [ServerRpc]
     private void DefuseGameObjectiveLogicServerRpc()
     {
-        
+        RestartGameOfficeMap(3, 1);
         DefuseGameObjectiveLogicClientRpc();
     }
     
     [ClientRpc]
     private void DefuseGameObjectiveLogicClientRpc()
     {
-        
+        StopCoroutine(_objcetiveDrillCoroutine);
+        Utils.Instance.TextInformationSystem("Drill has been disarmed", 0, .06f, 2f);
     }
 
     IEnumerator StartDrillTimerFinishVisuals(int durationTime)
@@ -126,6 +128,10 @@ public class OfficeMapGameLogic : NetworkBehaviour
             remainingTime -= 1;
         }
         Utils.Instance.TextInformationSystem("Raiders won", 0, .06f, 2f);
+        if (IsServer)
+        {
+            RestartGameOfficeMap(3, 0);
+        }
     }
     public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
@@ -178,5 +184,14 @@ public class OfficeMapGameLogic : NetworkBehaviour
         
         GameObject spawnPoint = GameObject.Find($"Team{currentPlayerData.Team}Spawn");
         Utils.Instance.SpawnPlayerOnSpawnPointClientRpc(currentPlayerData.PlayerNetworkObjectReference, spawnPoint);
+    }
+
+    private void RestartGameOfficeMap(float duration, int teamIndexOverwrite)
+    {
+        GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
+        gameManager.StartCountdownTimerWithServerTimeClientRpc(duration + 1);
+        StartCoroutine(gameManager.NextRoundCoroutine(duration ,teamIndexOverwrite));
+        _objectiveStart = false;
+        _gameObjective.transform.Find("Drill").gameObject.SetActive(false);
     }
 }
