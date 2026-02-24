@@ -85,6 +85,7 @@ public struct DataToSendOverNetwork: INetworkSerializable
 public class GameManager : NetworkBehaviour
 {
     public static List<PlayerData> AllPlayersData = new List<PlayerData>();
+    public static Action addToGameRestartQueue;
     private static Dictionary<ulong, int> teamsDictionary = new Dictionary<ulong, int>();
     private static List<int> _playersAlive = new List<int>();
     private TextMeshProUGUI teamOneWinCounter, teamTwoWinCounter;
@@ -92,7 +93,8 @@ public class GameManager : NetworkBehaviour
     private Transform _team0Spawn, _team1Spawn;
     public GameObject camera;
     [FormerlySerializedAs("pistol")] public GameObject weapon;
-    private bool _teamAddingSetupDone = false, _roundIsRestarting = false;
+    public bool teamAddingSetupDone = false;
+    private bool _roundIsRestarting = false;
     private static float _remainingTime = 120;
     private static Coroutine _timerCoroutine;
     public bool isAlive = true;
@@ -159,8 +161,8 @@ public class GameManager : NetworkBehaviour
     {
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
-        yield return new WaitUntil(() => _teamAddingSetupDone);
-
+        yield return new WaitUntil(() => teamAddingSetupDone);
+        
         gameObject.GetComponent<weaponSpawning>().SpawnWeapon();
         
         yield return new WaitUntil(() => gameObject.GetComponent<weaponSpawning>().isWeaponSpawned);
@@ -177,7 +179,7 @@ public class GameManager : NetworkBehaviour
         GameObject.Find("UiControler").GetComponent<uiControler>()
             .UpdateMoneyAmountUiServerRpc(60);
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconect;
-        NetworkManager.Singleton.SceneManager.OnLoadComplete += OfficeMapGameLogic.Instance.OnClientSceneLoaded;
+        // NetworkManager.Singleton.SceneManager.OnLoadComplete += OfficeMapGameLogic.Instance.OnClientSceneLoaded;
         if (IsServer)
         {
             OfficeMapGameLogic.serverGameObjectReference = gameObject;
@@ -197,7 +199,7 @@ public class GameManager : NetworkBehaviour
     void OnDisable() {
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconect;
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientConnected;
-        NetworkManager.Singleton.SceneManager.OnLoadComplete -= OfficeMapGameLogic.Instance.OnClientSceneLoaded;
+        // NetworkManager.Singleton.SceneManager.OnLoadComplete -= OfficeMapGameLogic.Instance.OnClientSceneLoaded;
 
     }
     
@@ -258,7 +260,7 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void AcknowledgeTeamAddingSetupClientRpc()
     {
-        _teamAddingSetupDone = true;
+        teamAddingSetupDone = true;
     }
 
     public void CreateCamera()
@@ -694,6 +696,8 @@ public class GameManager : NetworkBehaviour
         RestartPositions();
         RestartWeaponsMagazinesClientRpc();
         RestartTimer();
+        addToGameRestartQueue?.Invoke();
+        addToGameRestartQueue = null;
         foreach (PlayerData playerData in AllPlayersData)
         {
             turnOfRagdollOnSelectedPlayerClientRpc(playerData.PlayerNetworkObjectReference);

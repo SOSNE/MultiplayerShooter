@@ -142,7 +142,7 @@ public class Utils : NetworkBehaviour
         return null;
     }
 
-    public static List<PlayerData> GetSelectedPlayersData(List<ulong> playerIds)
+    public static List<PlayerData> GetSelectedPlayersDataList(List<ulong> playerIds)
     {
         List<PlayerData> selectedPlayers = new List<PlayerData>(); 
         foreach (var data in GameManager.AllPlayersData)
@@ -153,6 +153,19 @@ public class Utils : NetworkBehaviour
             }
         }
         return selectedPlayers;
+    }
+    
+    public static PlayerData GetSelectedPlayerData(ulong playerId)
+    {
+        foreach (var data in GameManager.AllPlayersData)
+        {
+            if (data.ClientId == playerId)
+            {
+                return data;
+            }
+        }
+        Debug.Log("Data not found for: " + playerId);
+        return default; // if not found
     }
     
     [ClientRpc]
@@ -223,5 +236,15 @@ public class Utils : NetworkBehaviour
             yield return new WaitForSeconds(textTimeToLive);
             Destroy(textMeshPro.gameObject);
         }
+    }
+    
+    public NetworkObject GetPlayerObjectUsingClientId(ulong clientId)
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
+        {
+            return client.PlayerObject;
+        }
+
+        return null;
     }
 }

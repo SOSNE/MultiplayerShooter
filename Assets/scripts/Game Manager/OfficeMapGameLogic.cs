@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 public class OfficeMapGameLogic : NetworkBehaviour
 {
-    //TODO when one tim kill whole other team then we have to stop objective coroutine.
     //Handling of when player connect on the other map. current setup dont handle tact for example. OnClientSceneLoaded is
     //called only when player first load the lobby.
     
@@ -25,12 +25,25 @@ public class OfficeMapGameLogic : NetworkBehaviour
     private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
     private Coroutine _objectiveDrillCoroutine;
-    
-    
-    private void Awake()
+
+
+    public override void OnNetworkSpawn()
     {
-        Instance = this;
-        
+        if (IsServer)
+        {
+            Instance = this;
+            print("subscribed");
+            //this is called when any client loads the scene. and subscribing
+            //to it will invoke this function when it happens.
+            //OnSceneEvent handle normal scene changes ass also scene synchronizations
+            //when player joins while new scene is already loaded
+            NetworkManager.SceneManager.OnSceneEvent += OnSceneEvent;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (IsServer) NetworkManager.Singleton.SceneManager.OnSceneEvent -= OnSceneEvent;
     }
     
     private bool _isShowingTextFlag = false;
@@ -105,11 +118,10 @@ public class OfficeMapGameLogic : NetworkBehaviour
     [ClientRpc]
     private void PerformGameObjectiveLogicClientRpc()
     {
-        print("start rpc");
-
         Utils.Instance.TextInformationSystem("Drill has been planted", 0, .06f, 2f);
         _gameObjective.transform.Find("Drill").gameObject.SetActive(true);
         _objectiveDrillCoroutine = StartCoroutine(StartDrillTimerFinishVisuals(30));
+        GameManager.addToGameRestartQueue += ResetObjectiveCoroutineClientRpc;
     }
     
     IEnumerator StartDrillTimerFinishVisuals(int durationTime)
@@ -126,6 +138,13 @@ public class OfficeMapGameLogic : NetworkBehaviour
             RestartGameOfficeMapClientRpc();
         }
     }
+    
+    [ClientRpc]
+    private void ResetObjectiveCoroutineClientRpc()
+    {
+       StopCoroutine(_objectiveDrillCoroutine);
+    }
+    
     
     //Agents
     private void PerformDefuseAction()
@@ -148,11 +167,28 @@ public class OfficeMapGameLogic : NetworkBehaviour
         Utils.Instance.TextInformationSystem("Drill has been disarmed", 0, .06f, 2f);
     }
 
-    
-    public void OnClientSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    public void OnSceneEvent(SceneEvent sceneEvent)
     {
+        // print(" invoce subscribed");
         if (!IsServer) return;
-        if (sceneName != "Office") return;
+        if (sceneEvent.SceneEventType == SceneEventType.LoadComplete || 
+            sceneEvent.SceneEventType == SceneEventType.SynchronizeComplete)
+        {
+            // This is your Unique ID for the client
+            StartCoroutine(SetupPlayerInNewMap(sceneEvent));
+        }
+    }
+    
+    private IEnumerator SetupPlayerInNewMap(SceneEvent sceneEvent)
+    {
+        ulong clientId = sceneEvent.ClientId;
+        print("startCoutr");
+
+        yield return new WaitUntil(() => Utils.Instance.GetPlayerObjectUsingClientId(clientId).GetComponent<GameManager>().teamAddingSetupDone);
+
+        string sceneName = sceneEvent.SceneName;
+            
+        if (sceneName != "Office") yield break;
         
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
@@ -164,8 +200,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
         
         TeleportPlayersToSpawn(clientId);
         
-        List<ulong> playerIds = new List<ulong>{clientId};
-        PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
+        PlayerData currentPlayerData = Utils.GetSelectedPlayerData(clientId);
         PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
         StartingMapSetupClientRpc(clientRpcParams);
         // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
@@ -195,9 +230,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
     
     private void TeleportPlayersToSpawn(ulong clientId)
     {
-        List<ulong> playerIds = new List<ulong>{clientId};
-        PlayerData currentPlayerData = Utils.GetSelectedPlayersData(playerIds)[0];
-        
+        PlayerData currentPlayerData = Utils.GetSelectedPlayerData(clientId);
+        print(currentPlayerData.PlayerName);
         GameObject spawnPoint = GameObject.Find($"Team{currentPlayerData.Team}Spawn");
         Utils.Instance.SpawnPlayerOnSpawnPointClientRpc(currentPlayerData.PlayerNetworkObjectReference, spawnPoint);
     }
