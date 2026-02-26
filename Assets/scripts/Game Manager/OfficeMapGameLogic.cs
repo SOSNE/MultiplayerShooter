@@ -25,6 +25,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
     private GameObject _clientGameObject, _gameObjective;
     private bool _theMapIsOpen = false;
     private Coroutine _objectiveDrillCoroutine;
+    private PlayerData _currentPlayerData;
 
 
     public override void OnNetworkSpawn()
@@ -55,6 +56,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
 
         if (!objectiveStart.Value) // BEFORE placing drill
         {
+            if (_currentPlayerData.Team == 0) return;
+
             if (distance <= 2f)
             {
                 if (!_isShowingTextFlag)
@@ -84,17 +87,22 @@ public class OfficeMapGameLogic : NetworkBehaviour
         }
         else // AFTER drill placed → defuse mode
         {
+            if (_currentPlayerData.Team == 1) return;
             if (distance <= 2f)
             {
                 if (!_isShowingTextFlag)
                 {
-                    Utils.Instance.TextInformationSystem("Press E to defuse the drill", 1, .06f, 2f);
+                    Utils.Instance.TextInformationSystem("Hold E to defuse the drill", 1, .03f, 2f);
                     _isShowingTextFlag = true;
                 }
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     PerformDefuseAction();
+                }
+                else if (Input.GetKeyUp(KeyCode.E))
+                {
+                    StopDefuseActionWithoutCompletion();
                 }
             }
             else if (_isShowingTextFlag) // left range
@@ -152,6 +160,11 @@ public class OfficeMapGameLogic : NetworkBehaviour
         SkillCheckMInigameLogic.OnSucceedSkillCheckMiniGame += DefuseGameObjectiveLogicServerRpc;
         skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StartSkillCheckMiniGame();
     }
+    private void StopDefuseActionWithoutCompletion()
+    {
+        SkillCheckMInigameLogic.OnSucceedSkillCheckMiniGame -= DefuseGameObjectiveLogicServerRpc;
+        skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StopSkillCheckMiniGame();
+    }
     
     [ServerRpc(RequireOwnership = false)]
     private void DefuseGameObjectiveLogicServerRpc()
@@ -200,8 +213,8 @@ public class OfficeMapGameLogic : NetworkBehaviour
         
         TeleportPlayersToSpawn(clientId);
         
-        PlayerData currentPlayerData = Utils.GetSelectedPlayerData(clientId);
-        PlayStartingTextMessageClientRpc(currentPlayerData.Team, clientRpcParams);
+        _currentPlayerData = Utils.GetSelectedPlayerData(clientId);
+        PlayStartingTextMessageClientRpc(_currentPlayerData.Team, clientRpcParams);
         StartingMapSetupClientRpc(clientRpcParams);
         // GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
         // gameManager.StartCountdownTimerWithServerTimeClientRpc(10f);

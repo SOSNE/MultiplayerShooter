@@ -247,4 +247,8 @@ public class Utils : NetworkBehaviour
 
         return null;
     }
+    public ulong GetCurrentPlayerId()
+    {
+        return NetworkManager.Singleton.LocalClientId;
+    }
 }
