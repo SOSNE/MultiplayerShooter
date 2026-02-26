@@ -15,7 +15,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
     
     
     
-    public NetworkVariable<bool> objectiveStart = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> objectiveStart = new NetworkVariable<bool>(false), objectiveStopted  = new NetworkVariable<bool>(false);
     
     public static OfficeMapGameLogic Instance;
     public static GameObject serverGameObjectReference;
@@ -52,6 +52,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
     private void Update()
     {
         if(!_theMapIsOpen) return;
+        if(objectiveStopted.Value) return;
         float distance = Vector3.Distance(_clientGameObject.transform.position, _gameObjective.transform.position);
 
         if (!objectiveStart.Value) // BEFORE placing drill
@@ -169,6 +170,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void DefuseGameObjectiveLogicServerRpc()
     {
+        Utils.Instance.StopTextInformationSystem(1);
         RestartGameOfficeMap(3, 0);
         DefuseGameObjectiveLogicClientRpc();
     }
@@ -253,7 +255,10 @@ public class OfficeMapGameLogic : NetworkBehaviour
     {
         GameManager gameManager = serverGameObjectReference.GetComponent<GameManager>();
         gameManager.StartCountdownTimerWithServerTimeClientRpc(duration + 1, 1);
-        StartCoroutine(gameManager.NextRoundCoroutine(duration ,teamIndexOverwrite));
+        StartCoroutine(gameManager.NextRoundCoroutine(duration ,teamIndexOverwrite, additionalLogic: () =>
+        {
+            objectiveStopted.Value = false;
+        }));
         RestartGameOfficeMapClientRpc();
     }
 
@@ -264,6 +269,7 @@ public class OfficeMapGameLogic : NetworkBehaviour
         // objectiveStart = false;
         skillCheckMinGame.GetComponent<SkillCheckMInigameLogic>().StopSkillCheckMiniGame();
         _gameObjective.transform.Find("Drill").gameObject.SetActive(false);
+        objectiveStopted.Value = true;
     }
     
     

@@ -280,6 +280,7 @@ public class GameManager : NetworkBehaviour
             yield return new WaitForSeconds(1f);
             _remainingTime -= 1f;
         }
+        
         if (IsServer)
         {
             StartCoroutine(NextRoundCoroutine(2, witchTeamGetsPoints, 1));
@@ -686,7 +687,7 @@ public class GameManager : NetworkBehaviour
         StartCountdownTimerWithServerTimeClientRpc(_remainingTime, 1);
     }
     
-    public IEnumerator NextRoundCoroutine(float duration, int teamIndexOverwrite, ulong clientId = default)
+    public IEnumerator NextRoundCoroutine(float duration, int teamIndexOverwrite, ulong clientId = default, Action additionalLogic = default)
     {
         UpdatePointScoreDictionary(clientId, teamIndexOverwrite);
         yield return new WaitForSeconds(duration);
@@ -696,6 +697,7 @@ public class GameManager : NetworkBehaviour
         RestartPositions();
         RestartWeaponsMagazinesClientRpc();
         RestartTimer();
+        additionalLogic?.Invoke();//this and next can be merge in one.
         addToGameRestartQueue?.Invoke();
         addToGameRestartQueue = null;
         foreach (PlayerData playerData in AllPlayersData)
